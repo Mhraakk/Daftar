@@ -1,0 +1,14 @@
+{
+  "enabledPlugins": {
+    "litigation-legal@claude-for-legal": true,
+    "commercial-legal@claude-for-legal": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-for-legal": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-for-legal"
+      }
+    }
+  }
+}

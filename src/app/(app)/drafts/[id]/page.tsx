@@ -1,7 +1,8 @@
-import { ExternalLink, History, Plus, Trash2 } from "lucide-react";
+import { ExternalLink, History, Plus, Sparkles, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActionButton } from "@/components/ui/action-button";
+import { LinkButton } from "@/components/ui/button";
 import { FormDialog } from "@/components/ui/form-dialog";
 import { DL, PageHeader, Panel } from "@/components/ui/page";
 import { Seal, StatusSeal } from "@/components/ui/seal";
@@ -17,6 +18,10 @@ import { finalizeBlockers } from "@/server/drafts";
 import { addSourceAction, removeSourceAction, restoreDraftAction, verifySourceAction } from "../actions";
 import { DraftWorkspace } from "./workspace";
 
+const TIMELINE_LIMIT = 50;
+const NOTE_ROWS = 2;
+// eslint-disable-next-line ts-patterns/no-magic-numbers -- FieldDef.span needs the literal type 2
+const FULL = 2 as const;
 const SOURCE_LABEL: Record<string, string> = { MANUAL: "ویرایش", TEMPLATE: "ایجاد از قالب", AI: "هوش مصنوعی", RESTORE: "بازگردانی" };
 const ORIGIN: Record<string, string> = { USER: "واردشده توسط کاربر", AI: "پیشنهاد هوش مصنوعی — تأییدنشده", LIBRARY: "کتابخانه حقوقی دفتر", WEB: "منبع وب" };
 
@@ -41,7 +46,7 @@ export default async function DraftPage({ params }: { params: Promise<{ id: stri
   if (!d) notFound();
   const [names, timeline, fin] = await Promise.all([
     userNames([d.authorId, d.reviewerId, d.approvedById, ...d.versions.map((v) => v.authorId), ...d.reviews.map((r) => r.reviewerId)]),
-    activityFor({ entityType: "LegalDraft", entityId: id }, 50),
+    activityFor({ entityType: "LegalDraft", entityId: id }, TIMELINE_LIMIT),
     d.status === "FINAL" ? db.activityLog.findFirst({ where: { entityType: "LegalDraft", entityId: id, action: "draft.finalized" }, orderBy: { createdAt: "desc" } }) : null,
   ]);
   const editableStatus = d.status === "DRAFT" || d.status === "CHANGES_REQUESTED";
@@ -65,6 +70,12 @@ export default async function DraftPage({ params }: { params: Promise<{ id: stri
             perms={perms} blockers={finalizeBlockers(d)} finalDocId={(fin?.meta as { documentId?: string } | null)?.documentId ?? null} />
         </div>
         <aside className="flex flex-col gap-4">
+          {editable && can(user, "ai.use") && (
+            <Panel title="دستیار هوشمند" icon={<Sparkles />}>
+              <p className="mb-2 text-xs text-ink-2">بازنویسی رسمی متن این پیش‌نویس؛ نتیجه پس از بررسی شما به‌صورت نسخه تازه اعمال می‌شود.</p>
+              <LinkButton href={`/assistant?draft=${d.id}`} size="sm">بازنویسی رسمی متن</LinkButton>
+            </Panel>
+          )}
           <Panel title="مشخصات">
             <DL cols={1} items={[
               { label: "تنظیم‌کننده", value: names[d.authorId] }, { label: "بررسی‌کننده", value: d.reviewerId && names[d.reviewerId] },
@@ -89,7 +100,7 @@ export default async function DraftPage({ params }: { params: Promise<{ id: stri
           <Panel title={`منابع و مستندات (${faNum(d.sources.length)})`}
             action={d.status !== "FINAL" && can(user, "draft.create") && <FormDialog trigger="افزودن" triggerVariant="ghost" triggerSize="sm" icon={<Plus />} title="افزودن منبع" size="sm" cols={1} action={addSourceAction} hidden={{ draftId: id }} successMessage="منبع افزوده شد."
               description="هر استناد قانونی یا رویه‌ای باید قابل ردیابی به منبع معتبر باشد."
-              fields={[{ name: "citation", label: "متن ارجاع", required: true, placeholder: "مثلاً ماده ۳۳۶ قانون آیین دادرسی مدنی" }, { name: "url", label: "نشانی منبع رسمی", ltr: true, placeholder: "https://…" }, { name: "note", label: "توضیح", type: "textarea", rows: 2 }]} />}>
+              fields={[{ name: "citation", label: "متن ارجاع", required: true, placeholder: "مثلاً ماده ۳۳۶ قانون آیین دادرسی مدنی" }, { name: "url", label: "نشانی منبع رسمی", ltr: true, placeholder: "https://…" }, { name: "note", label: "توضیح", type: "textarea", rows: NOTE_ROWS }]} />}>
             {d.sources.length === 0 ? <p className="text-sm text-ink-3">منبعی ثبت نشده است. استنادهای قانونی متن را اینجا با نشانی منبع ثبت کنید تا بررسی‌کننده بتواند آن‌ها را تطبیق دهد.</p> : (
               <ul className="flex flex-col gap-2">{d.sources.map((s) => (
                 <li key={s.id} className="rounded-md border border-line p-2.5 text-sm">

@@ -42,6 +42,7 @@ export const NAV: NavGroup[] = [
       { href: "/admin/audit", label: "تاریخچه فعالیت‌ها", icon: "History", perm: "audit.view" },
       { href: "/admin/automation", label: "اتوماسیون", icon: "Workflow", perm: "automation.manage" },
       { href: "/admin/settings", label: "تنظیمات دفتر", icon: "Settings", perm: "settings.manage" },
+      { href: "/admin/ai", label: "هوش مصنوعی", icon: "BrainCircuit", perm: "ai.configure" },
       { href: "/admin/backup", label: "پشتیبان‌گیری", icon: "DatabaseBackup", perm: "backup.manage" },
     ],
   },

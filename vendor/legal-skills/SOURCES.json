@@ -1,0 +1,7 @@
+{
+  "note": "Vendored legal skills used verbatim by the Daftar app. Refresh with scripts/vendor-legal-skills.sh, then run npm run skills:sync.",
+  "sources": [
+    { "id": "contract-review", "repo": "https://github.com/evolsb/claude-legal-skill", "commit": "bca0d2e9d5ec81298ddfbfde78fa4f38fb4589b0", "license": "MIT", "licenseFile": "contract-review/LICENSE" },
+    { "id": "claude-for-legal", "repo": "https://github.com/anthropics/claude-for-legal", "commit": "4a6c651889c97cc9140580363c73e0eb17379c2b", "license": "Apache-2.0", "licenseFile": "claude-for-legal/LICENSE" }
+  ]
+}

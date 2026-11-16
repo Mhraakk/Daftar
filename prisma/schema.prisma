@@ -65,6 +65,7 @@ model User {
   department         Department?  @relation("DepartmentUsers", fields: [departmentId], references: [id], onDelete: SetNull)
   managedDepartments Department[] @relation("DepartmentManager")
   isActive           Boolean      @default(true)
+  messengerChatId    String?
   mustChangePassword Boolean      @default(false)
   failedLogins       Int          @default(0)
   lockedUntil        DateTime?
@@ -687,6 +688,7 @@ model Notification {
   important  Boolean   @default(false)
   readAt     DateTime?
   createdAt  DateTime  @default(now())
+  pushedAt   DateTime?
 
   @@index([userId, readAt])
   @@index([userId, createdAt])
@@ -931,13 +933,17 @@ model AiInteraction {
   id             String      @id @default(cuid())
   userId         String
   kind           String
+  title          String?
   provider       String
   model          String
   prompt         String
+  request        Json?
   contextSummary String?
   response       String?
-  status         String
+  status         String      @default("QUEUED")
+  stopReason     String?
   error          String?
+  attempts       Int         @default(0)
   inputTokens    Int?
   outputTokens   Int?
   durationMs     Int?
@@ -945,13 +951,18 @@ model AiInteraction {
   case           Case?       @relation(fields: [caseId], references: [id], onDelete: SetNull)
   draftId        String?
   draft          LegalDraft? @relation(fields: [draftId], references: [id], onDelete: SetNull)
+  skillRunId     String?
+  skillRun       SkillRun?   @relation(fields: [skillRunId], references: [id], onDelete: Cascade)
   sources        Json?
+  meta           Json?
+  startedAt      DateTime?
+  finishedAt     DateTime?
   createdAt      DateTime    @default(now())
-
-  skillRun SkillRun?
 
   @@index([userId, createdAt])
   @@index([caseId])
+  @@index([status, createdAt])
+  @@index([skillRunId])
 }
 
 model LegalSkill {
@@ -964,9 +975,15 @@ model LegalSkill {
   origin       String
   license      String
   sha256       String
+  path         String   @default("")
+  mode         String   @default("RUN")
+  category     String?
+  version      String?
+  sizeBytes    Int      @default(0)
   enabled      Boolean  @default(true)
   requiresCase Boolean  @default(false)
   titleFa      String?
+  summaryFa    String?
   syncedAt     DateTime @default(now())
 
   runs SkillRun[]
@@ -975,26 +992,34 @@ model LegalSkill {
 }
 
 model SkillRun {
-  id            String         @id @default(cuid())
-  skillId       String
-  skill         LegalSkill     @relation(fields: [skillId], references: [id], onDelete: Restrict)
-  userId        String
-  caseId        String?
-  case          Case?          @relation(fields: [caseId], references: [id], onDelete: SetNull)
-  inputSummary  String
-  documentIds   String[]       @default([])
-  output        String?
-  status        String
-  reviewStatus  String         @default("PENDING_REVIEW")
-  reviewedById  String?
-  reviewedAt    DateTime?
-  reviewNote    String?
-  interactionId String?        @unique
-  interaction   AiInteraction? @relation(fields: [interactionId], references: [id], onDelete: SetNull)
-  createdAt     DateTime       @default(now())
+  id           String     @id @default(cuid())
+  skillId      String
+  skill        LegalSkill @relation(fields: [skillId], references: [id], onDelete: Restrict)
+  userId       String
+  caseId       String?
+  case         Case?      @relation(fields: [caseId], references: [id], onDelete: SetNull)
+  title        String     @default("")
+  inputSummary String
+  documentIds  String[]   @default([])
+  gates        Json?
+  dataScope    Json?
+  preflight    Json?
+  messages     Json       @default("[]")
+  output       String?
+  status       String     @default("QUEUED")
+  reviewStatus String     @default("PENDING_REVIEW")
+  reviewedById String?
+  reviewedAt   DateTime?
+  reviewNote   String?
+  skillSha256  String     @default("")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
+
+  interactions AiInteraction[]
 
   @@index([caseId])
   @@index([userId, createdAt])
+  @@index([skillId])
 }
 
 // ───────────────────────── جست‌وجو و اتصال‌ها ─────────────────────────

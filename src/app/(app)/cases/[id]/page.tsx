@@ -1,4 +1,4 @@
-import { AlarmClock, FileUp, ListPlus, Pencil, Trash2, UserCheck, UserPlus } from "lucide-react";
+import { AlarmClock, FileUp, ListPlus, Pencil, Scale, Sparkles, Trash2, UserCheck, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { NoteBox } from "@/components/note-box";
@@ -22,6 +22,14 @@ import { CASE_TRANSITIONS, closingSummary } from "@/server/cases";
 import { createDeadlineAction, deadlineStatusAction, verifyDeadlineAction } from "../../deadlines/actions";
 import { createTaskAction } from "../../tasks/actions";
 import { addPartyAction, assignCaseAction, caseMemberAction, changeCaseStatusAction, removePartyAction, updateCaseAction } from "../actions";
+
+const UPCOMING_EVENTS = 5;
+const TIMELINE_LIMIT = 150;
+const SUMMARY_ITEMS = 5;
+const NOTE_ROWS = 2;
+const REASON_ROWS = 3;
+// eslint-disable-next-line ts-patterns/no-magic-numbers -- FieldDef.span needs the literal type 2
+const FULL = 2 as const;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const u = await getSessionUser();
@@ -47,11 +55,11 @@ export default async function CasePage({ params, searchParams }: { params: Promi
     can(user, "correspondence.view") ? db.correspondence.findMany({ where: { caseId: id, AND: [corrScope(user)] }, orderBy: { registeredAt: "desc" } }) : [],
     can(user, "draft.view") ? db.legalDraft.findMany({ where: { caseId: id, AND: [draftScope(user)] }, orderBy: { updatedAt: "desc" } }) : [],
     db.note.findMany({ where: { caseId: id }, orderBy: { createdAt: "desc" } }),
-    db.calendarEvent.findMany({ where: { caseId: id, cancelledAt: null, startAt: { gte: now } }, orderBy: { startAt: "asc" }, take: 5 }),
+    db.calendarEvent.findMany({ where: { caseId: id, cancelledAt: null, startAt: { gte: now } }, orderBy: { startAt: "asc" }, take: UPCOMING_EVENTS }),
     closingSummary(id),
   ]);
   const names = await userNames([c.responsibleId, c.createdById, ...tasks.map((t) => t.assigneeId), ...deadlines.map((d) => d.assigneeId), ...notes.map((n) => n.authorId), ...drafts.map((d) => d.authorId), ...docs.map((d) => d.createdById)]);
-  const timeline = tab === "timeline" ? await activityFor({ caseId: id }, 150) : [];
+  const timeline = tab === "timeline" ? await activityFor({ caseId: id }, TIMELINE_LIMIT) : [];
   const base = `/cases/${id}`;
   const locked = c.status === "ARCHIVED" || c.status === "CLOSED";
   const canEdit = can(user, "case.edit") && c.status !== "ARCHIVED";
@@ -68,6 +76,8 @@ export default async function CasePage({ params, searchParams }: { params: Promi
           <span className="text-sm text-ink-2">مراجعه‌کننده: <Link href={`/clients/${c.clientId}`} className="font-bold text-lapis hover:underline">{c.client.displayName}</Link></span>
         </>}
         actions={<>
+          {can(user, "ai.use") && <LinkButton href={`/assistant?task=case_analysis&case=${id}`} size="sm" variant="ghost"><Sparkles />تحلیل با دستیار</LinkButton>}
+          {can(user, "skill.run") && <LinkButton href={`/skills?case=${id}`} size="sm" variant="ghost"><Scale />مهارت‌های حقوقی</LinkButton>}
           {canEdit && !locked && nextSteps.map((s) => (
             <ActionButton key={s} action={changeCaseStatusAction} payload={{ id, to: s }} size="sm" successMessage="وضعیت پرونده تغییر کرد.">{`تغییر به «${CASE_STATUS[s].label}»`}</ActionButton>
           ))}
@@ -79,7 +89,7 @@ export default async function CasePage({ params, searchParams }: { params: Promi
           {can(user, "case.assign") && c.status !== "ARCHIVED" && (
             <FormDialog trigger={c.responsibleId ? "تغییر مسئول" : "ارجاع به کارمند"} triggerVariant={c.responsibleId ? "secondary" : "primary"} triggerSize="sm" icon={<UserCheck />} title="ارجاع پرونده"
               description="کارمند مسئول اعلان دریافت می‌کند و پرونده در کارتابل او قرار می‌گیرد." action={assignCaseAction} hidden={{ id }} cols={1} submitLabel="ارجاع" successMessage="پرونده ارجاع شد."
-              fields={[{ name: "responsibleId", label: "کارمند مسئول", type: "lookup", lookup: "user", required: true }, { name: "note", label: "دستور / توضیح", type: "textarea", rows: 2 }]} />
+              fields={[{ name: "responsibleId", label: "کارمند مسئول", type: "lookup", lookup: "user", required: true }, { name: "note", label: "دستور / توضیح", type: "textarea", rows: NOTE_ROWS }]} />
           )}
           {can(user, "case.close") && !locked && (
             <FormDialog trigger="بستن پرونده" triggerVariant="danger" triggerSize="sm" title="مختومه‌کردن پرونده" action={changeCaseStatusAction} hidden={{ id, to: "CLOSED" }} cols={1} submitLabel="تأیید و بستن پرونده" successMessage="پرونده مختومه شد."
@@ -87,7 +97,7 @@ export default async function CasePage({ params, searchParams }: { params: Promi
                 ? `این پرونده ${faNum(closing.openTasks.length)} وظیفه باز و ${faNum(closing.openDeadlines.length)} مهلت باز دارد${closing.openDrafts ? ` و ${faNum(closing.openDrafts)} سند حقوقی ناتمام` : ""}. با تأیید، موارد باز لغو می‌شوند.`
                 : "وظیفه یا مهلت بازی برای این پرونده وجود ندارد."}
               fields={[
-                { name: "reason", label: "نتیجه / دلیل مختومه‌شدن", type: "textarea", rows: 3, required: true },
+                { name: "reason", label: "نتیجه / دلیل مختومه‌شدن", type: "textarea", rows: REASON_ROWS, required: true },
                 ...(closing.openTasks.length + closing.openDeadlines.length > 0 ? [{ name: "acknowledgeOpenItems", label: "وضعیت موارد باز را بررسی کرده‌ام و لغو آن‌ها را تأیید می‌کنم", type: "checkbox" as const, required: true }] : []),
               ]} />
           )}
@@ -126,7 +136,7 @@ export default async function CasePage({ params, searchParams }: { params: Promi
             </Panel>
             <Panel title="اصحاب پرونده" bodyClass="p-0"
               action={canEdit && <FormDialog trigger="افزودن طرف" triggerVariant="ghost" triggerSize="sm" icon={<UserPlus />} title="افزودن طرف پرونده" action={addPartyAction} hidden={{ caseId: id }} successMessage="افزوده شد."
-                fields={[{ name: "role", label: "سمت", type: "select", required: true, options: OPT.partyRole }, { name: "name", label: "نام و نام خانوادگی / نام شخص حقوقی", required: true }, { name: "nationalId", label: "کد / شناسه ملی", ltr: true }, { name: "phone", label: "تلفن", ltr: true }, { name: "address", label: "نشانی", span: 2 }]} />}>
+                fields={[{ name: "role", label: "سمت", type: "select", required: true, options: OPT.partyRole }, { name: "name", label: "نام و نام خانوادگی / نام شخص حقوقی", required: true }, { name: "nationalId", label: "کد / شناسه ملی", ltr: true }, { name: "phone", label: "تلفن", ltr: true }, { name: "address", label: "نشانی", span: FULL }]} />}>
               <table className="tbl"><thead><tr><th>سمت</th><th>نام</th><th>کد ملی</th><th>تلفن</th><th>نشانی</th><th /></tr></thead>
                 <tbody>{c.parties.map((p) => (
                   <tr key={p.id}><td><Seal tone={p.clientId ? "accent" : "neutral"}>{p.role}</Seal></td><td className="font-medium">{p.name}</td><td className="num ltr text-right">{p.nationalId ?? "—"}</td><td className="num ltr text-right">{p.phone ?? "—"}</td><td className="max-w-[240px] truncate">{p.address ?? "—"}</td>
@@ -136,14 +146,14 @@ export default async function CasePage({ params, searchParams }: { params: Promi
             <Panel title="مهلت‌ها و وظایف باز" bodyClass="p-0">
               {openDeadlines.length + openTasks.length === 0 ? <EmptyState title="مورد بازی وجود ندارد" hint="از زبانه‌های «وظایف» و «مهلت‌ها» مورد جدید ثبت کنید." /> : (
                 <ul>
-                  {openDeadlines.slice(0, 5).map((d) => (
+                  {openDeadlines.slice(0, SUMMARY_ITEMS).map((d) => (
                     <li key={d.id} className="flex items-center gap-3 border-b border-line px-4 py-2.5 last:border-0">
                       <AlarmClock className={cn("size-4 shrink-0", d.dueAt < now ? "text-mohr" : "text-zafaran")} />
                       <span className="min-w-0 flex-1 truncate">{d.title}</span>
                       <span className={cn("num text-sm", d.dueAt < now ? "font-bold text-mohr" : "text-ink-2")}>{relativeDay(d.dueAt, now)} · {formatJalali(d.dueAt, "date")}</span>
                     </li>
                   ))}
-                  {openTasks.slice(0, 5).map((t) => (
+                  {openTasks.slice(0, SUMMARY_ITEMS).map((t) => (
                     <li key={t.id} className="flex items-center gap-3 border-b border-line px-4 py-2.5 last:border-0">
                       <Link href={`/tasks/${t.id}`} className="min-w-0 flex-1 truncate hover:text-lapis">{t.title}</Link>
                       <span className="text-sm text-ink-2">{t.assigneeId ? names[t.assigneeId] : "بدون مجری"}</span><StatusSeal map={TASK_STATUS} value={t.status} />

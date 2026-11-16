@@ -6,8 +6,7 @@ import { Button, type ButtonProps } from "./button";
 import { Modal } from "./modal";
 import { useToast } from "./toast";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyAction = (input: any) => Promise<ActionResult<any>>;
+type AnyAction = (input: Record<string, unknown>) => Promise<ActionResult<unknown>>;
 
 /** دکمه اجرای یک اکشن سرور با تأیید اختیاری (برای عملیات حساس) */
 export function ActionButton({
@@ -29,7 +28,9 @@ export function ActionButton({
       if (!res.ok) { toast.error(res.error); return; }
       toast.success(successMessage);
       setOpen(false); setNote("");
-      if (redirectTo) router.push(redirectTo); else router.refresh();
+      // الگوی «{id}» در مقصد با شناسه بازگشتی اکشن جایگزین می‌شود
+      const id = (res.data as { id?: string } | undefined)?.id ?? "";
+      if (redirectTo) router.push(redirectTo.split("{id}").join(id)); else router.refresh();
     });
   const needsDialog = !!confirm || !!askNote;
   return (

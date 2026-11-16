@@ -115,6 +115,11 @@
   .prose-md blockquote { @apply my-2 border-s-4 border-line-strong ps-3 text-ink-2; }
   .prose-md code { @apply rounded bg-surface-2 px-1 text-xs; } .prose-md hr { @apply my-4; }
   .prose-md a { @apply text-lapis underline; }
+  .prose-md h4 { @apply mb-1 mt-3 font-bold; }
+  .prose-md td, .prose-md th { overflow-wrap: anywhere; }
+  .prose-md table { table-layout: auto; max-width: 100%; }
+  .prose-md pre { @apply my-2 whitespace-pre-wrap rounded bg-surface-2 p-2 text-xs; }
+  .prose-ltr { direction: ltr; text-align: left; }
 }
 
 @media print {
