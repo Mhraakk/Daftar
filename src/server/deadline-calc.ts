@@ -70,7 +70,9 @@ export function extractJalaliDates(text: string, limit = 40): ExtractedDate[] {
     if (seen.has(key)) return;
     seen.add(key);
     const context = src.slice(Math.max(0, idx - 70), Math.min(src.length, idx + raw.length + 50)).replace(/\s+/g, " ").trim();
-    const hint = HINTS.find(([re]) => re.test(context))?.[1] ?? null;
+    // برای برچسب پیشنهادی فقط واژه‌های نزدیک به خودِ تاریخ ملاک است
+    const near = src.slice(Math.max(0, idx - 32), Math.min(src.length, idx + raw.length + 12));
+    const hint = HINTS.find(([re]) => re.test(near))?.[1] ?? null;
     out.push({ jy, jm, jd, raw, context, hint });
   };
   for (const m of src.matchAll(/(?<!\d)(1[34]\d{2}|\d{2})[\/\-.](\d{1,2})[\/\-.](\d{1,2})(?!\d)/g)) {

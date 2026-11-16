@@ -52,7 +52,7 @@ export async function createBackup(kind: "MANUAL" | "SCHEDULED", actorId: string
   const work = await fs.mkdtemp(path.join(os.tmpdir(), "daftar-bk-"));
   try {
     const dump = path.join(work, "db.dump");
-    await run("pg_dump", ["--format=custom", "--no-owner", "--no-privileges", `--file=${dump}`, pgUrl()], { maxBuffer: MAXBUF });
+    await run("pg_dump", ["--format=custom", "--no-owner", "--no-privileges", "--no-comments", `--file=${dump}`, pgUrl()], { maxBuffer: MAXBUF });
     const store = storageRoot();
     await fs.mkdir(store, { recursive: true });
     const manifest: BackupManifest = { createdAt: new Date().toISOString(), kind, counts: await tableCounts(pgUrl()), storageFiles: await countFiles(store), dumpSha256: await sha256File(dump), appVersion: process.env.npm_package_version ?? "0.1.0" };

@@ -44,7 +44,10 @@ export function taskScope(u: SessionUser): Prisma.TaskWhereInput {
 
 export function deadlineScope(u: SessionUser): Prisma.DeadlineWhereInput {
   if (can(u, "deadline.view_all")) return {};
-  return { OR: [{ assigneeId: u.id }, { createdById: u.id }, { case: caseScope(u) }] };
+  const or: Prisma.DeadlineWhereInput[] = [{ assigneeId: u.id }, { createdById: u.id }, { case: caseScope(u) }];
+  // تأییدکننده مهلت‌های قانونی باید همه مهلت‌های قانونی را برای تطبیق و تأیید ببیند
+  if (can(u, "deadline.verify_legal")) or.push({ isLegal: true });
+  return { OR: or };
 }
 
 export function eventScope(u: SessionUser): Prisma.CalendarEventWhereInput {
