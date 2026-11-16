@@ -665,6 +665,9 @@ model DeadlineRule {
   basis        String
   description  String?
   sourceUrl    String?
+  // ماده‌ای از کتابخانه که مبنای این قاعده است (برای تطبیق کنار هم)
+  lawCode      String?
+  articleNos   String[]  @default([])
   verified     Boolean   @default(false)
   verifiedById String?
   verifiedAt   DateTime?
@@ -904,6 +907,29 @@ model DraftSource {
 }
 
 // کتابخانه حقوقی داخلی (متون با منبع قابل ردیابی)
+// قانونی که به‌صورت کامل (همه مواد) وارد کتابخانه شده است؛ واحد تأیید گروهی «نسخه قانون»
+model Law {
+  id               String    @id @default(cuid())
+  code             String    @unique
+  title            String
+  shortTitle       String?
+  approvedAt       String?
+  sourceName       String
+  sourceSha256     String?
+  sourceFileKey    String?
+  sourcePageOffset Int       @default(0)
+  headings         Json      @default("[]")
+  closing          String?
+  articleCount     Int       @default(0)
+  importedAt       DateTime  @default(now())
+  verifiedAt       DateTime?
+  verifiedById     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  articles LegalSource[]
+}
+
 model LegalSource {
   id           String    @id @default(cuid())
   kind         String
@@ -921,10 +947,23 @@ model LegalSource {
   createdById  String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  lawCode      String?
+  law          Law?      @relation(fields: [lawCode], references: [code], onDelete: Restrict)
+  orderNo      Int?
+  // VALID | AMENDED | PARTLY_AMENDED | PARTLY_REPEALED | REPEALED — منسوخ‌ها برای استناد پیشنهاد نمی‌شوند
+  status       String    @default("VALID")
+  statusNote   String?
+  headingPath  String[]  @default([])
+  sourcePages  Int[]     @default([])
+  // ویرایش دستی متن یک ماده واردشده؛ ورود دوباره قانون این ویرایش را بازنویسی نمی‌کند
+  editedAt     DateTime?
+  editedById   String?
 
   draftSources DraftSource[]
 
+  @@unique([lawCode, articleNo])
   @@index([reference, articleNo])
+  @@index([lawCode, orderNo])
 }
 
 // ───────────────────────── هوش مصنوعی و مهارت‌های حقوقی ─────────────────────────

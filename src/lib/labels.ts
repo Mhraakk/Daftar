@@ -63,6 +63,15 @@ export const EVENT_TYPE: Record<string, { label: string; tone: Tone }> = {
   FOLLOW_UP: { label: "پیگیری", tone: "warning" },
   OTHER: { label: "سایر", tone: "neutral" },
 };
+// وضعیت ماده قانون (از راهنمای رنگ PDF منبع یا ثبت دستی)؛ منسوخ برای استناد پیشنهاد نمی‌شود
+export const SOURCE_STATUS: Record<string, { label: string; tone: Tone }> = {
+  VALID: { label: "معتبر", tone: "success" },
+  AMENDED: { label: "اصلاحی/الحاقی", tone: "info" },
+  PARTLY_AMENDED: { label: "بخشی اصلاح‌شده", tone: "info" },
+  PARTLY_REPEALED: { label: "بخشی منسوخ", tone: "warning" },
+  REPEALED: { label: "منسوخ", tone: "danger" },
+  INTERPRETATION: { label: "تفسیر", tone: "neutral" },
+};
 export const CONFIDENTIALITY: Record<string, { label: string; tone: Tone }> = {
   NORMAL: { label: "عادی", tone: "neutral" },
   CONFIDENTIAL: { label: "محرمانه", tone: "warning" },

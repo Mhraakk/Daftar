@@ -17,7 +17,9 @@
     "test:unit": "vitest run tests/unit",
     "test:int": "vitest run tests/integration",
     "test:e2e": "playwright test --trace off",
-    "skills:sync": "tsx scripts/sync-legal-skills.ts"
+    "skills:sync": "tsx scripts/sync-legal-skills.ts",
+    "acp:import": "tsx scripts/import-acp.ts",
+    "acp:extract": "python3 scripts/acp/extract_acp.py --pdf prisma/seed-data/acp/source.pdf --out prisma/seed-data/acp --work .cache/acp"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

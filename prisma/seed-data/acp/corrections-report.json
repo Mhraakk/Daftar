@@ -1,0 +1,1706 @@
+{
+ "sourceSha256": "b83e4532fabf34314f6db22a4ef2aba7310f3e4abfa2e227dcf3607a0cefee98",
+ "coverage": {
+  "expected": 529,
+  "found": 529,
+  "missing": [],
+  "duplicates": [],
+  "orderBreaks": []
+ },
+ "statusCounts": {
+  "VALID": 524,
+  "REPEALED": 4,
+  "PARTLY_AMENDED": 1
+ },
+ "corrections": {
+  "total": 1440,
+  "byKind": {
+   "stray-mark": 3,
+   "ligature": 576,
+   "split-ye": 235,
+   "reviewed": 53,
+   "madda": 573
+  }
+ },
+ "distinctCorrections": [
+  {
+   "kind": "madda",
+   "before": "ان",
+   "after": "آن",
+   "evidence": "reviewed-word-table",
+   "count": 331
+  },
+  {
+   "kind": "ligature",
+   "before": "ابالغ",
+   "after": "ابلاغ",
+   "evidence": "ocr-same-line",
+   "count": 140
+  },
+  {
+   "kind": "split-ye",
+   "before": "تار یخ",
+   "after": "تاریخ",
+   "evidence": "ocr-same-line",
+   "count": 59
+  },
+  {
+   "kind": "madda",
+   "before": "انان",
+   "after": "آنان",
+   "evidence": "reviewed-word-table",
+   "count": 47
+  },
+  {
+   "kind": "ligature",
+   "before": "صالحیت",
+   "after": "صلاحیت",
+   "evidence": "ocr-same-line",
+   "count": 43
+  },
+  {
+   "kind": "ligature",
+   "before": "لزم",
+   "after": "لازم",
+   "evidence": "ocr-same-line",
+   "count": 40
+  },
+  {
+   "kind": "madda",
+   "before": "انها",
+   "after": "آنها",
+   "evidence": "reviewed-word-table",
+   "count": 38
+  },
+  {
+   "kind": "ligature",
+   "before": "اعالم",
+   "after": "اعلام",
+   "evidence": "ocr-same-line",
+   "count": 34
+  },
+  {
+   "kind": "ligature",
+   "before": "دلیل",
+   "after": "دلایل",
+   "evidence": "ocr-same-line",
+   "count": 31
+  },
+  {
+   "kind": "ligature",
+   "before": "اختالف",
+   "after": "اختلاف",
+   "evidence": "ocr-same-line",
+   "count": 28
+  },
+  {
+   "kind": "ligature",
+   "before": "اطالع",
+   "after": "اطلاع",
+   "evidence": "ocr-same-line",
+   "count": 27
+  },
+  {
+   "kind": "split-ye",
+   "before": "ز یر",
+   "after": "زیر",
+   "evidence": "ocr-same-line",
+   "count": 22
+  },
+  {
+   "kind": "split-ye",
+   "before": "هز ینه",
+   "after": "هزینه",
+   "evidence": "ocr-same-line",
+   "count": 19
+  },
+  {
+   "kind": "madda",
+   "before": "ارای",
+   "after": "آرای",
+   "evidence": "reviewed-word-table",
+   "count": 16
+  },
+  {
+   "kind": "madda",
+   "before": "ان،",
+   "after": "آن،",
+   "evidence": "reviewed-word-table",
+   "count": 16
+  },
+  {
+   "kind": "madda",
+   "before": "انرا",
+   "after": "آنرا",
+   "evidence": "reviewed-word-table",
+   "count": 15
+  },
+  {
+   "kind": "ligature",
+   "before": "خالف",
+   "after": "خلاف",
+   "evidence": "ocr-same-line",
+   "count": 12
+  },
+  {
+   "kind": "ligature",
+   "before": "اسالمی",
+   "after": "اسلامی",
+   "evidence": "ocr-same-line",
+   "count": 11
+  },
+  {
+   "kind": "split-ye",
+   "before": "جر یان",
+   "after": "جریان",
+   "evidence": "ocr-same-line",
+   "count": 11
+  },
+  {
+   "kind": "madda",
+   "before": "انچه",
+   "after": "آنچه",
+   "evidence": "reviewed-word-table",
+   "count": 11
+  },
+  {
+   "kind": "ligature",
+   "before": "انقالب",
+   "after": "انقلاب",
+   "evidence": "ocr-same-line",
+   "count": 10
+  },
+  {
+   "kind": "madda",
+   "before": "انجا",
+   "after": "آنجا",
+   "evidence": "reviewed-word-table",
+   "count": 10
+  },
+  {
+   "kind": "ligature",
+   "before": "لیحه",
+   "after": "لایحه",
+   "evidence": "ocr-same-line",
+   "count": 9
+  },
+  {
+   "kind": "split-ye",
+   "before": "اخطار یه",
+   "after": "اخطاریه",
+   "evidence": "ocr-same-line",
+   "count": 9
+  },
+  {
+   "kind": "split-ye",
+   "before": "مواز ین",
+   "after": "موازین",
+   "evidence": "ocr-same-line",
+   "count": 8
+  },
+  {
+   "kind": "split-ye",
+   "before": "در یافت",
+   "after": "دریافت",
+   "evidence": "ocr-same-line",
+   "count": 8
+  },
+  {
+   "kind": "split-ye",
+   "before": "طر یق",
+   "after": "طریق",
+   "evidence": "ocr-same-line",
+   "count": 8
+  },
+  {
+   "kind": "ligature",
+   "before": "استدلل",
+   "after": "استدلال",
+   "evidence": "ocr-same-line",
+   "count": 8
+  },
+  {
+   "kind": "madda",
+   "before": "اخرین",
+   "after": "آخرین",
+   "evidence": "reviewed-word-table",
+   "count": 8
+  },
+  {
+   "kind": "split-ye",
+   "before": "اخر ین",
+   "after": "اخرین",
+   "evidence": "ocr-same-line",
+   "count": 7
+  },
+  {
+   "kind": "split-ye",
+   "before": "تصر یح",
+   "after": "تصریح",
+   "evidence": "ocr-same-line",
+   "count": 7
+  },
+  {
+   "kind": "ligature",
+   "before": "مالحظه",
+   "after": "ملاحظه",
+   "evidence": "ocr-same-line",
+   "count": 7
+  },
+  {
+   "kind": "ligature",
+   "before": "دلیلی",
+   "after": "دلایلی",
+   "evidence": "ocr-same-line",
+   "count": 7
+  },
+  {
+   "kind": "ligature",
+   "before": "بطالن",
+   "after": "بطلان",
+   "evidence": "ocr-same-line",
+   "count": 7
+  },
+  {
+   "kind": "madda",
+   "before": "ایین",
+   "after": "آیین",
+   "evidence": "reviewed-word-table",
+   "count": 7
+  },
+  {
+   "kind": "ligature",
+   "before": "صالحیتدار",
+   "after": "صلاحیتدار",
+   "evidence": "ocr-same-line",
+   "count": 6
+  },
+  {
+   "kind": "ligature",
+   "before": "عالوه",
+   "after": "علاوه",
+   "evidence": "ocr-same-line",
+   "count": 6
+  },
+  {
+   "kind": "ligature",
+   "before": "وکالی",
+   "after": "وکلای",
+   "evidence": "ocr-same-line",
+   "count": 6
+  },
+  {
+   "kind": "ligature",
+   "before": "طالق",
+   "after": "طلاق",
+   "evidence": "ocr-same-line",
+   "count": 6
+  },
+  {
+   "kind": "split-ye",
+   "before": "اکثر یت",
+   "after": "اکثریت",
+   "evidence": "ocr-same-line",
+   "count": 6
+  },
+  {
+   "kind": "reviewed",
+   "before": "بال",
+   "after": "بالا",
+   "evidence": "reviewed-word-table",
+   "count": 6
+  },
+  {
+   "kind": "madda",
+   "before": "اگهی",
+   "after": "آگهی",
+   "evidence": "reviewed-word-table",
+   "count": 6
+  },
+  {
+   "kind": "split-ye",
+   "before": "،تار یخ",
+   "after": "،تاریخ",
+   "evidence": "ocr-same-line",
+   "count": 5
+  },
+  {
+   "kind": "ligature",
+   "before": "ولیت",
+   "after": "ولایت",
+   "evidence": "ocr-same-line",
+   "count": 5
+  },
+  {
+   "kind": "ligature",
+   "before": "اطالعات",
+   "after": "اطلاعات",
+   "evidence": "ocr-same-line",
+   "count": 5
+  },
+  {
+   "kind": "ligature",
+   "before": "اصالح",
+   "after": "اصلاح",
+   "evidence": "ocr-same-line",
+   "count": 5
+  },
+  {
+   "kind": "ligature",
+   "before": "صالحیت",
+   "after": "صلاحیت",
+   "evidence": "propagated",
+   "count": 5
+  },
+  {
+   "kind": "madda",
+   "before": "اتی",
+   "after": "آتی",
+   "evidence": "reviewed-word-table",
+   "count": 5
+  },
+  {
+   "kind": "madda",
+   "before": "اید",
+   "after": "آید",
+   "evidence": "reviewed-word-table",
+   "count": 5
+  },
+  {
+   "kind": "ligature",
+   "before": "معامالت",
+   "after": "معاملات",
+   "evidence": "ocr-same-line",
+   "count": 4
+  },
+  {
+   "kind": "ligature",
+   "before": "،ابالغ",
+   "after": "،ابلاغ",
+   "evidence": "ocr-same-line",
+   "count": 4
+  },
+  {
+   "kind": "ligature",
+   "before": "بعالوه",
+   "after": "بعلاوه",
+   "evidence": "ocr-same-line",
+   "count": 4
+  },
+  {
+   "kind": "ligature",
+   "before": "مالک",
+   "after": "ملاک",
+   "evidence": "ocr-same-line",
+   "count": 4
+  },
+  {
+   "kind": "split-ye",
+   "before": "ز یان",
+   "after": "زیان",
+   "evidence": "ocr-same-line",
+   "count": 4
+  },
+  {
+   "kind": "ligature",
+   "before": "،طالق",
+   "after": "،طلاق",
+   "evidence": "ocr-same-line",
+   "count": 4
+  },
+  {
+   "kind": "split-ye",
+   "before": "تجز یه",
+   "after": "تجزیه",
+   "evidence": "ocr-same-line",
+   "count": 4
+  },
+  {
+   "kind": "ligature",
+   "before": "بالاثر",
+   "after": "بلااثر",
+   "evidence": "ocr-same-line",
+   "count": 4
+  },
+  {
+   "kind": "split-ye",
+   "before": "اخطار یه",
+   "after": "اخطاریه",
+   "evidence": "propagated",
+   "count": 4
+  },
+  {
+   "kind": "ligature",
+   "before": "ابالغ",
+   "after": "ابلاغ",
+   "evidence": "propagated",
+   "count": 4
+  },
+  {
+   "kind": "reviewed",
+   "before": "بالتر",
+   "after": "بالاتر",
+   "evidence": "reviewed-word-table",
+   "count": 4
+  },
+  {
+   "kind": "madda",
+   "before": "اثار",
+   "after": "آثار",
+   "evidence": "reviewed-word-table",
+   "count": 4
+  },
+  {
+   "kind": "madda",
+   "before": "اید،",
+   "after": "آید،",
+   "evidence": "reviewed-word-table",
+   "count": 4
+  },
+  {
+   "kind": "madda",
+   "before": "انکه",
+   "after": "آنکه",
+   "evidence": "reviewed-word-table",
+   "count": 4
+  },
+  {
+   "kind": "stray-mark",
+   "before": "ُ",
+   "after": "",
+   "evidence": "combining mark without a letter",
+   "count": 3
+  },
+  {
+   "kind": "ligature",
+   "before": "اصالحی",
+   "after": "اصلاحی",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "ligature",
+   "before": "،لزم",
+   "after": "،لازم",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "split-ye",
+   "before": "مامور ین",
+   "after": "مامورین",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "ligature",
+   "before": "قبال",
+   "after": "قبلا",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "split-ye",
+   "before": "نزدیکتر ین",
+   "after": "نزدیکترین",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "split-ye",
+   "before": "مامور یت",
+   "after": "ماموریت",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "split-ye",
+   "before": "تفر یط",
+   "after": "تفریط",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "split-ye",
+   "before": "تشر یفات",
+   "after": "تشریفات",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "ligature",
+   "before": "امالک",
+   "after": "املاک",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "split-ye",
+   "before": "فور یت",
+   "after": "فوریت",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "split-ye",
+   "before": ".تار یخ",
+   "after": ".تاریخ",
+   "evidence": "ocr-same-line",
+   "count": 3
+  },
+  {
+   "kind": "ligature",
+   "before": "لزم",
+   "after": "لازم",
+   "evidence": "propagated",
+   "count": 3
+  },
+  {
+   "kind": "reviewed",
+   "before": "الجرا",
+   "after": "الاجرا",
+   "evidence": "reviewed-word-table",
+   "count": 3
+  },
+  {
+   "kind": "reviewed",
+   "before": "التباع",
+   "after": "الاتباع",
+   "evidence": "reviewed-word-table",
+   "count": 3
+  },
+  {
+   "kind": "reviewed",
+   "before": "درصورتی",
+   "after": "در صورتی",
+   "evidence": "reviewed-word-table",
+   "count": 3
+  },
+  {
+   "kind": "reviewed",
+   "before": "وال",
+   "after": "والا",
+   "evidence": "reviewed-word-table",
+   "count": 3
+  },
+  {
+   "kind": "madda",
+   "before": "اوری",
+   "after": "آوری",
+   "evidence": "reviewed-word-table",
+   "count": 3
+  },
+  {
+   "kind": "madda",
+   "before": "امد.",
+   "after": "آمد.",
+   "evidence": "reviewed-word-table",
+   "count": 3
+  },
+  {
+   "kind": "madda",
+   "before": "امده",
+   "after": "آمده",
+   "evidence": "reviewed-word-table",
+   "count": 3
+  },
+  {
+   "kind": "madda",
+   "before": "انان.",
+   "after": "آنان.",
+   "evidence": "reviewed-word-table",
+   "count": 3
+  },
+  {
+   "kind": "ligature",
+   "before": "اصالحات",
+   "after": "اصلاحات",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "،انقالب",
+   "after": "،انقلاب",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "اخالق",
+   "after": "اخلاق",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "انحالل",
+   "after": "انحلال",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "وکالء",
+   "after": "وکلاء",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "split-ye",
+   "before": "مدیر یت",
+   "after": "مدیریت",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "،عالوه",
+   "after": "،علاوه",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "-ابالغ",
+   "after": "-ابلاغ",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "split-ye",
+   "before": "شهردار یها",
+   "after": "شهرداریها",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "اختالل",
+   "after": "اختلال",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "وکال",
+   "after": "وکلا",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "split-ye",
+   "before": "ارز یابی",
+   "after": "ارزیابی",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "مستقال",
+   "after": "مستقلا",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "استعالم",
+   "after": "استعلام",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "بالفاصله",
+   "after": "بلافاصله",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "split-ye",
+   "before": "صر یح",
+   "after": "صریح",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "،صالحیت",
+   "after": "،صلاحیت",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "split-ye",
+   "before": "ر یال",
+   "after": "ریال",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "split-ye",
+   "before": "ز یر:",
+   "after": "زیر:",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "ابالغ.",
+   "after": "ابلاغ.",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "اختالفی",
+   "after": "اختلافی",
+   "evidence": "ocr-same-line",
+   "count": 2
+  },
+  {
+   "kind": "reviewed",
+   "before": "کثیرالنتشار",
+   "after": "کثیرالانتشار",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "reviewed",
+   "before": "غیراین",
+   "after": "غیر این",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "reviewed",
+   "before": "درجریان",
+   "after": "در جریان",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "reviewed",
+   "before": "سالنه",
+   "after": "سالانه",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "madda",
+   "before": "اورده",
+   "after": "آورده",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "madda",
+   "before": "اید.",
+   "after": "آید.",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "madda",
+   "before": "اماده",
+   "after": "آماده",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "madda",
+   "before": "اخر",
+   "after": "آخر",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "madda",
+   "before": "درامدهای",
+   "after": "درآمدهای",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "madda",
+   "before": "اذوقه",
+   "after": "آذوقه",
+   "evidence": "reviewed-word-table",
+   "count": 2
+  },
+  {
+   "kind": "ligature",
+   "before": "،اصالحی",
+   "after": "،اصلاحی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اصال",
+   "after": "اصلا",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "،خالف",
+   "after": "،خلاف",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "صالحیتی",
+   "after": "صلاحیتی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اختالفات",
+   "after": "اختلافات",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "-اختالف",
+   "after": "-اختلاف",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "،اختالف",
+   "after": "،اختلاف",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "،شهردار یها",
+   "after": "،شهرداریها",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "،تصر یح",
+   "after": "،تصریح",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "ایالء",
+   "after": "ایلاء",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "ابالغهایی",
+   "after": "ابلاغهایی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "ابتالء",
+   "after": "ابتلاء",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "ز یانی",
+   "after": "زیانی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": ".عالوه",
+   "after": ".علاوه",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "،وکالی",
+   "after": "،وکلای",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "،ارز یابی",
+   "after": "،ارزیابی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "-جر یان",
+   "after": "-جریان",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "طر یقی",
+   "after": "طریقی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": ".اعالم",
+   "after": ".اعلام",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "-تار یخ",
+   "after": "-تاریخ",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "،جر یان",
+   "after": "،جریان",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "-محصولتی",
+   "after": "-محصولاتی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اعالن",
+   "after": "اعلان",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "،بالفاصله",
+   "after": "،بلافاصله",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "سایر ین",
+   "after": "سایرین",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "قر ینه",
+   "after": "قرینه",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "بهاطالع",
+   "after": "بهاطلاع",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "،معامالت",
+   "after": "،معاملات",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "معمول",
+   "after": "معمولا",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "ولدت",
+   "after": "ولادت",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "احضار یه",
+   "after": "احضاریه",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "دلئل",
+   "after": "دلائل",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "لل",
+   "after": "لال",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "جالله",
+   "after": "جلاله",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "،دلیل",
+   "after": "،دلایل",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "جز یی",
+   "after": "جزیی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اولد.",
+   "after": "اولاد.",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "قهر یه",
+   "after": "قهریه",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "مستدل",
+   "after": "مستدلا",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اطالعی",
+   "after": "اطلاعی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "بالارجاع",
+   "after": "بلاارجاع",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "خالصه",
+   "after": "خلاصه",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "درجر یان",
+   "after": "درجریان",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "،طولنی",
+   "after": "،طولانی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "تر ین",
+   "after": "ترین",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "وز یران",
+   "after": "وزیران",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "وز یر",
+   "after": "وزیر",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "-هز ینه",
+   "after": "-هزینه",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "وار یز",
+   "after": "واریز",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "بهز یستی",
+   "after": "بهزیستی",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "split-ye",
+   "before": "،هز ینه",
+   "after": "،هزینه",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اتالف",
+   "after": "اتلاف",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "بالواسطه",
+   "after": "بلاواسطه",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "،مالک",
+   "after": "،ملاک",
+   "evidence": "ocr-same-line",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "انقالب",
+   "after": "انقلاب",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اسالمی",
+   "after": "اسلامی",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "خالف",
+   "after": "خلاف",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اصالح",
+   "after": "اصلاح",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اطالع",
+   "after": "اطلاع",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اطالعات",
+   "after": "اطلاعات",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اتالف",
+   "after": "اتلاف",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "صالحیتدار",
+   "after": "صلاحیتدار",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اخالق",
+   "after": "اخلاق",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "مستقال",
+   "after": "مستقلا",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "اعالم",
+   "after": "اعلام",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "ligature",
+   "before": "طالق",
+   "after": "طلاق",
+   "evidence": "propagated",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "و ا ّل",
+   "after": "و الّا",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "بالتر،",
+   "after": "بالاتر،",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "کال",
+   "after": "کالا",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "بالترین",
+   "after": "بالاترین",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "راعنوان",
+   "after": "را عنوان",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "درمهلت",
+   "after": "در مهلت",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "کردهاست.",
+   "after": "کرده است.",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "بنابه",
+   "after": "بنا به",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "یاسند",
+   "after": "یا سند",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "بالبر",
+   "after": "بالابر",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "بهدعاوی",
+   "after": "به دعاوی",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "مورداستناد",
+   "after": "مورد استناد",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "بهاطلاع",
+   "after": "به اطلاع",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "سوالتی",
+   "after": "سوالاتی",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "درمواردی",
+   "after": "در مواردی",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "الجاره،",
+   "after": "الاجاره،",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "اسالم",
+   "after": "اسلام",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "می‌نمایداگر",
+   "after": "می‌نماید اگر",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "وا ّل",
+   "after": "والّا",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "اعساردر",
+   "after": "اعسار در",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "ازاثبات",
+   "after": "از اثبات",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "الجراء،",
+   "after": "الاجراء،",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "reviewed",
+   "before": "الجراء",
+   "after": "الاجراء",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "انهم",
+   "after": "آنهم",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "ائین",
+   "after": "آئین",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "ان.",
+   "after": "آن.",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "ادرس",
+   "after": "آدرس",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "اینده",
+   "after": "آینده",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "انها)",
+   "after": "آنها)",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "اوردن",
+   "after": "آوردن",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "اورد.",
+   "after": "آورد.",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "ان)",
+   "after": "آن)",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "ازادی",
+   "after": "آزادی",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "اورند.",
+   "after": "آورند.",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "ازاد",
+   "after": "آزاد",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "امد",
+   "after": "آمد",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "انها،",
+   "after": "آنها،",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "اگهی،",
+   "after": "آگهی،",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "-ارای",
+   "after": "-آرای",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "انها.",
+   "after": "آنها.",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "انان،",
+   "after": "آنان،",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "امره",
+   "after": "آمره",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "اورد",
+   "after": "آورد",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "امد،",
+   "after": "آمد،",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  },
+  {
+   "kind": "madda",
+   "before": "درامد",
+   "after": "درآمد",
+   "evidence": "reviewed-word-table",
+   "count": 1
+  }
+ ],
+ "unconfirmedLigatureSuspects": [
+  "(الحاقی",
+  "(الف)",
+  "(مالی",
+  "-بالله",
+  "-تالله)",
+  "-مطالبه",
+  "-وکالت",
+  "ابطال",
+  "اجمال",
+  "احتمال",
+  "احتمالی",
+  "احتمالی،",
+  "احوال",
+  "احوالی",
+  "اختلال",
+  "ارسال",
+  "استدلال",
+  "استدلال،",
+  "استمهال",
+  "استمهال،",
+  "اشتغال",
+  "اشکال",
+  "اصالت",
+  "اعمال",
+  "الوکاله",
+  "الوکاله.",
+  "امثال",
+  "اموال",
+  "اموال،",
+  "انحلال",
+  "انفصال",
+  "اهالی",
+  "بالا",
+  "بالابر",
+  "بالاتر",
+  "بالاتر،",
+  "بالاترین",
+  "بالسویه",
+  "بالعکس.",
+  "ثالث",
+  "ثالث.",
+  "ثالث،",
+  "ثالثی",
+  "جلاله",
+  "حال",
+  "حالت",
+  "دخالت",
+  "دیوانعالی",
+  "ریال",
+  "زوال",
+  "سال",
+  "سال)",
+  "سالانه",
+  "سوالاتی",
+  "صالح",
+  "صالحه",
+  "عالی",
+  "غیرمالی",
+  "غیرمالی.",
+  "لال",
+  "مال",
+  "مالکیت",
+  "مالکیت،",
+  "مالی",
+  "متعال",
+  "متوالی",
+  "مخالف",
+  "مخالفت",
+  "مستلزم",
+  "مشارالیه",
+  "مشارالیه،",
+  "مصالح",
+  "مصالحه",
+  "مطالب",
+  "مطالبه",
+  "مطالبه،",
+  "مطالعه",
+  "ملزم",
+  "نقاله",
+  "والا",
+  "والدین",
+  "والّا",
+  "وکالت",
+  "وکالت.",
+  "وکالت،",
+  "وکالتنامه",
+  "کالا",
+  "کثیرالانتشار"
+ ],
+ "droppedFragments": [
+  "page 12 y=532.1: 'ّ'"
+ ],
+ "notes": [
+  "Hamza is printed without hamza in the source (رای، تامین، مامور); kept as printed.",
+  "Madda is missing on the rendered page itself; only words in MADDA_WORDS were restored."
+ ]
+}

@@ -5,6 +5,7 @@ import { DEFAULT_ROLES, PERMISSIONS } from "../src/lib/permissions";
 import { DEADLINE_RULES } from "./seed-data/deadline-rules";
 import { CONNECTORS } from "./seed-data/connectors";
 import { seedTemplates } from "./seed-data/templates";
+import { ACP_IMPORT, importLaw } from "../src/server/law-import";
 
 const db = new PrismaClient();
 
@@ -41,10 +42,16 @@ async function main() {
     console.log(`✔ حساب مدیر سامانه ساخته شد: ${username}`);
   }
 
-  // قواعد مهلت (پیشنهادی؛ تا تأیید مسئول حقوقی «تأییدنشده» می‌مانند)
+  // قواعد مهلت (پیشنهادی؛ تا تأیید مسئول حقوقی «تأییدنشده» می‌مانند). مبنای قاعده تأییدشده بازنویسی نمی‌شود.
   for (const r of DEADLINE_RULES) {
-    await db.deadlineRule.upsert({ where: { key: r.key }, create: r, update: { title: r.title, description: r.description } });
+    const prev = await db.deadlineRule.findUnique({ where: { key: r.key } });
+    const basis = prev?.verified ? {} : { basis: r.basis, days: r.days, monthsAbroad: r.monthsAbroad, lawCode: r.lawCode, articleNos: r.articleNos };
+    await db.deadlineRule.upsert({ where: { key: r.key }, create: r, update: { title: r.title, description: r.description, ...basis } });
   }
+
+  // متن قانون آیین دادرسی مدنی (از PDF دفتر؛ همه مواد «تأییدنشده» تا تطبیق با متن رسمی)
+  const acp = await importLaw(db, ACP_IMPORT);
+  console.log(`✔ ق.آ.د.م: ${acp.created} ماده جدید، ${acp.updated} به‌روزرسانی، ${acp.unchanged} بدون تغییر.`);
 
   // اتصال‌های بیرونی (همه غیرفعال تا پیکربندی)
   for (const c of CONNECTORS) {

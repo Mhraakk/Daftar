@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { ActionButton } from "@/components/ui/action-button";
 import { FormDialog } from "@/components/ui/form-dialog";
@@ -13,17 +14,28 @@ import { addHolidayAction, removeHolidayAction, saveOfficeAction, saveRuleAction
 
 export const metadata = { title: "تنظیمات دفتر" };
 
+const DAY_MS = 86_400_000;
+const PAST_HOLIDAY_DAYS = 30;
+const DESCRIPTION_ROWS = 2;
+// eslint-disable-next-line ts-patterns/no-magic-numbers -- FieldDef.span needs the literal type 2
+const FULL = 2 as const;
+
 export default async function SettingsPage() {
   const user = await requirePagePerm("settings.manage");
-  const [office, holidays, rules] = await Promise.all([getOffice(), db.holiday.findMany({ orderBy: { date: "asc" }, where: { date: { gte: new Date(Date.now() - 30 * 86_400_000) } } }), db.deadlineRule.findMany({ orderBy: { title: "asc" } })]);
-  const ruleFields = [{ name: "title", label: "عنوان", required: true, span: 2 as const }, { name: "days", label: "مدت (روز) — مقیم ایران", type: "number" as const, required: true }, { name: "monthsAbroad", label: "مدت (ماه) — مقیم خارج", type: "number" as const }, { name: "basis", label: "مستند قانونی", required: true, span: 2 as const }, { name: "description", label: "توضیح", type: "textarea" as const, rows: 2 }];
+  const [office, holidays, rules] = await Promise.all([getOffice(), db.holiday.findMany({ orderBy: { date: "asc" }, where: { date: { gte: new Date(Date.now() - PAST_HOLIDAY_DAYS * DAY_MS) } } }), db.deadlineRule.findMany({ orderBy: { title: "asc" } })]);
+  const linked = rules.filter((r) => r.lawCode && r.articleNos.length);
+  const articles = linked.length
+    ? await db.legalSource.findMany({ where: { OR: linked.map((r) => ({ lawCode: r.lawCode, articleNo: { in: r.articleNos } })) }, select: { id: true, lawCode: true, articleNo: true, title: true, text: true, verified: true, status: true } })
+    : [];
+  const articlesOf = (r: (typeof rules)[number]) => articles.filter((a) => a.lawCode === r.lawCode && r.articleNos.includes(a.articleNo ?? ""));
+  const ruleFields = [{ name: "title", label: "عنوان", required: true, span: FULL }, { name: "days", label: "مدت (روز) — مقیم ایران", type: "number" as const, required: true }, { name: "monthsAbroad", label: "مدت (ماه) — مقیم خارج", type: "number" as const }, { name: "basis", label: "مستند قانونی", required: true, span: FULL }, { name: "description", label: "توضیح", type: "textarea" as const, rows: DESCRIPTION_ROWS }];
   return (
     <>
       <PageHeader title="تنظیمات دفتر" subtitle="مشخصات دفتر، تعطیلات رسمی و قواعد مهلت‌های قانونی" />
       <div className="grid gap-4 xl:grid-cols-2">
         <Panel title="مشخصات دفتر">
           <SmartForm action={saveOfficeAction} submitLabel="ذخیره" successMessage="مشخصات دفتر ذخیره شد." initial={office as unknown as Record<string, unknown>}
-            fields={[{ name: "officeName", label: "نام دفتر", required: true, span: 2 }, { name: "officeCode", label: "کد دفتر", ltr: true }, { name: "city", label: "شهر" }, { name: "phone", label: "تلفن", ltr: true }, { name: "letterheadNote", label: "زیرنویس سربرگ" }, { name: "address", label: "نشانی", span: 2 }]} />
+            fields={[{ name: "officeName", label: "نام دفتر", required: true, span: FULL }, { name: "officeCode", label: "کد دفتر", ltr: true }, { name: "city", label: "شهر" }, { name: "phone", label: "تلفن", ltr: true }, { name: "letterheadNote", label: "زیرنویس سربرگ" }, { name: "address", label: "نشانی", span: FULL }]} />
         </Panel>
         <Panel title={`تعطیلات رسمی (${faNum(holidays.length)})`} action={<FormDialog trigger="افزودن تعطیلی" triggerVariant="secondary" triggerSize="sm" title="افزودن تعطیلی رسمی" size="sm" cols={1} action={addHolidayAction} successMessage="افزوده شد."
           fields={[{ name: "date", label: "تاریخ", type: "jdate", required: true }, { name: "title", label: "عنوان", required: true, placeholder: "مثلاً عید نوروز" }]} />}>
@@ -39,7 +51,15 @@ export default async function SettingsPage() {
           <div className="overflow-x-auto"><table className="tbl"><thead><tr><th>عنوان</th><th>مدت</th><th>مستند</th><th>وضعیت</th><th>عملیات</th></tr></thead>
             <tbody>{rules.map((r) => (
               <tr key={r.id}><td className="font-medium">{r.title}<span className="block max-w-md text-xs text-ink-3">{r.description}</span></td>
-                <td className="num whitespace-nowrap">{faNum(r.days)} روز{r.monthsAbroad ? ` / ${faNum(r.monthsAbroad)} ماه` : ""}</td><td className="max-w-xs text-sm">{r.basis}</td>
+                <td className="num whitespace-nowrap">{faNum(r.days)} روز{r.monthsAbroad ? ` / ${faNum(r.monthsAbroad)} ماه` : ""}</td><td className="max-w-sm text-sm">{r.basis}
+                  {articlesOf(r).map((a) => (
+                    <details key={a.id} className="mt-1 rounded border border-line bg-surface-2 px-2 py-1 text-xs" data-testid="rule-article">
+                      <summary className="cursor-pointer text-lapis">متن {a.title} {a.verified ? "(تأییدشده)" : "(تأییدنشده)"}</summary>
+                      <p className="mt-1 whitespace-pre-line leading-6 text-ink-2">{a.text}</p>
+                      <Link className="text-lapis underline" href={`/research/library/${a.id}`}>باز کردن در کتابخانه</Link>
+                    </details>
+                  ))}
+                </td>
                 <td>{r.verified ? <Seal tone="success" dot>تأییدشده</Seal> : <Seal tone="warning" dot>تأییدنشده</Seal>}</td>
                 <td><div className="flex gap-1">
                   {can(user, "deadline.verify_legal") && (r.verified

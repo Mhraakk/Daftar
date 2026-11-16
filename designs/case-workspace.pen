@@ -1,0 +1,3914 @@
+{
+  "version": "2.22",
+  "children": [
+    {
+      "type": "frame",
+      "id": "rMBSR",
+      "x": 0,
+      "y": 0,
+      "name": "Case Workspace",
+      "clip": true,
+      "width": 1440,
+      "height": 1417,
+      "fill": "$paper",
+      "children": [
+        {
+          "type": "frame",
+          "id": "n76zPz",
+          "name": "Main",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 28,
+          "padding": [
+            0,
+            40,
+            40,
+            40
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "Leu7a",
+              "name": "Top Bar",
+              "width": "fill_container",
+              "height": 72,
+              "stroke": "$line",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "d0IcsR",
+                  "name": "Top Left",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Siegk",
+                      "name": "Avatar",
+                      "width": 36,
+                      "height": 36,
+                      "fill": "$accent",
+                      "cornerRadius": 18,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "vG972",
+                          "name": "س‌م",
+                          "fill": "#FFF",
+                          "content": "س‌م",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DYuLK",
+                      "name": "Bell",
+                      "width": 36,
+                      "height": 36,
+                      "cornerRadius": 18,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "JmQId",
+                          "name": "i",
+                          "width": 18,
+                          "height": 18,
+                          "icon": "bell",
+                          "library": "lucide",
+                          "fill": "$ink2"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "kJg7B",
+                      "name": "Command",
+                      "width": 340,
+                      "height": 40,
+                      "fill": "$card",
+                      "cornerRadius": 10,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "padding": [
+                        0,
+                        12
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "QkM1W",
+                          "name": "Kbd",
+                          "fill": "$paper",
+                          "cornerRadius": 5,
+                          "padding": [
+                            2,
+                            6
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "XHIDw",
+                              "name": "⌘K",
+                              "fill": "$ink3",
+                              "content": "⌘K",
+                              "fontFamily": "Vazirmatn",
+                              "fontSize": 11
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "AuokL",
+                          "name": "S",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "peF5r",
+                              "name": "جست‌وجو یا فرمان به ",
+                              "fill": "$ink3",
+                              "content": "جست‌وجو یا فرمان به دستیار…",
+                              "fontFamily": "Vazirmatn",
+                              "fontSize": 13
+                            },
+                            {
+                              "type": "icon",
+                              "id": "vlDXs",
+                              "name": "i",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "search",
+                              "library": "lucide",
+                              "fill": "$ink3"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "b9U50x",
+                  "name": "Breadcrumb",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "POEOS",
+                      "name": "۱۴۰۳-ح-۰۸۷۲",
+                      "fill": "$ink",
+                      "content": "۱۴۰۳-ح-۰۸۷۲",
+                      "fontFamily": "Vazirmatn",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "icon",
+                      "id": "nXKXL",
+                      "name": "c",
+                      "width": 14,
+                      "height": 14,
+                      "icon": "chevron-left",
+                      "library": "lucide",
+                      "fill": "$ink3"
+                    },
+                    {
+                      "type": "text",
+                      "id": "eiBxq",
+                      "name": "پرونده‌ها",
+                      "fill": "$ink2",
+                      "content": "پرونده‌ها",
+                      "fontFamily": "Vazirmatn",
+                      "fontSize": 13
+                    },
+                    {
+                      "type": "icon",
+                      "id": "H5Qih",
+                      "name": "c",
+                      "width": 14,
+                      "height": 14,
+                      "icon": "chevron-left",
+                      "library": "lucide",
+                      "fill": "$ink3"
+                    },
+                    {
+                      "type": "text",
+                      "id": "d3s9aB",
+                      "name": "دفتر وکالت مهرآیین",
+                      "fill": "$ink2",
+                      "content": "دفتر وکالت مهرآیین",
+                      "fontFamily": "Vazirmatn",
+                      "fontSize": 13
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lMu1H",
+              "name": "Case Header",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "end",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "cZFBn",
+                  "name": "Actions",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "XGCM6",
+                      "name": "More",
+                      "width": 44,
+                      "height": 44,
+                      "cornerRadius": 10,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "Pwm5N",
+                          "name": "i",
+                          "width": 18,
+                          "height": 18,
+                          "icon": "ellipsis",
+                          "library": "lucide",
+                          "fill": "$ink2"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "XdI9T",
+                      "name": "Share",
+                      "height": 44,
+                      "cornerRadius": 10,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        16
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "F4Zag",
+                          "name": "گزارش برای موکل",
+                          "fill": "$ink",
+                          "content": "گزارش برای موکل",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "icon",
+                          "id": "V2yo4",
+                          "name": "i",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "send",
+                          "library": "lucide",
+                          "fill": "$ink2"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DOGWD",
+                      "name": "Primary",
+                      "height": 44,
+                      "fill": "$ink",
+                      "cornerRadius": 10,
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        18
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "s9gD1",
+                          "name": "اقدام جدید",
+                          "fill": "#FFF",
+                          "content": "اقدام جدید",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "icon",
+                          "id": "E9Kbz9",
+                          "name": "i",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "plus",
+                          "library": "lucide",
+                          "fill": "#FFF"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "FL0Ly",
+                  "name": "Title Block",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "GOEq1",
+                      "name": "Tags",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "rM3yF",
+                          "name": "Tag",
+                          "fill": "$card",
+                          "cornerRadius": 20,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "padding": [
+                            4,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Zrh7R",
+                              "name": "شعبهٔ ۱۲ دادگاه عموم",
+                              "fill": "$ink2",
+                              "content": "شعبهٔ ۱۲ دادگاه عمومی حقوقی تهران",
+                              "fontFamily": "Vazirmatn",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "pFTDJ",
+                          "name": "Tag",
+                          "fill": "$card",
+                          "cornerRadius": 20,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "padding": [
+                            4,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "N8QcjW",
+                              "name": "دعوای مطالبهٔ وجه",
+                              "fill": "$ink2",
+                              "content": "دعوای مطالبهٔ وجه",
+                              "fontFamily": "Vazirmatn",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "X9qbIN",
+                          "name": "Tag",
+                          "fill": "$accentSoft",
+                          "cornerRadius": 20,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "padding": [
+                            4,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "gMhwZ",
+                              "name": "● در جریان رسیدگی",
+                              "fill": "$accent",
+                              "content": "● در جریان رسیدگی",
+                              "fontFamily": "Vazirmatn",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "no1kZ",
+                      "name": "Case Title",
+                      "fill": "$ink",
+                      "content": "شرکت آرمان‌سازان پارس علیه شرکت نوین‌تجارت کیان",
+                      "fontFamily": "Vazirmatn",
+                      "fontSize": 34,
+                      "fontWeight": "800"
+                    },
+                    {
+                      "type": "text",
+                      "id": "F5OnM",
+                      "name": "مطالبهٔ ۱۸٫۴ میلیارد",
+                      "fill": "$ink2",
+                      "content": "مطالبهٔ ۱۸٫۴ میلیارد ریال بابت اجرای قرارداد پیمانکاری شمارهٔ ۲۲۴/پ  ·  وکیل مسئول: سارا مهرآیین  ·  تشکیل: ۱۴ مهر ۱۴۰۳",
+                      "fontFamily": "Vazirmatn",
+                      "fontSize": 14
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "SxANW",
+              "name": "Stage Tracker",
+              "width": "fill_container",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ZYlW3",
+                  "name": "Stage",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 3,
+                      "id": "YvraA",
+                      "name": "Bar",
+                      "fill": "#DCD6C9",
+                      "width": "fill_container",
+                      "height": 4
+                    },
+                    {
+                      "type": "frame",
+                      "id": "vFUCw",
+                      "name": "Lbl",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "YFFSx",
+                          "name": "—",
+                          "fill": "$ink3",
+                          "content": "—",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 11
+                        },
+                        {
+                          "type": "text",
+                          "id": "OpndQ",
+                          "name": "تجدیدنظر",
+                          "fill": "$ink3",
+                          "content": "تجدیدنظر",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "a9zNi",
+                  "name": "Stage",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 3,
+                      "id": "cwJLC",
+                      "name": "Bar",
+                      "fill": "#DCD6C9",
+                      "width": "fill_container",
+                      "height": 4
+                    },
+                    {
+                      "type": "frame",
+                      "id": "rPtBE",
+                      "name": "Lbl",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "NE3rx",
+                          "name": "—",
+                          "fill": "$ink3",
+                          "content": "—",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 11
+                        },
+                        {
+                          "type": "text",
+                          "id": "i3RdO",
+                          "name": "رأی بدوی",
+                          "fill": "$ink3",
+                          "content": "رأی بدوی",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Q02zw",
+                  "name": "Stage",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 3,
+                      "id": "a4MsIG",
+                      "name": "Bar",
+                      "fill": "#DCD6C9",
+                      "width": "fill_container",
+                      "height": 4
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xfX1j",
+                      "name": "Lbl",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "eLtvW",
+                          "name": "۲۸ آذر",
+                          "fill": "$ink3",
+                          "content": "۲۸ آذر",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 11
+                        },
+                        {
+                          "type": "text",
+                          "id": "KOrXP",
+                          "name": "جلسهٔ دوم",
+                          "fill": "$ink3",
+                          "content": "جلسهٔ دوم",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "e3XSXv",
+                  "name": "Stage",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 3,
+                      "id": "x2CcU",
+                      "name": "Bar",
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 90,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#D9D3C4",
+                            "position": 0
+                          },
+                          {
+                            "color": "#D9D3C4",
+                            "position": 0.45
+                          },
+                          {
+                            "color": "#B98A2E",
+                            "position": 0.46
+                          },
+                          {
+                            "color": "#B98A2E",
+                            "position": 1
+                          }
+                        ]
+                      },
+                      "width": "fill_container",
+                      "height": 6
+                    },
+                    {
+                      "type": "frame",
+                      "id": "rTAeP",
+                      "name": "Lbl",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "c8APN",
+                          "name": "در جریان",
+                          "fill": "$gold",
+                          "content": "در جریان",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "XB6Th",
+                          "name": "کارشناسی",
+                          "fill": "$ink",
+                          "content": "کارشناسی",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "npAPA",
+                  "name": "Stage",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 3,
+                      "id": "r7kPX",
+                      "name": "Bar",
+                      "fill": "$accent",
+                      "width": "fill_container",
+                      "height": 4
+                    },
+                    {
+                      "type": "frame",
+                      "id": "MUw4P",
+                      "name": "Lbl",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "aBuFN",
+                          "name": "۱۸ آبان",
+                          "fill": "$ink3",
+                          "content": "۱۸ آبان",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 11
+                        },
+                        {
+                          "type": "text",
+                          "id": "B26m5",
+                          "name": "جلسهٔ اول",
+                          "fill": "$ink",
+                          "content": "جلسهٔ اول",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Be5l7",
+                  "name": "Stage",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 3,
+                      "id": "epCdz",
+                      "name": "Bar",
+                      "fill": "$accent",
+                      "width": "fill_container",
+                      "height": 4
+                    },
+                    {
+                      "type": "frame",
+                      "id": "aREID",
+                      "name": "Lbl",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "iYrH6",
+                          "name": "۲ آبان",
+                          "fill": "$ink3",
+                          "content": "۲ آبان",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 11
+                        },
+                        {
+                          "type": "text",
+                          "id": "m5hnN2",
+                          "name": "ابلاغ",
+                          "fill": "$ink",
+                          "content": "ابلاغ",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "R0X6RA",
+                  "name": "Stage",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 3,
+                      "id": "jn0sE",
+                      "name": "Bar",
+                      "fill": "$accent",
+                      "width": "fill_container",
+                      "height": 4
+                    },
+                    {
+                      "type": "frame",
+                      "id": "y2l2W",
+                      "name": "Lbl",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "I2xF1",
+                          "name": "۱۴ مهر",
+                          "fill": "$ink3",
+                          "content": "۱۴ مهر",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 11
+                        },
+                        {
+                          "type": "text",
+                          "id": "Vjfjc",
+                          "name": "تقدیم دادخواست",
+                          "fill": "$ink",
+                          "content": "تقدیم دادخواست",
+                          "fontFamily": "Vazirmatn",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Hdbke",
+              "name": "Body",
+              "width": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "oeK8I",
+                  "name": "Side Column",
+                  "width": 420,
+                  "layout": "vertical",
+                  "gap": 20,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Legx0",
+                      "name": "Assistant Panel",
+                      "width": "fill_container",
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 160,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#1B2A25",
+                            "position": 0
+                          },
+                          {
+                            "color": "#14181F",
+                            "position": 1
+                          }
+                        ]
+                      },
+                      "cornerRadius": 18,
+                      "layout": "vertical",
+                      "gap": 18,
+                      "padding": 24,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "TjdFP",
+                          "name": "AI Head",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "QAurJ",
+                              "name": "Live",
+                              "fill": "#FFFFFF14",
+                              "cornerRadius": 20,
+                              "padding": [
+                                3,
+                                10
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "T2fiT",
+                                  "name": "به‌روز · ۳ دقیقه پیش",
+                                  "fill": "#B9C2BE",
+                                  "content": "به‌روز · ۳ دقیقه پیش",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "SU3hF",
+                              "name": "AI Title",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "yvxFo",
+                                  "name": "اقدام بعدی پیشنهادی",
+                                  "fill": "#FFF",
+                                  "content": "اقدام بعدی پیشنهادی",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 16,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "zw69r",
+                                  "name": "i",
+                                  "width": 18,
+                                  "height": 18,
+                                  "icon": "sparkles",
+                                  "library": "lucide",
+                                  "fill": "$gold"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ikiFt",
+                          "name": "Top Suggestion",
+                          "width": "fill_container",
+                          "fill": "#FFFFFF0D",
+                          "cornerRadius": 14,
+                          "stroke": "#B98A2E66",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 18,
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "R9XFa",
+                              "name": "Badge",
+                              "fill": "#B5472B",
+                              "cornerRadius": 6,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "q7sud",
+                                  "name": "فوری · مهلت ۳ روز",
+                                  "fill": "#FFF",
+                                  "content": "فوری · مهلت ۳ روز",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "oABi0",
+                              "name": "ثبت اعتراض به نظر کا",
+                              "fill": "#FFF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "ثبت اعتراض به نظر کارشناس رسمی",
+                              "textAlign": "right",
+                              "fontFamily": "Vazirmatn",
+                              "fontSize": 19,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Kp9bo",
+                              "name": "نظر کارشناس در ۱۲ آب",
+                              "fill": "#C9D0CC",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "نظر کارشناس در ۱۲ آبان ابلاغ شد و مهلت یک‌هفته‌ای اعتراض (مادهٔ ۲۶۰ ق.آ.د.م) پنجشنبه پایان می‌یابد. در گزارش، ۴ قلم از صورت‌وضعیت‌ها نادیده گرفته شده است.",
+                              "lineHeight": 1.8,
+                              "textAlign": "right",
+                              "fontFamily": "Vazirmatn",
+                              "fontSize": 13
+                            },
+                            {
+                              "type": "frame",
+                              "id": "J7wL2h",
+                              "name": "Hero Actions",
+                              "width": "fill_container",
+                              "gap": 8,
+                              "justifyContent": "end",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "AxROQ",
+                                  "name": "Ghost",
+                                  "height": 38,
+                                  "cornerRadius": 9,
+                                  "stroke": "#FFFFFF33",
+                                  "strokeWidth": 1,
+                                  "padding": [
+                                    0,
+                                    14
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "QTbNY",
+                                      "name": "مشاهدهٔ استدلال",
+                                      "fill": "#E6EAE8",
+                                      "content": "مشاهدهٔ استدلال",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 13
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "DUp2R",
+                                  "name": "Draft",
+                                  "height": 38,
+                                  "fill": "$gold",
+                                  "cornerRadius": 9,
+                                  "gap": 6,
+                                  "padding": [
+                                    0,
+                                    14
+                                  ],
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "r05x0z",
+                                      "name": "تهیهٔ پیش‌نویس لایحه",
+                                      "fill": "$ink",
+                                      "content": "تهیهٔ پیش‌نویس لایحه",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 13,
+                                      "fontWeight": "700"
+                                    },
+                                    {
+                                      "type": "icon",
+                                      "id": "Hgfqj",
+                                      "name": "i",
+                                      "width": 15,
+                                      "height": 15,
+                                      "icon": "pen-line",
+                                      "library": "lucide",
+                                      "fill": "$ink"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "oq7Pp",
+                          "name": "Suggestion",
+                          "width": "fill_container",
+                          "stroke": "#FFFFFF14",
+                          "strokeWidth": {
+                            "top": 1
+                          },
+                          "gap": 12,
+                          "padding": [
+                            12,
+                            0,
+                            0,
+                            0
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "EVcOl",
+                              "name": "go",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "arrow-up-left",
+                              "library": "lucide",
+                              "fill": "#6F7A76"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "qevox",
+                              "name": "Txt",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 3,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "hSUWf",
+                                  "name": "درخواست استعلام از ا",
+                                  "fill": "#FFF",
+                                  "content": "درخواست استعلام از ادارهٔ ثبت",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "MzgpI",
+                                  "name": "برای احراز صاحبان ام",
+                                  "fill": "#8E9995",
+                                  "content": "برای احراز صاحبان امضای مجاز خوانده",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "OQ8Oo",
+                              "name": "Ic",
+                              "width": 36,
+                              "height": 36,
+                              "fill": "#FFFFFF10",
+                              "cornerRadius": 10,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "Lvqy7",
+                                  "name": "i",
+                                  "width": 17,
+                                  "height": 17,
+                                  "icon": "landmark",
+                                  "library": "lucide",
+                                  "fill": "#D8C08A"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "eNbN3",
+                          "name": "Suggestion",
+                          "width": "fill_container",
+                          "stroke": "#FFFFFF14",
+                          "strokeWidth": {
+                            "top": 1
+                          },
+                          "gap": 12,
+                          "padding": [
+                            12,
+                            0,
+                            0,
+                            0
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "dfe0p",
+                              "name": "go",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "arrow-up-left",
+                              "library": "lucide",
+                              "fill": "#6F7A76"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Ef5vy",
+                              "name": "Txt",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 3,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "biXop",
+                                  "name": "ارسال گزارش وضعیت به",
+                                  "fill": "#FFF",
+                                  "content": "ارسال گزارش وضعیت به موکل",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "g5oKB3",
+                                  "name": "آخرین گزارش ۲۳ روز پ",
+                                  "fill": "#8E9995",
+                                  "content": "آخرین گزارش ۲۳ روز پیش فرستاده شده",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "YtKj8",
+                              "name": "Ic",
+                              "width": 36,
+                              "height": 36,
+                              "fill": "#FFFFFF10",
+                              "cornerRadius": 10,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "lP4Uk",
+                                  "name": "i",
+                                  "width": 17,
+                                  "height": 17,
+                                  "icon": "message-square-text",
+                                  "library": "lucide",
+                                  "fill": "#D8C08A"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "gqJSL",
+                          "name": "Suggestion",
+                          "width": "fill_container",
+                          "stroke": "#FFFFFF14",
+                          "strokeWidth": {
+                            "top": 1
+                          },
+                          "gap": 12,
+                          "padding": [
+                            12,
+                            0,
+                            0,
+                            0
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "i6gem",
+                              "name": "go",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "arrow-up-left",
+                              "library": "lucide",
+                              "fill": "#6F7A76"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "AgbMi",
+                              "name": "Txt",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 3,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "myonH",
+                                  "name": "تأمین دلیل: صورت‌جلس",
+                                  "fill": "#FFF",
+                                  "content": "تأمین دلیل: صورت‌جلسه‌های کارگاه",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "RqTve",
+                                  "name": "احتمال انکار در جلسه",
+                                  "fill": "#8E9995",
+                                  "content": "احتمال انکار در جلسهٔ دوم — ۷۲٪",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "swFhN",
+                              "name": "Ic",
+                              "width": 36,
+                              "height": 36,
+                              "fill": "#FFFFFF10",
+                              "cornerRadius": 10,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "RNlQt",
+                                  "name": "i",
+                                  "width": 17,
+                                  "height": 17,
+                                  "icon": "shield-check",
+                                  "library": "lucide",
+                                  "fill": "#D8C08A"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "CbmWx",
+                      "name": "Deadlines",
+                      "width": "fill_container",
+                      "fill": "$card",
+                      "cornerRadius": 18,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "layout": "vertical",
+                      "gap": 16,
+                      "padding": 24,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "s0wv4",
+                          "name": "Head",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "cgMls",
+                              "name": "تقویم کامل",
+                              "fill": "$accent",
+                              "content": "تقویم کامل",
+                              "fontFamily": "Vazirmatn",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "DFDK1",
+                              "name": "مهلت‌ها",
+                              "fill": "$ink",
+                              "content": "مهلت‌ها",
+                              "fontFamily": "Vazirmatn",
+                              "fontSize": 16,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "mODMn",
+                          "name": "Deadline",
+                          "width": "fill_container",
+                          "gap": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "VAnQK",
+                              "name": "Txt",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 3,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "pn36G",
+                                  "name": "مهلت اعتراض به نظر ک",
+                                  "fill": "$ink",
+                                  "content": "مهلت اعتراض به نظر کارشناس",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "QOvcF",
+                                  "name": "قانونی · ۳ روز مانده",
+                                  "fill": "$urgent",
+                                  "content": "قانونی · ۳ روز مانده",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "d3MCgo",
+                              "name": "Date",
+                              "width": 54,
+                              "height": 58,
+                              "fill": "$urgentSoft",
+                              "cornerRadius": 12,
+                              "layout": "vertical",
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "v6Tc1",
+                                  "name": "۲۴",
+                                  "fill": "$urgent",
+                                  "content": "۲۴",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 20,
+                                  "fontWeight": "800"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "HhOoc",
+                                  "name": "آبان",
+                                  "fill": "$ink2",
+                                  "content": "آبان",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "K09W2",
+                          "name": "Deadline",
+                          "width": "fill_container",
+                          "gap": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "THAMW",
+                              "name": "Txt",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 3,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "S7pOx",
+                                  "name": "پرداخت دستمزد کارشنا",
+                                  "fill": "$ink",
+                                  "content": "پرداخت دستمزد کارشناس هیئت",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "d8JIuR",
+                                  "name": "پیش‌بینی‌شده · ۱۴ رو",
+                                  "fill": "$gold",
+                                  "content": "پیش‌بینی‌شده · ۱۴ روز",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "BuXzq",
+                              "name": "Date",
+                              "width": 54,
+                              "height": 58,
+                              "fill": "$goldSoft",
+                              "cornerRadius": 12,
+                              "layout": "vertical",
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "E7JgJ",
+                                  "name": "۰۵",
+                                  "fill": "$ink",
+                                  "content": "۰۵",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 20,
+                                  "fontWeight": "800"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "p7WBAw",
+                                  "name": "آذر",
+                                  "fill": "$ink2",
+                                  "content": "آذر",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "kl9Qe",
+                          "name": "Deadline",
+                          "width": "fill_container",
+                          "gap": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Nz5Qk",
+                              "name": "Txt",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 3,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "RMcV6",
+                                  "name": "جلسهٔ دوم رسیدگی — س",
+                                  "fill": "$ink",
+                                  "content": "جلسهٔ دوم رسیدگی — ساعت ۱۰:۳۰",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "pxvSU",
+                                  "name": "شعبهٔ ۱۲ · طبقهٔ سوم",
+                                  "fill": "$ink3",
+                                  "content": "شعبهٔ ۱۲ · طبقهٔ سوم",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "bjJG6",
+                              "name": "Date",
+                              "width": 54,
+                              "height": 58,
+                              "fill": "$paper",
+                              "cornerRadius": 12,
+                              "layout": "vertical",
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "BYJ5p",
+                                  "name": "۲۸",
+                                  "fill": "$ink",
+                                  "content": "۲۸",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 20,
+                                  "fontWeight": "800"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "Wf17W",
+                                  "name": "آذر",
+                                  "fill": "$ink2",
+                                  "content": "آذر",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "c8vwS",
+                          "name": "Deadline",
+                          "width": "fill_container",
+                          "gap": 14,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "ZNYGm",
+                              "name": "Txt",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 3,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Pa6FI",
+                                  "name": "پایان مهلت ارائهٔ اص",
+                                  "fill": "$ink",
+                                  "content": "پایان مهلت ارائهٔ اصل اسناد",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "hqAzc",
+                                  "name": "دستور دادگاه",
+                                  "fill": "$ink3",
+                                  "content": "دستور دادگاه",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "bO9eM",
+                              "name": "Date",
+                              "width": 54,
+                              "height": 58,
+                              "fill": "$paper",
+                              "cornerRadius": 12,
+                              "layout": "vertical",
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "y8nP2",
+                                  "name": "۱۵",
+                                  "fill": "$ink",
+                                  "content": "۱۵",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 20,
+                                  "fontWeight": "800"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "BWj1I",
+                                  "name": "دی",
+                                  "fill": "$ink2",
+                                  "content": "دی",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "uPhSe",
+                  "name": "Main Column",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 20,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "eenlf",
+                      "name": "Parties",
+                      "width": "fill_container",
+                      "fill": "$card",
+                      "cornerRadius": 18,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "BY1TQ",
+                          "name": "Party",
+                          "width": "fill_container",
+                          "stroke": "$line",
+                          "strokeWidth": {
+                            "right": 1
+                          },
+                          "gap": 14,
+                          "padding": 22,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "iiJMU",
+                              "name": "Txt",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 4,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "h1tf5",
+                                  "name": "خوانده",
+                                  "fill": "$urgent",
+                                  "content": "خوانده",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "PxDZ2",
+                                  "name": "شرکت نوین‌تجارت کیان",
+                                  "fill": "$ink",
+                                  "content": "شرکت نوین‌تجارت کیان",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 16,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "C5JGqI",
+                                  "name": "سهامی خاص · شناسهٔ م",
+                                  "fill": "$ink2",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "سهامی خاص · شناسهٔ ملی ۱۰۱۰۳۴۵۶۷۸۹",
+                                  "textAlign": "right",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "Gzj4x",
+                                  "name": "وکیل: علی رضوانی (پا",
+                                  "fill": "$ink3",
+                                  "content": "وکیل: علی رضوانی (پایه‌یک)",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "iuS7k",
+                              "name": "Av",
+                              "width": 48,
+                              "height": 48,
+                              "fill": "$urgentSoft",
+                              "cornerRadius": 14,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "SCRRg",
+                                  "name": "نک",
+                                  "fill": "$urgent",
+                                  "content": "نک",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 15,
+                                  "fontWeight": "800"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "R2h1Rn",
+                          "name": "Party",
+                          "width": "fill_container",
+                          "gap": 14,
+                          "padding": 22,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "xzr3f",
+                              "name": "Txt",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 4,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "pCXDw",
+                                  "name": "خواهان · موکل",
+                                  "fill": "$accent",
+                                  "content": "خواهان · موکل",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "gJktl",
+                                  "name": "شرکت آرمان‌سازان پار",
+                                  "fill": "$ink",
+                                  "content": "شرکت آرمان‌سازان پارس",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 16,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "O7j0kx",
+                                  "name": "مدیرعامل: مهندس کاوه",
+                                  "fill": "$ink2",
+                                  "content": "مدیرعامل: مهندس کاوه نیک‌پور",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "CqMkf",
+                                  "name": "آخرین تماس: ۹ آبان ·",
+                                  "fill": "$ink3",
+                                  "content": "آخرین تماس: ۹ آبان · تلفنی",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "coHmu",
+                              "name": "Av",
+                              "width": 48,
+                              "height": 48,
+                              "fill": "$accentSoft",
+                              "cornerRadius": 14,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "TpOkc",
+                                  "name": "آپ",
+                                  "fill": "$accent",
+                                  "content": "آپ",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 15,
+                                  "fontWeight": "800"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "PVZNO",
+                          "name": "Key Facts",
+                          "width": 250,
+                          "fill": "$paper",
+                          "cornerRadius": [
+                            18,
+                            0,
+                            0,
+                            18
+                          ],
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 22,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "W2gPnG",
+                              "name": "KV",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "h2ACF",
+                                  "name": "۱۸٫۴ میلیارد ریال",
+                                  "fill": "$ink",
+                                  "content": "۱۸٫۴ میلیارد ریال",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 13,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "YW0Ob",
+                                  "name": "خواسته",
+                                  "fill": "$ink2",
+                                  "content": "خواسته",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "X0g7m",
+                              "name": "KV",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "vkOx1",
+                                  "name": "۴۶۰ میلیون ریال",
+                                  "fill": "$ink",
+                                  "content": "۴۶۰ میلیون ریال",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 13,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "j04RM2",
+                                  "name": "هزینهٔ دادرسی",
+                                  "fill": "$ink2",
+                                  "content": "هزینهٔ دادرسی",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "i0sI2n",
+                              "name": "KV",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Csdr1",
+                                  "name": "۶۸٪ · متوسط رو به با",
+                                  "fill": "$ink",
+                                  "content": "۶۸٪ · متوسط رو به بالا",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 13,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "yh0fY",
+                                  "name": "احتمال موفقیت",
+                                  "fill": "$ink2",
+                                  "content": "احتمال موفقیت",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "rqEBE",
+                      "name": "Two Up",
+                      "width": "fill_container",
+                      "gap": 20,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "yLJUw",
+                          "name": "Documents",
+                          "width": "fill_container",
+                          "fill": "$card",
+                          "cornerRadius": 18,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "gap": 16,
+                          "padding": 24,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "u2mEeM",
+                              "name": "Head",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "ASzcw",
+                                  "name": "همه · ۲۴",
+                                  "fill": "$accent",
+                                  "content": "مشاهدهٔ همه",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "wPbYN",
+                                  "name": "T",
+                                  "gap": 8,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "ZtAFF",
+                                      "name": "Cnt",
+                                      "fill": "$paper",
+                                      "cornerRadius": 10,
+                                      "padding": [
+                                        1,
+                                        8
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "MnSKv",
+                                          "name": "۲۴",
+                                          "fill": "$ink2",
+                                          "content": "۲۴",
+                                          "fontFamily": "Vazirmatn",
+                                          "fontSize": 11,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "A77bw",
+                                      "name": "اسناد",
+                                      "fill": "$ink",
+                                      "content": "اسناد",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 16,
+                                      "fontWeight": "700"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ELUBH",
+                              "name": "Drop",
+                              "width": "fill_container",
+                              "fill": "$paper",
+                              "cornerRadius": 12,
+                              "stroke": "#CFC7B5",
+                              "strokeWidth": 1,
+                              "gap": 8,
+                              "padding": 14,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "v789G",
+                                  "name": "فایل را رها کنید — د",
+                                  "fill": "$ink2",
+                                  "content": "فایل را رها کنید — دستیار خودکار طبقه‌بندی و خلاصه می‌کند",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "Hbim0",
+                                  "name": "i",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "upload",
+                                  "library": "lucide",
+                                  "fill": "$ink2"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "mSrnu",
+                              "name": "Doc",
+                              "width": "fill_container",
+                              "gap": 12,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "xohwQ",
+                                  "name": "Tag",
+                                  "cornerRadius": 6,
+                                  "stroke": "$line",
+                                  "strokeWidth": 1,
+                                  "padding": [
+                                    2,
+                                    8
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Noaqn",
+                                      "name": "مهم",
+                                      "fill": "$ink2",
+                                      "content": "مهم",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "fiQiB",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "G20lZ",
+                                      "name": "گزارش کارشناس رسمی —",
+                                      "fill": "$ink",
+                                      "content": "گزارش کارشناس رسمی — نهایی",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 13,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "WIKh2",
+                                      "name": "۱۲ آبان · ۱۸ صفحه",
+                                      "fill": "$ink3",
+                                      "content": "۱۲ آبان · ۱۸ صفحه",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "QONwa",
+                                  "name": "Ext",
+                                  "width": 38,
+                                  "height": 44,
+                                  "fill": "$paper",
+                                  "cornerRadius": [
+                                    4,
+                                    10,
+                                    4,
+                                    4
+                                  ],
+                                  "stroke": "$line",
+                                  "strokeWidth": 1,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Q47TuD",
+                                      "name": "e",
+                                      "fill": "$urgent",
+                                      "content": "PDF",
+                                      "fontFamily": "JetBrains Mono",
+                                      "fontSize": 9,
+                                      "fontWeight": "700"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "vneTd",
+                              "name": "Doc",
+                              "width": "fill_container",
+                              "gap": 12,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "YtAWy",
+                                  "name": "Tag",
+                                  "cornerRadius": 6,
+                                  "stroke": "$line",
+                                  "strokeWidth": 1,
+                                  "padding": [
+                                    2,
+                                    8
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "ih4DK",
+                                      "name": "مستند اصلی",
+                                      "fill": "$ink2",
+                                      "content": "مستند اصلی",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "AgGZL",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "agW0b",
+                                      "name": "قرارداد پیمانکاری ۲۲",
+                                      "fill": "$ink",
+                                      "content": "قرارداد پیمانکاری ۲۲۴/پ",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 13,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "i7xQYr",
+                                      "name": "۳ مهر · ۳۲ صفحه",
+                                      "fill": "$ink3",
+                                      "content": "۳ مهر · ۳۲ صفحه",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "kRy8K",
+                                  "name": "Ext",
+                                  "width": 38,
+                                  "height": 44,
+                                  "fill": "$paper",
+                                  "cornerRadius": [
+                                    4,
+                                    10,
+                                    4,
+                                    4
+                                  ],
+                                  "stroke": "$line",
+                                  "strokeWidth": 1,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "aqhFN",
+                                      "name": "e",
+                                      "fill": "$accent",
+                                      "content": "PDF",
+                                      "fontFamily": "JetBrains Mono",
+                                      "fontSize": 9,
+                                      "fontWeight": "700"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "g2kFq",
+                              "name": "Doc",
+                              "width": "fill_container",
+                              "gap": 12,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "eUB6L",
+                                  "name": "Tag",
+                                  "cornerRadius": 6,
+                                  "stroke": "$line",
+                                  "strokeWidth": 1,
+                                  "padding": [
+                                    2,
+                                    8
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "sOW4F",
+                                      "name": "مالی",
+                                      "fill": "$ink2",
+                                      "content": "مالی",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "rjNQs",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "rMYjp",
+                                      "name": "صورت‌وضعیت‌های ۱ تا ",
+                                      "fill": "$ink",
+                                      "content": "صورت‌وضعیت‌های ۱ تا ۹",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 13,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "v2ZXsC",
+                                      "name": "۳ مهر · ۹ فایل",
+                                      "fill": "$ink3",
+                                      "content": "۳ مهر · ۹ فایل",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "lvoWr",
+                                  "name": "Ext",
+                                  "width": 38,
+                                  "height": 44,
+                                  "fill": "$paper",
+                                  "cornerRadius": [
+                                    4,
+                                    10,
+                                    4,
+                                    4
+                                  ],
+                                  "stroke": "$line",
+                                  "strokeWidth": 1,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "rr6nU",
+                                      "name": "e",
+                                      "fill": "$gold",
+                                      "content": "XLS",
+                                      "fontFamily": "JetBrains Mono",
+                                      "fontSize": 9,
+                                      "fontWeight": "700"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "vftyC",
+                          "name": "Tasks",
+                          "width": "fill_container",
+                          "fill": "$card",
+                          "cornerRadius": 18,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "gap": 16,
+                          "padding": 24,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "x1vmRY",
+                              "name": "Head",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "UMr3v",
+                                  "name": "+ وظیفه",
+                                  "fill": "$accent",
+                                  "content": "+ وظیفه",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "PxQLC",
+                                  "name": "T",
+                                  "gap": 8,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "wtaLy",
+                                      "name": "Cnt",
+                                      "fill": "$paper",
+                                      "cornerRadius": 10,
+                                      "padding": [
+                                        1,
+                                        8
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "XDv1L",
+                                          "name": "۵",
+                                          "fill": "$ink2",
+                                          "content": "۵",
+                                          "fontFamily": "Vazirmatn",
+                                          "fontSize": 11,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "scqzC",
+                                      "name": "وظایف",
+                                      "fill": "$ink",
+                                      "content": "وظایف",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 16,
+                                      "fontWeight": "700"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "J0YFj",
+                              "name": "Task",
+                              "width": "fill_container",
+                              "stroke": "$line",
+                              "strokeWidth": {
+                                "top": 1
+                              },
+                              "gap": 12,
+                              "padding": [
+                                10,
+                                0
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "UsPDJ",
+                                  "name": "Meta",
+                                  "fill": "$urgentSoft",
+                                  "cornerRadius": 6,
+                                  "padding": [
+                                    2,
+                                    8
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Chi3p",
+                                      "name": "امروز",
+                                      "fill": "$urgent",
+                                      "content": "امروز",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11,
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "aRjVW",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "sagx4",
+                                      "name": "مطالعهٔ گزارش کارشنا",
+                                      "fill": "$ink",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "مطالعهٔ گزارش کارشناس و استخراج ایرادها",
+                                      "textAlign": "right",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 13,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "f97uUv",
+                                      "name": "سارا م.",
+                                      "fill": "$ink3",
+                                      "content": "سارا م.",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "MCMuw",
+                                  "name": "Check",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "#00000000",
+                                  "cornerRadius": 6,
+                                  "stroke": "#C9C2B3",
+                                  "strokeWidth": 1.5,
+                                  "justifyContent": "center",
+                                  "alignItems": "center"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ExwiN",
+                              "name": "Task",
+                              "width": "fill_container",
+                              "stroke": "$line",
+                              "strokeWidth": {
+                                "top": 1
+                              },
+                              "gap": 12,
+                              "padding": [
+                                10,
+                                0
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "ytwZa",
+                                  "name": "Meta",
+                                  "fill": "$paper",
+                                  "cornerRadius": 6,
+                                  "padding": [
+                                    2,
+                                    8
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "nm7Tk",
+                                      "name": "فردا",
+                                      "fill": "$ink2",
+                                      "content": "فردا",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11,
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "DkkNP",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "S2s9Xo",
+                                      "name": "هماهنگی جلسه با مشاو",
+                                      "fill": "$ink",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "هماهنگی جلسه با مشاور فنی موکل",
+                                      "textAlign": "right",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 13,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "U7UW2N",
+                                      "name": "پویا ر.",
+                                      "fill": "$ink3",
+                                      "content": "پویا ر.",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "wDb8p",
+                                  "name": "Check",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "#00000000",
+                                  "cornerRadius": 6,
+                                  "stroke": "#C9C2B3",
+                                  "strokeWidth": 1.5,
+                                  "justifyContent": "center",
+                                  "alignItems": "center"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "DzECE",
+                              "name": "Task",
+                              "width": "fill_container",
+                              "stroke": "$line",
+                              "strokeWidth": {
+                                "top": 1
+                              },
+                              "gap": 12,
+                              "padding": [
+                                10,
+                                0
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "bnVr3",
+                                  "name": "Meta",
+                                  "fill": "$paper",
+                                  "cornerRadius": 6,
+                                  "padding": [
+                                    2,
+                                    8
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "X023hD",
+                                      "name": "۲۲ آبان",
+                                      "fill": "$ink2",
+                                      "content": "۲۲ آبان",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11,
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "n9Im1",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "C3enP",
+                                      "name": "تکمیل فهرست صورت‌وضع",
+                                      "fill": "$ink",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "تکمیل فهرست صورت‌وضعیت‌های تأییدشده",
+                                      "textAlign": "right",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 13,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "W1CxH",
+                                      "name": "نگار ا.",
+                                      "fill": "$ink3",
+                                      "content": "نگار ا.",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "I73V9",
+                                  "name": "Check",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "#00000000",
+                                  "cornerRadius": 6,
+                                  "stroke": "#C9C2B3",
+                                  "strokeWidth": 1.5,
+                                  "justifyContent": "center",
+                                  "alignItems": "center"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Pv8Wg",
+                              "name": "Task",
+                              "width": "fill_container",
+                              "stroke": "$line",
+                              "strokeWidth": {
+                                "top": 1
+                              },
+                              "gap": 12,
+                              "padding": [
+                                10,
+                                0
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "o7huN",
+                                  "name": "Meta",
+                                  "fill": "$paper",
+                                  "cornerRadius": 6,
+                                  "padding": [
+                                    2,
+                                    8
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "x8jqG",
+                                      "name": "انجام شد",
+                                      "fill": "$ink2",
+                                      "content": "انجام شد",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11,
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "m9PsHA",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 2,
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Oomrc",
+                                      "name": "اسکن اصل قرارداد و ا",
+                                      "fill": "$ink3",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "اسکن اصل قرارداد و الحاقیه‌ها",
+                                      "textAlign": "right",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 13,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "Nap0l",
+                                      "name": "پویا ر.",
+                                      "fill": "$ink3",
+                                      "content": "پویا ر.",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "ztH8t",
+                                  "name": "Check",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "$accent",
+                                  "cornerRadius": 6,
+                                  "stroke": "$accent",
+                                  "strokeWidth": 1.5,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "Xqsdz",
+                                      "name": "i",
+                                      "width": 13,
+                                      "height": 13,
+                                      "icon": "check",
+                                      "library": "lucide",
+                                      "fill": "#FFF"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "l5rKy9",
+                      "name": "Lower",
+                      "width": "fill_container",
+                      "gap": 20,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "B547qs",
+                          "name": "History",
+                          "width": "fill_container",
+                          "fill": "$card",
+                          "cornerRadius": 18,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "gap": 16,
+                          "padding": 24,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "IjYqG",
+                              "name": "Head",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "k5llz",
+                                  "name": "فیلتر رویدادها",
+                                  "fill": "$accent",
+                                  "content": "فیلتر رویدادها",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "EdhFN",
+                                  "name": "تاریخچهٔ پرونده",
+                                  "fill": "$ink",
+                                  "content": "تاریخچهٔ پرونده",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 16,
+                                  "fontWeight": "700"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ARFRz",
+                              "name": "Event",
+                              "width": "fill_container",
+                              "gap": 14,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "euJ7l",
+                                  "name": "امروز ۰۹:۱۲",
+                                  "fill": "$ink3",
+                                  "content": "امروز ۰۹:۱۲",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "Z8zKC",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 3,
+                                  "padding": [
+                                    4,
+                                    0,
+                                    12,
+                                    0
+                                  ],
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "w0TavV",
+                                      "name": "دستیار ۴ ایراد ماهوی",
+                                      "fill": "$ink",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "دستیار ۴ ایراد ماهوی در گزارش کارشناس شناسایی کرد",
+                                      "textAlign": "right",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 14,
+                                      "fontWeight": "700"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "pJlVn",
+                                      "name": "مقایسه با صورت‌وضعیت",
+                                      "fill": "$ink2",
+                                      "content": "مقایسه با صورت‌وضعیت‌های ۳، ۵، ۶ و ۸",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 12
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "F8ks5B",
+                                  "name": "Axis",
+                                  "width": 32,
+                                  "layout": "vertical",
+                                  "gap": 4,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "I26q1T",
+                                      "name": "Dot",
+                                      "width": 32,
+                                      "height": 32,
+                                      "fill": "$ink",
+                                      "cornerRadius": 16,
+                                      "stroke": "$line",
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "icon",
+                                          "id": "IHCIy",
+                                          "name": "i",
+                                          "width": 15,
+                                          "height": 15,
+                                          "icon": "sparkles",
+                                          "library": "lucide",
+                                          "fill": "$gold"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "rectangle",
+                                      "id": "dvEj0",
+                                      "name": "Line",
+                                      "fill": "$line",
+                                      "width": 1.5,
+                                      "height": 34
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "KMnqk",
+                              "name": "Event",
+                              "width": "fill_container",
+                              "gap": 14,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "vmHvx",
+                                  "name": "۱۲ آبان",
+                                  "fill": "$ink3",
+                                  "content": "۱۲ آبان",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "KlPBB",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 3,
+                                  "padding": [
+                                    4,
+                                    0,
+                                    12,
+                                    0
+                                  ],
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "A2gRk",
+                                      "name": "ابلاغ نظر کارشناس رس",
+                                      "fill": "$ink",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "ابلاغ نظر کارشناس رسمی دادگستری از طریق ثنا",
+                                      "textAlign": "right",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 14,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "brd5D",
+                                      "name": "کارشناس: مهندس فرهاد",
+                                      "fill": "$ink2",
+                                      "content": "کارشناس: مهندس فرهاد صدری · رشتهٔ ساختمان",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 12
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "y6xHVF",
+                                  "name": "Axis",
+                                  "width": 32,
+                                  "layout": "vertical",
+                                  "gap": 4,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "YPPa2",
+                                      "name": "Dot",
+                                      "width": 32,
+                                      "height": 32,
+                                      "fill": "$paper",
+                                      "cornerRadius": 16,
+                                      "stroke": "$line",
+                                      "strokeWidth": 1,
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "icon",
+                                          "id": "KdGCz",
+                                          "name": "i",
+                                          "width": 15,
+                                          "height": 15,
+                                          "icon": "inbox",
+                                          "library": "lucide",
+                                          "fill": "$urgent"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "rectangle",
+                                      "id": "zvYAw",
+                                      "name": "Line",
+                                      "fill": "$line",
+                                      "width": 1.5,
+                                      "height": 34
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "pQq44",
+                              "name": "Event",
+                              "width": "fill_container",
+                              "gap": 14,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "VspAN",
+                                  "name": "۱۸ آبان",
+                                  "fill": "$ink3",
+                                  "content": "۱۸ آبان",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "iQNI2",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 3,
+                                  "padding": [
+                                    4,
+                                    0,
+                                    12,
+                                    0
+                                  ],
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "YYY50",
+                                      "name": "برگزاری جلسهٔ اول رس",
+                                      "fill": "$ink",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "برگزاری جلسهٔ اول رسیدگی؛ قرار ارجاع به کارشناس صادر شد",
+                                      "textAlign": "right",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 14,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "dJVSY",
+                                      "name": "حضور: سارا مهرآیین، ",
+                                      "fill": "$ink2",
+                                      "content": "حضور: سارا مهرآیین، وکیل خوانده",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 12
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "QHdde",
+                                  "name": "Axis",
+                                  "width": 32,
+                                  "layout": "vertical",
+                                  "gap": 4,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "fWA0x",
+                                      "name": "Dot",
+                                      "width": 32,
+                                      "height": 32,
+                                      "fill": "$paper",
+                                      "cornerRadius": 16,
+                                      "stroke": "$line",
+                                      "strokeWidth": 1,
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "icon",
+                                          "id": "DcTgf",
+                                          "name": "i",
+                                          "width": 15,
+                                          "height": 15,
+                                          "icon": "gavel",
+                                          "library": "lucide",
+                                          "fill": "$accent"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "rectangle",
+                                      "id": "O9yncp",
+                                      "name": "Line",
+                                      "fill": "$line",
+                                      "width": 1.5,
+                                      "height": 34
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "akuyM",
+                              "name": "Event",
+                              "width": "fill_container",
+                              "gap": 14,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "V567t5",
+                                  "name": "۹ آبان",
+                                  "fill": "$ink3",
+                                  "content": "۹ آبان",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "ZOohm",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 3,
+                                  "padding": [
+                                    4,
+                                    0,
+                                    12,
+                                    0
+                                  ],
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "WtDgk",
+                                      "name": "تماس تلفنی با موکل —",
+                                      "fill": "$ink",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "تماس تلفنی با موکل — تأیید ارسال مدارک تکمیلی",
+                                      "textAlign": "right",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 14,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "YPZ2Q",
+                                      "name": "مدت: ۱۸ دقیقه · ثبت ",
+                                      "fill": "$ink2",
+                                      "content": "مدت: ۱۸ دقیقه · ثبت توسط نگار ا.",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 12
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "b84OPj",
+                                  "name": "Axis",
+                                  "width": 32,
+                                  "layout": "vertical",
+                                  "gap": 4,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "bNPb9",
+                                      "name": "Dot",
+                                      "width": 32,
+                                      "height": 32,
+                                      "fill": "$paper",
+                                      "cornerRadius": 16,
+                                      "stroke": "$line",
+                                      "strokeWidth": 1,
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "icon",
+                                          "id": "kfg8j",
+                                          "name": "i",
+                                          "width": 15,
+                                          "height": 15,
+                                          "icon": "phone",
+                                          "library": "lucide",
+                                          "fill": "$ink2"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "rectangle",
+                                      "id": "EvrPb",
+                                      "name": "Line",
+                                      "fill": "$line",
+                                      "width": 1.5,
+                                      "height": 34
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "trMVk",
+                              "name": "Event",
+                              "width": "fill_container",
+                              "gap": 14,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "s7kzv",
+                                  "name": "۱۴ مهر",
+                                  "fill": "$ink3",
+                                  "content": "۱۴ مهر",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "VzONU",
+                                  "name": "Txt",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 3,
+                                  "padding": [
+                                    4,
+                                    0,
+                                    12,
+                                    0
+                                  ],
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "v5UVm",
+                                      "name": "تقدیم دادخواست و پرد",
+                                      "fill": "$ink",
+                                      "textGrowth": "fixed-width",
+                                      "width": "fill_container",
+                                      "content": "تقدیم دادخواست و پرداخت هزینهٔ دادرسی",
+                                      "textAlign": "right",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 14,
+                                      "fontWeight": "600"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "gYnfa",
+                                      "name": "کد رهگیری ۹۲۰۳۴۱۷۷",
+                                      "fill": "$ink2",
+                                      "content": "کد رهگیری ۹۲۰۳۴۱۷۷",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 12
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "Thxzz",
+                                  "name": "Axis",
+                                  "width": 32,
+                                  "layout": "vertical",
+                                  "gap": 4,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "a3YAm",
+                                      "name": "Dot",
+                                      "width": 32,
+                                      "height": 32,
+                                      "fill": "$paper",
+                                      "cornerRadius": 16,
+                                      "stroke": "$line",
+                                      "strokeWidth": 1,
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "icon",
+                                          "id": "H42BcO",
+                                          "name": "i",
+                                          "width": 15,
+                                          "height": 15,
+                                          "icon": "file-plus",
+                                          "library": "lucide",
+                                          "fill": "$ink2"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Mhblx",
+                          "name": "Drafts",
+                          "width": 330,
+                          "fill": "$card",
+                          "cornerRadius": 18,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "gap": 16,
+                          "padding": 24,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "nLXsz",
+                              "name": "Head",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "iRXvz",
+                                  "name": "+ جدید",
+                                  "fill": "$accent",
+                                  "content": "+ جدید",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 12,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "PJfHF",
+                                  "name": "پیش‌نویس‌ها",
+                                  "fill": "$ink",
+                                  "content": "پیش‌نویس‌ها",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 16,
+                                  "fontWeight": "700"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "LfMN6",
+                              "name": "Draft",
+                              "width": "fill_container",
+                              "fill": "$paper",
+                              "cornerRadius": 12,
+                              "layout": "vertical",
+                              "gap": 10,
+                              "padding": 14,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "GxQiz",
+                                  "name": "Top",
+                                  "width": "fill_container",
+                                  "justifyContent": "space_between",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "ypWnO",
+                                      "name": "در حال نگارش",
+                                      "fill": "$gold",
+                                      "content": "در حال نگارش",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11,
+                                      "fontWeight": "700"
+                                    },
+                                    {
+                                      "type": "icon",
+                                      "id": "GIsDH",
+                                      "name": "i",
+                                      "width": 16,
+                                      "height": 16,
+                                      "icon": "file-pen-line",
+                                      "library": "lucide",
+                                      "fill": "$ink2"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "Wrq8V",
+                                  "name": "لایحهٔ اعتراض به نظر",
+                                  "fill": "$ink",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "لایحهٔ اعتراض به نظر کارشناس",
+                                  "textAlign": "right",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "kCMiO",
+                                  "name": "نسخهٔ ۲ · ویرایش ۱ س",
+                                  "fill": "$ink3",
+                                  "content": "نسخهٔ ۲ · ویرایش ۱ ساعت پیش",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "OIrCq",
+                                  "name": "Progress",
+                                  "width": "fill_container",
+                                  "height": 4,
+                                  "fill": "#E4DFD3",
+                                  "cornerRadius": 2,
+                                  "justifyContent": "end",
+                                  "children": [
+                                    {
+                                      "type": "rectangle",
+                                      "cornerRadius": 2,
+                                      "id": "I4huJ",
+                                      "name": "Fill",
+                                      "fill": "$gold",
+                                      "width": 200,
+                                      "height": 4
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "FnJXJ",
+                              "name": "Draft",
+                              "width": "fill_container",
+                              "fill": "$paper",
+                              "cornerRadius": 12,
+                              "layout": "vertical",
+                              "gap": 10,
+                              "padding": 14,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "RBr8J",
+                                  "name": "Top",
+                                  "width": "fill_container",
+                                  "justifyContent": "space_between",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "MnXUy",
+                                      "name": "نهایی",
+                                      "fill": "$accent",
+                                      "content": "نهایی",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11,
+                                      "fontWeight": "700"
+                                    },
+                                    {
+                                      "type": "icon",
+                                      "id": "B5kLN7",
+                                      "name": "i",
+                                      "width": 16,
+                                      "height": 16,
+                                      "icon": "file-pen-line",
+                                      "library": "lucide",
+                                      "fill": "$ink2"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "Set8G",
+                                  "name": "اظهارنامهٔ مطالبهٔ خ",
+                                  "fill": "$ink",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "اظهارنامهٔ مطالبهٔ خسارت تأخیر",
+                                  "textAlign": "right",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "UIDXI",
+                                  "name": "نسخهٔ ۴ · ارسال‌شده",
+                                  "fill": "$ink3",
+                                  "content": "نسخهٔ ۴ · ارسال‌شده",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "g2Xjx",
+                                  "name": "Progress",
+                                  "width": "fill_container",
+                                  "height": 4,
+                                  "fill": "#E4DFD3",
+                                  "cornerRadius": 2,
+                                  "justifyContent": "end",
+                                  "children": [
+                                    {
+                                      "type": "rectangle",
+                                      "cornerRadius": 2,
+                                      "id": "HXmsG",
+                                      "name": "Fill",
+                                      "fill": "$accent",
+                                      "width": "fill_container",
+                                      "height": 4
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "IIB9v",
+                              "name": "Draft",
+                              "width": "fill_container",
+                              "fill": "$paper",
+                              "cornerRadius": 12,
+                              "layout": "vertical",
+                              "gap": 10,
+                              "padding": 14,
+                              "alignItems": "end",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "H6w7s",
+                                  "name": "Top",
+                                  "width": "fill_container",
+                                  "justifyContent": "space_between",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "D3M6y",
+                                      "name": "پیشنهاد AI",
+                                      "fill": "$ink3",
+                                      "content": "پیشنهاد AI",
+                                      "fontFamily": "Vazirmatn",
+                                      "fontSize": 11,
+                                      "fontWeight": "700"
+                                    },
+                                    {
+                                      "type": "icon",
+                                      "id": "ApwpL",
+                                      "name": "i",
+                                      "width": 16,
+                                      "height": 16,
+                                      "icon": "file-pen-line",
+                                      "library": "lucide",
+                                      "fill": "$ink2"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "D6mVM",
+                                  "name": "لایحهٔ دفاعیه جلسهٔ ",
+                                  "fill": "$ink",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "لایحهٔ دفاعیه جلسهٔ دوم",
+                                  "textAlign": "right",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 14,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "nqKX2",
+                                  "name": "طرح اولیه از دستیار",
+                                  "fill": "$ink3",
+                                  "content": "طرح اولیه از دستیار",
+                                  "fontFamily": "Vazirmatn",
+                                  "fontSize": 11
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "P1JXr",
+                                  "name": "Progress",
+                                  "width": "fill_container",
+                                  "height": 4,
+                                  "fill": "#E4DFD3",
+                                  "cornerRadius": 2,
+                                  "justifyContent": "end",
+                                  "children": [
+                                    {
+                                      "type": "rectangle",
+                                      "cornerRadius": 2,
+                                      "id": "ZN97V",
+                                      "name": "Fill",
+                                      "fill": "$ink3",
+                                      "width": 91,
+                                      "height": 4
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "y6D7z",
+          "name": "Rail",
+          "width": 76,
+          "height": "fill_container",
+          "fill": "$ink",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": [
+            24,
+            0
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "nJQHz",
+              "name": "Logo",
+              "width": 44,
+              "height": 44,
+              "fill": "$gold",
+              "cornerRadius": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "CDjN6",
+                  "name": "د",
+                  "fill": "$ink",
+                  "content": "د",
+                  "fontFamily": "Vazirmatn",
+                  "fontSize": 22,
+                  "fontWeight": "800"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "puotr",
+              "name": "Spacer",
+              "width": 1,
+              "height": 18
+            },
+            {
+              "type": "frame",
+              "id": "vAu2F",
+              "name": "Nav layout-dashboard",
+              "width": 48,
+              "height": 48,
+              "fill": "#00000000",
+              "cornerRadius": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "p5P3F9",
+                  "name": "i",
+                  "width": 22,
+                  "height": 22,
+                  "icon": "layout-dashboard",
+                  "library": "lucide",
+                  "fill": "#8A92A3"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XIzw2",
+              "name": "Nav briefcase",
+              "width": 48,
+              "height": 48,
+              "fill": "#FFFFFF1A",
+              "cornerRadius": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "pSONJ",
+                  "name": "i",
+                  "width": 22,
+                  "height": 22,
+                  "icon": "briefcase",
+                  "library": "lucide",
+                  "fill": "#F3EAD3"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "T5JIyr",
+              "name": "Nav calendar-days",
+              "width": 48,
+              "height": 48,
+              "fill": "#00000000",
+              "cornerRadius": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "wN7hN",
+                  "name": "i",
+                  "width": 22,
+                  "height": 22,
+                  "icon": "calendar-days",
+                  "library": "lucide",
+                  "fill": "#8A92A3"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "GlsR7",
+              "name": "Nav users",
+              "width": 48,
+              "height": 48,
+              "fill": "#00000000",
+              "cornerRadius": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "dEtqr",
+                  "name": "i",
+                  "width": 22,
+                  "height": 22,
+                  "icon": "users",
+                  "library": "lucide",
+                  "fill": "#8A92A3"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Tt437",
+              "name": "Nav file-text",
+              "width": 48,
+              "height": 48,
+              "fill": "#00000000",
+              "cornerRadius": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "Kr9rG",
+                  "name": "i",
+                  "width": 22,
+                  "height": 22,
+                  "icon": "file-text",
+                  "library": "lucide",
+                  "fill": "#8A92A3"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "B9sRUf",
+              "name": "Nav sparkles",
+              "width": 48,
+              "height": 48,
+              "fill": "#00000000",
+              "cornerRadius": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "F5gUxr",
+                  "name": "i",
+                  "width": 22,
+                  "height": 22,
+                  "icon": "sparkles",
+                  "library": "lucide",
+                  "fill": "#8A92A3"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "IaNao",
+              "name": "Nav settings",
+              "width": 48,
+              "height": 48,
+              "fill": "#00000000",
+              "cornerRadius": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "i1XEyK",
+                  "name": "i",
+                  "width": 22,
+                  "height": 22,
+                  "icon": "settings",
+                  "library": "lucide",
+                  "fill": "#8A92A3"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "paper": {
+      "type": "color",
+      "value": "#F4F1EA"
+    },
+    "card": {
+      "type": "color",
+      "value": "#FFFDF8"
+    },
+    "ink": {
+      "type": "color",
+      "value": "#14181F"
+    },
+    "ink2": {
+      "type": "color",
+      "value": "#5B6170"
+    },
+    "ink3": {
+      "type": "color",
+      "value": "#9096A2"
+    },
+    "line": {
+      "type": "color",
+      "value": "#E4DFD3"
+    },
+    "accent": {
+      "type": "color",
+      "value": "#1F4D3F"
+    },
+    "accentSoft": {
+      "type": "color",
+      "value": "#E3ECE6"
+    },
+    "urgent": {
+      "type": "color",
+      "value": "#B5472B"
+    },
+    "urgentSoft": {
+      "type": "color",
+      "value": "#F6E2D9"
+    },
+    "gold": {
+      "type": "color",
+      "value": "#B98A2E"
+    },
+    "goldSoft": {
+      "type": "color",
+      "value": "#F3EAD3"
+    }
+  },
+  "fileToken": "e434f957-9335-4dd2-a63e-039f6920e2ed"
+}
