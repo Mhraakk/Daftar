@@ -177,11 +177,8 @@ function UserMenu({ user }: { user: { fullName: string; roleName: string; depart
           <Dropdown.Item asChild>
             <Link href="/account" className="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none data-[highlighted]:bg-surface-2"><KeyRound className="size-4" />حساب کاربری و رمز عبور</Link>
           </Dropdown.Item>
-          <Dropdown.Item asChild>
-            <form action={logoutAction}>
-              <button type="submit" className="flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm text-mohr outline-none hover:bg-mohr-50"><LogOut className="size-4" />خروج از سامانه</button>
-            </form>
-          </Dropdown.Item>
+          <Dropdown.Item onSelect={() => { void logoutAction(); }} role="button"
+            className="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm text-mohr outline-none data-[highlighted]:bg-mohr-50"><LogOut className="size-4" />خروج از سامانه</Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>

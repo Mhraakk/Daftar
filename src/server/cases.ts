@@ -53,7 +53,8 @@ export async function createCase(input: CaseInput, user: SessionUser) {
   const full = await db.client.findUniqueOrThrow({ where: { id: client.id } });
   if (full.archivedAt) throw new AppError("برای مراجعه‌کننده بایگانی‌شده نمی‌توان پرونده ایجاد کرد.");
   if (input.responsibleId && input.responsibleId !== user.id && !can(user, "case.assign")) throw new ForbiddenError("تعیین مسئول دیگر نیازمند مجوز ارجاع پرونده است.");
-  const responsibleId = input.responsibleId ?? (can(user, "case.assign") ? null : user.id);
+  // پذیرش (بدون مجوز ویرایش پرونده) پرونده را بدون مسئول ثبت می‌کند تا مدیر ارجاع دهد؛ کارمند حقوقی مسئول پرونده خود می‌شود.
+  const responsibleId = input.responsibleId ?? (can(user, "case.edit") && !can(user, "case.assign") ? user.id : null);
   const c = await db.$transaction(async (tx) => {
     const number = await nextNumber("CASE", tx);
     const row = await tx.case.create({

@@ -43,6 +43,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 export function LinkButton({
   href, variant = "secondary", size = "md", className, children, ...rest
 }: { href: string; variant?: Variant; size?: Size } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">) {
+  // مسیرهای API (دانلود/خروجی) ناوبری کامل مرورگر می‌خواهند، نه ناوبری سمت کلاینت
+  if (href.startsWith("/api/")) return <a href={href} className={buttonClass(variant, size, className)} {...rest}>{children}</a>;
   return (
     <Link href={href} className={buttonClass(variant, size, className)} {...rest}>
       {children}

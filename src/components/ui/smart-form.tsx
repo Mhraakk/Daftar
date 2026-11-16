@@ -61,7 +61,7 @@ export function SmartForm({
     for (const f of fields) {
       if (!visible(f) || !f.required) continue;
       const v = values[f.name];
-      if (v === "" || v === null || v === undefined || (Array.isArray(v) && v.length === 0)) errs[f.name] = `«${f.label}» الزامی است.`;
+      if (v === "" || v === null || v === undefined || v === false || (Array.isArray(v) && v.length === 0)) errs[f.name] = `«${f.label}» الزامی است.`;
     }
     if (Object.keys(errs).length) { setErrors(errs); setFormError("لطفاً موارد مشخص‌شده را تکمیل کنید."); return; }
     setFormError(null);
@@ -79,7 +79,11 @@ export function SmartForm({
       toast.success(successMessage);
       if (resetOnSuccess) setValues((s) => Object.fromEntries(Object.keys(s).map((k) => [k, Array.isArray(s[k]) ? [] : typeof s[k] === "boolean" ? false : ""])));
       onSuccess?.(res.data);
-      if (successHref) router.push(typeof successHref === "string" ? successHref : successHref(res.data as never));
+      if (successHref) {
+        // الگوی «/cases/{id}» با مقادیر پاسخ اکشن پر می‌شود (تابع را نمی‌توان از کامپوننت سرور فرستاد)
+        const d = (res.data ?? {}) as Record<string, unknown>;
+        router.push(typeof successHref === "string" ? successHref.replace(/\{(\w+)\}/g, (_, k) => String(d[k] ?? "")) : successHref(res.data as never));
+      }
       else if (refresh) router.refresh();
     });
   };
@@ -96,15 +100,13 @@ export function SmartForm({
             return (
               <label key={f.name} htmlFor={id} className={cn("flex cursor-pointer items-start gap-2.5 rounded-md border border-line bg-surface-2/60 px-3 py-2.5", wide && "sm:col-span-2")}>
                 <input id={id} type="checkbox" checked={!!v} onChange={(e) => set(f.name, e.target.checked)} className="mt-1 size-4 accent-[rgb(var(--firuze))]" />
-                <span><span className="font-medium">{f.label}</span>{f.hint && <span className="block text-xs text-ink-3">{f.hint}</span>}</span>
+                <span><span className="font-medium">{f.label}</span>{f.hint && <span className="block text-xs text-ink-3">{f.hint}</span>}{err && <span className="block text-xs text-mohr" role="alert">تأیید این مورد الزامی است.</span>}</span>
               </label>
             );
           }
           return (
             <div key={f.name} className={cn("min-w-0", wide && cols === 2 && "sm:col-span-2")}>
-              <label htmlFor={id} className="mb-1 block text-sm font-medium text-ink-2">
-                {f.label}{f.required && <span className="ms-0.5 text-mohr" aria-hidden>*</span>}
-              </label>
+              <label htmlFor={id} className={cn("mb-1 block text-sm font-medium text-ink-2", f.required && "after:ms-0.5 after:text-mohr after:content-['*']")}>{f.label}</label>
               {f.type === "textarea" ? (
                 <textarea id={id} rows={f.rows ?? 3} value={String(v ?? "")} placeholder={f.placeholder} autoFocus={f.autoFocus}
                   onChange={(e) => set(f.name, e.target.value)} className={cn("input", err && "input-error")} />

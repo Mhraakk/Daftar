@@ -8,12 +8,12 @@ type FormProps = React.ComponentProps<typeof SmartForm>;
 
 /** دکمه + پنجره فرم. پس از موفقیت بسته می‌شود و صفحه تازه‌سازی می‌گردد. */
 export function FormDialog({
-  trigger, triggerVariant = "primary", triggerSize = "md", title, description, size = "md", icon, ...form
+  trigger, triggerVariant = "primary", triggerSize = "md", title, description, size = "md", icon, defaultOpen = false, ...form
 }: {
   trigger: string; triggerVariant?: ButtonProps["variant"]; triggerSize?: ButtonProps["size"]; title: string; description?: string;
-  size?: "sm" | "md" | "lg"; icon?: React.ReactNode;
+  size?: "sm" | "md" | "lg"; icon?: React.ReactNode; defaultOpen?: boolean;
 } & FormProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <>
       <Button variant={triggerVariant} size={triggerSize} onClick={() => setOpen(true)}>{icon}{trigger}</Button>
