@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───── توکن‌های طراحی «دفتر» — الهام از کاغذ دفتر، لاجورد و فیروزهٔ کاشی، و مُهر ───── */
+:root {
+  --paper: 245 242 234;
+  --surface: 255 254 251;
+  --surface-2: 250 247 240;
+  --line: 228 222 209;
+  --line-strong: 203 195 178;
+  --ink: 24 34 43;
+  --ink-2: 74 86 97;
+  --ink-3: 124 135 145;
+  --lapis: 30 62 120;
+  --lapis-600: 23 48 96;
+  --lapis-50: 233 238 248;
+  --firuze: 13 122 120;
+  --firuze-50: 224 243 240;
+  --mohr: 160 50 37;
+  --mohr-50: 250 233 228;
+  --zafaran: 168 108 8;
+  --zafaran-50: 251 241 218;
+  --sabz: 44 108 74;
+  --sabz-50: 227 242 232;
+  --night: 16 29 37;
+  --night-2: 25 42 52;
+}
+
+@layer base {
+  html { font-feature-settings: "ss01", "tnum"; -webkit-text-size-adjust: 100%; }
+  body { @apply bg-paper text-ink text-base antialiased; }
+  * { @apply border-line; }
+  ::selection { background: rgb(var(--firuze) / 0.22); }
+  :focus-visible { outline: 2px solid rgb(var(--firuze)); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3, h4 { @apply font-bold text-ink; }
+  input[type="time"], input[dir="ltr"] { direction: ltr; }
+  /* نوار پیمایش ظریف */
+  * { scrollbar-width: thin; scrollbar-color: rgb(var(--line-strong)) transparent; }
+}
+
+@layer components {
+  /* خط‌کشی دوتایی سربرگ — نشانهٔ بصری سامانه (برگرفته از سربرگ نامه‌های اداری) */
+  .ledger-rule { position: relative; }
+  .ledger-rule::after {
+    content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 4px;
+    border-top: 1px solid rgb(var(--line-strong)); border-bottom: 1px solid rgb(var(--line));
+  }
+  /* مُهر وضعیت */
+  .seal {
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 text-xs font-medium leading-6;
+    box-shadow: inset 0 0 0 2px rgb(var(--surface)), inset 0 0 0 3px currentColor;
+    --tw-shadow-color: currentColor;
+  }
+  .seal-neutral { @apply border-line-strong bg-surface-2 text-ink-2; box-shadow: none; }
+  .seal-info { @apply border-lapis/30 bg-lapis-50 text-lapis; box-shadow: none; }
+  .seal-accent { @apply border-firuze/30 bg-firuze-50 text-firuze; box-shadow: none; }
+  .seal-success { @apply border-sabz/30 bg-sabz-50 text-sabz; box-shadow: none; }
+  .seal-warning { @apply border-zafaran/30 bg-zafaran-50 text-zafaran; box-shadow: none; }
+  .seal-danger { @apply border-mohr/30 bg-mohr-50 text-mohr; box-shadow: none; }
+
+  .panel { @apply rounded-lg border border-line bg-surface shadow-raised; }
+  .panel-title { @apply flex items-center justify-between gap-3 border-b border-line px-4 py-3 text-md font-bold; }
+
+  .input {
+    @apply block h-10 w-full rounded-md border border-line-strong bg-surface px-3 text-base text-ink transition-colors
+      placeholder:text-ink-3 hover:border-ink-3 focus:border-firuze focus:outline-none focus:ring-2 focus:ring-firuze/20
+      disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-ink-3;
+  }
+  textarea.input { @apply h-auto min-h-[88px] py-2 leading-7; }
+  select.input { @apply cursor-pointer appearance-none bg-no-repeat pe-3 ps-8; background-position: left 0.6rem center; background-size: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5661' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
+  .input-error { @apply border-mohr focus:border-mohr focus:ring-mohr/20; }
+
+  .tbl { @apply w-full border-separate border-spacing-0 text-base; }
+  .tbl thead th { @apply sticky top-0 z-[1] whitespace-nowrap border-b border-line-strong bg-surface-2 px-3 py-2.5 text-start text-xs font-bold text-ink-2; }
+  .tbl tbody td { @apply border-b border-line px-3 py-2.5 align-middle; }
+  .tbl tbody tr:last-child td { @apply border-b-0; }
+  .tbl tbody tr { @apply transition-colors hover:bg-surface-2/70; }
+
+  .num { font-variant-numeric: tabular-nums; }
+  .ltr { direction: ltr; unicode-bidi: isolate; }
+  .mono-code { @apply ltr inline-block rounded bg-surface-2 px-1.5 text-xs font-medium text-ink-2; font-variant-numeric: tabular-nums; }
+
+  /* نقش هندسی ظریف نوار کناری (گره‌چینی ساده‌شده) */
+  .girih {
+    background-color: rgb(var(--night));
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.035' stroke-width='1'%3E%3Cpath d='M28 0 L56 28 L28 56 L0 28 Z'/%3E%3Cpath d='M28 12 L44 28 L28 44 L12 28 Z'/%3E%3Cpath d='M0 0 L12 12 M56 0 L44 12 M0 56 L12 44 M56 56 L44 44'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* متن سند حقوقی (ویرایشگر، پیش‌نمایش، خروجی) */
+  .legal-doc { @apply text-ink; font-size: 15px; line-height: 2.1; text-align: justify; }
+  .legal-doc h1 { @apply mb-4 mt-2 text-center text-xl font-bold; }
+  .legal-doc h2 { @apply mb-2 mt-5 text-lg font-bold; }
+  .legal-doc h3 { @apply mb-1 mt-4 text-md font-bold; }
+  .legal-doc p { @apply my-2; }
+  .legal-doc ol { @apply my-2 list-decimal pe-0 ps-0; padding-inline-start: 1.75rem; list-style-type: persian; }
+  .legal-doc ul { @apply my-2 list-disc; padding-inline-start: 1.75rem; }
+  .legal-doc table { @apply my-3 w-full border-collapse; }
+  .legal-doc td, .legal-doc th { @apply border border-line-strong px-2 py-1 align-top; }
+  .legal-doc th { @apply bg-surface-2 font-bold; }
+  .legal-doc blockquote { @apply my-3 border-s-4 border-firuze/50 bg-firuze-50/40 px-3 py-1; }
+  .legal-doc .field-token, .field-token { @apply rounded bg-zafaran-50 px-1 text-zafaran; }
+  .legal-doc hr { @apply my-4 border-line-strong; }
+
+  .prose-md { @apply leading-8; }
+  .prose-md h1 { @apply mb-3 mt-4 text-xl; } .prose-md h2 { @apply mb-2 mt-5 border-b border-line pb-1 text-lg; }
+  .prose-md h3 { @apply mb-1 mt-4 text-md; } .prose-md p { @apply my-2; }
+  .prose-md ul { @apply my-2 list-disc ps-6; } .prose-md ol { @apply my-2 list-decimal ps-6; }
+  .prose-md table { @apply my-3 w-full border-collapse text-sm; }
+  .prose-md th, .prose-md td { @apply border border-line px-2 py-1.5 text-start align-top; } .prose-md th { @apply bg-surface-2; }
+  .prose-md blockquote { @apply my-2 border-s-4 border-line-strong ps-3 text-ink-2; }
+  .prose-md code { @apply rounded bg-surface-2 px-1 text-xs; } .prose-md hr { @apply my-4; }
+  .prose-md a { @apply text-lapis underline; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

@@ -1,0 +1,1091 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────── هویت و دسترسی ─────────────────────────
+
+model Department {
+  id        String          @id @default(cuid())
+  name      String          @unique
+  managerId String?
+  manager   User?           @relation("DepartmentManager", fields: [managerId], references: [id], onDelete: SetNull)
+  users     User[]          @relation("DepartmentUsers")
+  tasks     Task[]
+  events    CalendarEvent[]
+  messages  Message[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  key         String           @unique
+  name        String
+  description String?
+  isSystem    Boolean          @default(false)
+  users       User[]
+  permissions RolePermission[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Permission {
+  key   String           @id
+  group String
+  label String
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId        String
+  permissionKey String
+  role          Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission    Permission @relation(fields: [permissionKey], references: [key], onDelete: Cascade)
+
+  @@id([roleId, permissionKey])
+}
+
+model User {
+  id                 String       @id @default(cuid())
+  username           String       @unique
+  passwordHash       String
+  fullName           String
+  title              String?
+  nationalId         String?
+  phone              String?
+  email              String?
+  roleId             String
+  role               Role         @relation(fields: [roleId], references: [id])
+  departmentId       String?
+  department         Department?  @relation("DepartmentUsers", fields: [departmentId], references: [id], onDelete: SetNull)
+  managedDepartments Department[] @relation("DepartmentManager")
+  isActive           Boolean      @default(true)
+  mustChangePassword Boolean      @default(false)
+  failedLogins       Int          @default(0)
+  lockedUntil        DateTime?
+  lastLoginAt        DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  sessions         Session[]
+  notifications    Notification[]
+  activities       ActivityLog[]
+  caseMemberships  CaseMember[]
+  docAccess        DocumentAccess[]
+  messageReceipts  MessageRecipient[]
+  eventAttendances EventAttendee[]
+  reminders        Reminder[]
+  savedSearches    SavedSearch[]
+  searchHistory    SearchHistory[]
+
+  @@index([roleId])
+  @@index([departmentId])
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  tokenHash  String    @unique
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ───────────────────────── مراجعان و پرونده‌ها ─────────────────────────
+
+enum ClientType {
+  PERSON
+  LEGAL
+}
+
+model Client {
+  id           String     @id @default(cuid())
+  code         String     @unique
+  type         ClientType @default(PERSON)
+  firstName    String?
+  lastName     String?
+  companyName  String?
+  displayName  String
+  nationalId   String?    @unique
+  fatherName   String?
+  birthDate    DateTime?  @db.Date
+  mobile       String?
+  phone        String?
+  email        String?
+  address      String?
+  postalCode   String?
+  notes        String?
+  assignedToId String?
+  createdById  String
+  version      Int        @default(1)
+  archivedAt   DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  cases          Case[]
+  documents      Document[]
+  correspondence Correspondence[]
+  tasks          Task[]
+  deadlines      Deadline[]
+  events         CalendarEvent[]
+  notesList      Note[]
+  drafts         LegalDraft[]
+  parties        CaseParty[]
+
+  @@index([displayName])
+  @@index([mobile])
+  @@index([assignedToId])
+}
+
+enum CaseStatus {
+  INTAKE
+  OPEN
+  IN_PROGRESS
+  WAITING
+  CLOSED
+  ARCHIVED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model Case {
+  id              String     @id @default(cuid())
+  number          String     @unique
+  title           String
+  category        String
+  description     String?
+  clientId        String
+  client          Client     @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  responsibleId   String?
+  status          CaseStatus @default(INTAKE)
+  priority        Priority   @default(NORMAL)
+  courtName       String?
+  courtBranch     String?
+  courtCaseNumber String?
+  archiveNumber   String?
+  openedAt        DateTime   @default(now())
+  closedAt        DateTime?
+  closeReason     String?
+  archivedAt      DateTime?
+  createdById     String
+  version         Int        @default(1)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  members        CaseMember[]
+  parties        CaseParty[]
+  documents      Document[]
+  correspondence Correspondence[]
+  tasks          Task[]
+  deadlines      Deadline[]
+  events         CalendarEvent[]
+  notes          Note[]
+  drafts         LegalDraft[]
+  aiInteractions AiInteraction[]
+  research       ResearchRecord[]
+  skillRuns      SkillRun[]
+
+  @@index([clientId])
+  @@index([responsibleId])
+  @@index([status])
+}
+
+model CaseMember {
+  caseId  String
+  userId  String
+  case    Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedAt DateTime @default(now())
+
+  @@id([caseId, userId])
+  @@index([userId])
+}
+
+model CaseParty {
+  id         String   @id @default(cuid())
+  caseId     String
+  case       Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  role       String
+  name       String
+  nationalId String?
+  phone      String?
+  address    String?
+  clientId   String?
+  client     Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
+
+  @@index([caseId])
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  body      String
+  caseId    String?
+  case      Case?    @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  clientId  String?
+  client    Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  authorId  String
+  createdAt DateTime @default(now())
+
+  @@index([caseId])
+  @@index([clientId])
+}
+
+// ───────────────────────── اسناد ─────────────────────────
+
+enum Confidentiality {
+  NORMAL
+  CONFIDENTIAL
+  RESTRICTED
+}
+
+model Folder {
+  id        String     @id @default(cuid())
+  name      String
+  parentId  String?
+  parent    Folder?    @relation("FolderTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children  Folder[]   @relation("FolderTree")
+  documents Document[]
+  createdAt DateTime   @default(now())
+
+  @@unique([parentId, name])
+}
+
+model Document {
+  id               String          @id @default(cuid())
+  code             String          @unique
+  title            String
+  category         String
+  description      String?
+  tags             String[]        @default([])
+  confidentiality  Confidentiality @default(NORMAL)
+  clientId         String?
+  client           Client?         @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  caseId           String?
+  case             Case?           @relation(fields: [caseId], references: [id], onDelete: Restrict)
+  correspondenceId String?
+  correspondence   Correspondence? @relation(fields: [correspondenceId], references: [id], onDelete: SetNull)
+  taskId           String?
+  task             Task?           @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  messageId        String?
+  message          Message?        @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  folderId         String?
+  folder           Folder?         @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  createdById      String
+  archivedAt       DateTime?
+  deletedAt        DateTime?
+  deletedById      String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  versions DocumentVersion[]
+  access   DocumentAccess[]
+
+  @@index([caseId])
+  @@index([clientId])
+  @@index([correspondenceId])
+  @@index([category])
+}
+
+model DocumentVersion {
+  id            String   @id @default(cuid())
+  documentId    String
+  document      Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  versionNo     Int
+  fileName      String
+  mimeType      String
+  size          Int
+  sha256        String
+  storageKey    String
+  extractedText String?
+  textStatus    String   @default("PENDING")
+  note          String?
+  uploadedById  String
+  createdAt     DateTime @default(now())
+
+  @@unique([documentId, versionNo])
+  @@index([sha256])
+}
+
+model DocumentAccess {
+  documentId String
+  userId     String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedAt  DateTime @default(now())
+
+  @@id([documentId, userId])
+}
+
+// ───────────────────────── کارتابل و مکاتبات ─────────────────────────
+
+enum CorrDirection {
+  INCOMING
+  OUTGOING
+  INTERNAL
+}
+
+enum CorrStatus {
+  DRAFT
+  REGISTERED
+  IN_PROGRESS
+  APPROVED
+  REJECTED
+  COMPLETED
+  ARCHIVED
+}
+
+model Correspondence {
+  id              String        @id @default(cuid())
+  refNumber       String        @unique
+  direction       CorrDirection
+  subject         String
+  body            String?
+  externalParty   String?
+  externalRef     String?
+  letterDate      DateTime?     @db.Date
+  registeredAt    DateTime      @default(now())
+  priority        Priority      @default(NORMAL)
+  status          CorrStatus    @default(REGISTERED)
+  deadline        DateTime?
+  clientId        String?
+  client          Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  caseId          String?
+  case            Case?         @relation(fields: [caseId], references: [id], onDelete: SetNull)
+  createdById     String
+  currentHolderId String?
+  version         Int           @default(1)
+  archivedAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  referrals Referral[]
+  documents Document[]
+  tasks     Task[]
+
+  @@index([currentHolderId])
+  @@index([createdById])
+  @@index([caseId])
+  @@index([status])
+}
+
+enum ReferralAction {
+  REFER
+  FORWARD
+  RETURN
+  APPROVE
+  REJECT
+  COMPLETE
+  FOLLOW_UP
+}
+
+enum ReferralStatus {
+  PENDING
+  SEEN
+  DONE
+  RETURNED
+}
+
+model Referral {
+  id               String         @id @default(cuid())
+  correspondenceId String
+  correspondence   Correspondence @relation(fields: [correspondenceId], references: [id], onDelete: Cascade)
+  fromUserId       String
+  toUserId         String
+  action           ReferralAction @default(REFER)
+  instruction      String?
+  note             String?
+  status           ReferralStatus @default(PENDING)
+  dueAt            DateTime?
+  seenAt           DateTime?
+  actedAt          DateTime?
+  response         String?
+  createdAt        DateTime       @default(now())
+
+  @@index([toUserId, status])
+  @@index([fromUserId])
+  @@index([correspondenceId])
+}
+
+// ───────────────────────── وظایف و گردش کار ─────────────────────────
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  WAITING_REVIEW
+  DONE
+  REJECTED
+  CANCELLED
+}
+
+model Task {
+  id               String          @id @default(cuid())
+  code             String          @unique
+  title            String
+  description      String?
+  status           TaskStatus      @default(TODO)
+  priority         Priority        @default(NORMAL)
+  dueAt            DateTime?
+  assigneeId       String?
+  departmentId     String?
+  department       Department?     @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  createdById      String
+  caseId           String?
+  case             Case?           @relation(fields: [caseId], references: [id], onDelete: SetNull)
+  clientId         String?
+  client           Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  correspondenceId String?
+  correspondence   Correspondence? @relation(fields: [correspondenceId], references: [id], onDelete: SetNull)
+  draftId          String?
+  draft            LegalDraft?     @relation(fields: [draftId], references: [id], onDelete: SetNull)
+  progress         Int             @default(0)
+  result           String?
+  requiresApproval Boolean         @default(false)
+  approverId       String?
+  approvedAt       DateTime?
+  rejectionReason  String?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  escalatedAt      DateTime?
+  version          Int             @default(1)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  comments  TaskComment[]
+  documents Document[]
+  steps     TaskStep[]
+
+  @@index([assigneeId, status])
+  @@index([caseId])
+  @@index([dueAt])
+  @@index([departmentId])
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+}
+
+// مراحل تأیید چندمرحله‌ای
+model TaskStep {
+  id         String    @id @default(cuid())
+  taskId     String
+  task       Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  order      Int
+  title      String
+  approverId String
+  status     String    @default("PENDING")
+  comment    String?
+  decidedAt  DateTime?
+
+  @@unique([taskId, order])
+}
+
+// تاریخچه ارجاع و واگذاری (وظیفه / پرونده)
+model Assignment {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  fromUserId String?
+  toUserId   String?
+  byUserId   String
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+}
+
+// ───────────────────────── مهلت‌ها، یادآورها، تقویم ─────────────────────────
+
+enum DeadlineType {
+  FILING
+  PETITION
+  BRIEF
+  HEARING
+  APPEAL
+  OBJECTION
+  RESPONSE
+  REVIEW
+  FOLLOW_UP
+  DOCUMENT
+  OTHER
+}
+
+enum DeadlineStatus {
+  OPEN
+  DONE
+  MISSED
+  CANCELLED
+}
+
+enum DeadlineSource {
+  MANUAL
+  RULE
+  EXTRACTED
+  AI_SUGGESTED
+}
+
+model Deadline {
+  id              String         @id @default(cuid())
+  title           String
+  type            DeadlineType   @default(OTHER)
+  dueAt           DateTime
+  description     String?
+  caseId          String?
+  case            Case?          @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  clientId        String?
+  client          Client?        @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  assigneeId      String
+  priority        Priority       @default(NORMAL)
+  status          DeadlineStatus @default(OPEN)
+  source          DeadlineSource @default(MANUAL)
+  isLegal         Boolean        @default(false)
+  legalBasis      String?
+  ruleKey         String?
+  triggerDate     DateTime?      @db.Date
+  verifiedById    String?
+  verifiedAt      DateTime?
+  reminderOffsets Int[]          @default([4320, 1440, 120])
+  completedAt     DateTime?
+  completedById   String?
+  escalatedAt     DateTime?
+  createdById     String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  reminders Reminder[]
+
+  @@index([assigneeId, status])
+  @@index([dueAt])
+  @@index([caseId])
+}
+
+model Reminder {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deadlineId  String?
+  deadline    Deadline?      @relation(fields: [deadlineId], references: [id], onDelete: Cascade)
+  eventId     String?
+  event       CalendarEvent? @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  taskId      String?
+  kind        String
+  title       String
+  fireAt      DateTime
+  firedAt     DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime       @default(now())
+
+  @@index([fireAt, firedAt])
+  @@index([deadlineId])
+}
+
+enum EventType {
+  HEARING
+  APPOINTMENT
+  MEETING
+  FOLLOW_UP
+  OTHER
+}
+
+model CalendarEvent {
+  id            String      @id @default(cuid())
+  title         String
+  type          EventType   @default(OTHER)
+  startAt       DateTime
+  endAt         DateTime?
+  allDay        Boolean     @default(false)
+  location      String?
+  description   String?
+  caseId        String?
+  case          Case?       @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  clientId      String?
+  client        Client?     @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  ownerId       String
+  departmentId  String?
+  department    Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  remindMinutes Int?
+  cancelledAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  attendees EventAttendee[]
+  reminders Reminder[]
+
+  @@index([startAt])
+  @@index([ownerId])
+  @@index([caseId])
+}
+
+model EventAttendee {
+  eventId String
+  userId  String
+  event   CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, userId])
+  @@index([userId])
+}
+
+model Holiday {
+  date  DateTime @id @db.Date
+  title String
+}
+
+model DeadlineRule {
+  id           String    @id @default(cuid())
+  key          String    @unique
+  title        String
+  days         Int
+  monthsAbroad Int?
+  basis        String
+  description  String?
+  sourceUrl    String?
+  verified     Boolean   @default(false)
+  verifiedById String?
+  verifiedAt   DateTime?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// ───────────────────────── اعلان و پیام ─────────────────────────
+
+model Notification {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       String
+  title      String
+  body       String?
+  link       String?
+  entityType String?
+  entityId   String?
+  important  Boolean   @default(false)
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  senderId       String
+  subject        String
+  body           String
+  important      Boolean     @default(false)
+  isAnnouncement Boolean     @default(false)
+  departmentId   String?
+  department     Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  parentId       String?
+  parent         Message?    @relation("Thread", fields: [parentId], references: [id], onDelete: SetNull)
+  replies        Message[]   @relation("Thread")
+  createdAt      DateTime    @default(now())
+
+  recipients  MessageRecipient[]
+  attachments Document[]
+
+  @@index([senderId])
+}
+
+model MessageRecipient {
+  messageId  String
+  userId     String
+  message    Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readAt     DateTime?
+  archivedAt DateTime?
+
+  @@id([messageId, userId])
+  @@index([userId, readAt])
+}
+
+// ───────────────────────── ممیزی و تنظیمات ─────────────────────────
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  actorId     String?
+  actor       User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action      String
+  entityType  String
+  entityId    String?
+  entityLabel String?
+  caseId      String?
+  clientId    String?
+  meta        Json?
+  ip          String?
+  createdAt   DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([caseId, createdAt])
+  @@index([clientId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+}
+
+model Setting {
+  key         String   @id
+  value       Json
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+}
+
+model Sequence {
+  key   String
+  year  Int
+  value Int    @default(0)
+
+  @@id([key, year])
+}
+
+model BackupRecord {
+  id          String    @id @default(cuid())
+  fileName    String    @unique
+  kind        String
+  size        BigInt
+  sha256      String
+  status      String
+  note        String?
+  verifiedAt  DateTime?
+  restoredAt  DateTime?
+  createdById String?
+  createdAt   DateTime  @default(now())
+}
+
+// ───────────────────────── اسناد حقوقی ─────────────────────────
+
+model LegalTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  docType     String
+  category    String?
+  description String?
+  legalBasis  String?
+  isActive    Boolean  @default(true)
+  isSystem    Boolean  @default(false)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  versions LegalTemplateVersion[]
+  drafts   LegalDraft[]
+
+  @@index([docType])
+}
+
+model LegalTemplateVersion {
+  id             String        @id @default(cuid())
+  templateId     String
+  template       LegalTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  versionNo      Int
+  contentHtml    String
+  fields         Json          @default("[]")
+  sourceFileKey  String?
+  sourceFileName String?
+  note           String?
+  createdById    String?
+  createdAt      DateTime      @default(now())
+
+  @@unique([templateId, versionNo])
+}
+
+enum DraftStatus {
+  DRAFT
+  IN_REVIEW
+  CHANGES_REQUESTED
+  APPROVED
+  FINAL
+}
+
+model LegalDraft {
+  id             String         @id @default(cuid())
+  code           String         @unique
+  title          String
+  docType        String
+  status         DraftStatus    @default(DRAFT)
+  contentHtml    String         @default("")
+  caseId         String?
+  case           Case?          @relation(fields: [caseId], references: [id], onDelete: Restrict)
+  clientId       String?
+  client         Client?        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  templateId     String?
+  template       LegalTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  authorId       String
+  reviewerId     String?
+  approvedById   String?
+  approvedAt     DateTime?
+  finalizedAt    DateTime?
+  aiAssisted     Boolean        @default(false)
+  currentVersion Int            @default(0)
+  version        Int            @default(1)
+  archivedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  versions       LegalDraftVersion[]
+  reviews        DraftReview[]
+  sources        DraftSource[]
+  tasks          Task[]
+  aiInteractions AiInteraction[]
+
+  @@index([caseId])
+  @@index([authorId])
+  @@index([reviewerId, status])
+}
+
+model LegalDraftVersion {
+  id          String     @id @default(cuid())
+  draftId     String
+  draft       LegalDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  versionNo   Int
+  contentHtml String
+  note        String?
+  source      String     @default("MANUAL")
+  authorId    String
+  createdAt   DateTime   @default(now())
+
+  @@unique([draftId, versionNo])
+}
+
+model DraftReview {
+  id         String     @id @default(cuid())
+  draftId    String
+  draft      LegalDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  reviewerId String
+  decision   String
+  comment    String?
+  versionNo  Int
+  createdAt  DateTime   @default(now())
+
+  @@index([draftId])
+}
+
+model DraftSource {
+  id            String       @id @default(cuid())
+  draftId       String
+  draft         LegalDraft   @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  legalSourceId String?
+  legalSource   LegalSource? @relation(fields: [legalSourceId], references: [id], onDelete: SetNull)
+  citation      String
+  url           String?
+  note          String?
+  origin        String       @default("USER")
+  verified      Boolean      @default(false)
+  verifiedById  String?
+  createdAt     DateTime     @default(now())
+
+  @@index([draftId])
+}
+
+// کتابخانه حقوقی داخلی (متون با منبع قابل ردیابی)
+model LegalSource {
+  id           String    @id @default(cuid())
+  kind         String
+  title        String
+  reference    String?
+  articleNo    String?
+  text         String
+  sourceName   String?
+  sourceUrl    String?
+  retrievedAt  DateTime?
+  tags         String[]  @default([])
+  verified     Boolean   @default(false)
+  verifiedById String?
+  verifiedAt   DateTime?
+  createdById  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  draftSources DraftSource[]
+
+  @@index([reference, articleNo])
+}
+
+// ───────────────────────── هوش مصنوعی و مهارت‌های حقوقی ─────────────────────────
+
+model AiInteraction {
+  id             String      @id @default(cuid())
+  userId         String
+  kind           String
+  provider       String
+  model          String
+  prompt         String
+  contextSummary String?
+  response       String?
+  status         String
+  error          String?
+  inputTokens    Int?
+  outputTokens   Int?
+  durationMs     Int?
+  caseId         String?
+  case           Case?       @relation(fields: [caseId], references: [id], onDelete: SetNull)
+  draftId        String?
+  draft          LegalDraft? @relation(fields: [draftId], references: [id], onDelete: SetNull)
+  sources        Json?
+  createdAt      DateTime    @default(now())
+
+  skillRun SkillRun?
+
+  @@index([userId, createdAt])
+  @@index([caseId])
+}
+
+model LegalSkill {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  plugin       String
+  name         String
+  description  String
+  argumentHint String?
+  origin       String
+  license      String
+  sha256       String
+  enabled      Boolean  @default(true)
+  requiresCase Boolean  @default(false)
+  titleFa      String?
+  syncedAt     DateTime @default(now())
+
+  runs SkillRun[]
+
+  @@index([plugin])
+}
+
+model SkillRun {
+  id            String         @id @default(cuid())
+  skillId       String
+  skill         LegalSkill     @relation(fields: [skillId], references: [id], onDelete: Restrict)
+  userId        String
+  caseId        String?
+  case          Case?          @relation(fields: [caseId], references: [id], onDelete: SetNull)
+  inputSummary  String
+  documentIds   String[]       @default([])
+  output        String?
+  status        String
+  reviewStatus  String         @default("PENDING_REVIEW")
+  reviewedById  String?
+  reviewedAt    DateTime?
+  reviewNote    String?
+  interactionId String?        @unique
+  interaction   AiInteraction? @relation(fields: [interactionId], references: [id], onDelete: SetNull)
+  createdAt     DateTime       @default(now())
+
+  @@index([caseId])
+  @@index([userId, createdAt])
+}
+
+// ───────────────────────── جست‌وجو و اتصال‌ها ─────────────────────────
+
+model SearchEntry {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  title      String
+  subtitle   String?
+  body       String   @default("")
+  norm       String   @default("")
+  caseId     String?
+  clientId   String?
+  ownerId    String?
+  restricted Boolean  @default(false)
+  link       String
+  updatedAt  DateTime @updatedAt
+
+  @@unique([entityType, entityId])
+  @@index([caseId])
+  @@index([norm(ops: raw("gin_trgm_ops"))], map: "SearchEntry_trgm_idx", type: Gin)
+}
+
+model SavedSearch {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  query     Json
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model SearchHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query     String
+  results   Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model Connector {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  name        String
+  kind        String
+  enabled     Boolean   @default(false)
+  config      Json      @default("{}")
+  secretEnc   String?
+  status      String    @default("NOT_CONFIGURED")
+  lastSyncAt  DateTime?
+  lastError   String?
+  updatedById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model ResearchRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  query       String
+  caseId      String?
+  case        Case?    @relation(fields: [caseId], references: [id], onDelete: SetNull)
+  title       String
+  snippet     String?
+  source      String
+  sourceUrl   String?
+  retrievedAt DateTime @default(now())
+  category    String?
+  note        String?
+  createdAt   DateTime @default(now())
+
+  @@index([caseId])
+  @@index([userId])
+}
+
+model AutomationRule {
+  id          String    @id @default(cuid())
+  name        String
+  trigger     String
+  conditions  Json      @default("{}")
+  action      Json      @default("{}")
+  enabled     Boolean   @default(true)
+  runCount    Int       @default(0)
+  lastRunAt   DateTime?
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
