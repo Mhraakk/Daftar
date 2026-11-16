@@ -96,7 +96,10 @@
   .legal-doc p { @apply my-2; }
   .legal-doc ol { @apply my-2 list-decimal pe-0 ps-0; padding-inline-start: 1.75rem; list-style-type: persian; }
   .legal-doc ul { @apply my-2 list-disc; padding-inline-start: 1.75rem; }
-  .legal-doc table { @apply my-3 w-full border-collapse; }
+  .legal-doc table { @apply my-3 w-full border-collapse; table-layout: fixed; max-width: 100%; }
+  .legal-doc td, .legal-doc th { overflow-wrap: anywhere; }
+  .ProseMirror .tableWrapper { overflow-x: auto; }
+  .ProseMirror .selectedCell { @apply bg-firuze-50; }
   .legal-doc td, .legal-doc th { @apply border border-line-strong px-2 py-1 align-top; }
   .legal-doc th { @apply bg-surface-2 font-bold; }
   .legal-doc blockquote { @apply my-3 border-s-4 border-firuze/50 bg-firuze-50/40 px-3 py-1; }

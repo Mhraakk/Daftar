@@ -8,7 +8,7 @@ import { DL, Notice, PageHeader, Panel } from "@/components/ui/page";
 import { Seal, StatusSeal } from "@/components/ui/seal";
 import { Timeline } from "@/components/ui/timeline";
 import { NewVersionForm } from "@/components/upload-form";
-import { can, requirePagePerm } from "@/lib/auth/guard";
+import { can, requirePagePerm, getSessionUser } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
 import { formatJalali } from "@/lib/jalali";
 import { CONFIDENTIALITY } from "@/lib/labels";
@@ -20,6 +20,13 @@ import { activityFor } from "@/server/activity";
 import { deleteDocumentAction, documentAccessAction, updateDocumentAction } from "../actions";
 
 const TEXT_STATUS: Record<string, string> = { EXTRACTED: "متن استخراج و نمایه شد", OCR_DONE: "متن با OCR استخراج شد", OCR_PENDING: "در صف OCR", OCR_UNAVAILABLE: "سند تصویری است؛ موتور OCR روی سرور نصب نیست", NONE: "این نوع فایل متن قابل استخراج ندارد", FAILED: "استخراج متن ناموفق بود", PENDING: "در انتظار پردازش" };
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const u = await getSessionUser();
+  if (!u) return { title: "سند" };
+  const r = await db.document.findFirst({ where: { id: (await params).id, AND: [documentScope(u)] }, select: { title: true } });
+  return { title: r?.title ?? "سند" };
+}
 
 export default async function DocumentPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await requirePagePerm("document.view");

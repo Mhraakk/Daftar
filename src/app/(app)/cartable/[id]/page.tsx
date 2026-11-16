@@ -7,7 +7,7 @@ import { FormDialog } from "@/components/ui/form-dialog";
 import { DL, PageHeader, Panel } from "@/components/ui/page";
 import { Seal, StatusSeal } from "@/components/ui/seal";
 import { Timeline } from "@/components/ui/timeline";
-import { can, requirePagePerm } from "@/lib/auth/guard";
+import { can, requirePagePerm, getSessionUser } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
 import { taskFields } from "@/lib/form-defs";
 import { formatDateOnly, formatJalali } from "@/lib/jalali";
@@ -17,6 +17,13 @@ import { activityFor } from "@/server/activity";
 import { markReferralSeen } from "@/server/correspondence";
 import { createTaskAction } from "../../tasks/actions";
 import { archiveCorrAction, decideCorrAction, referCorrAction } from "../actions";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const u = await getSessionUser();
+  if (!u) return { title: "مکاتبه" };
+  const r = await db.correspondence.findFirst({ where: { id: (await params).id, AND: [corrScope(u)] }, select: { subject: true } });
+  return { title: r?.subject ?? "مکاتبه" };
+}
 
 export default async function CorrPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await requirePagePerm("correspondence.view");

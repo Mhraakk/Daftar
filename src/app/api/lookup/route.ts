@@ -12,7 +12,7 @@ export const GET = apiHandler(null, async (req, user) => {
   const en = toEnDigits(q);
   if (type === "user") {
     const rows = await db.user.findMany({
-      where: { isActive: true, ...(q ? { OR: [{ fullName: { contains: q, mode: "insensitive" } }, { username: { contains: en, mode: "insensitive" } }] } : {}) },
+      where: { isActive: true, ...(u.searchParams.get("perm") ? { role: { permissions: { some: { permissionKey: String(u.searchParams.get("perm")) } } } } : {}), ...(q ? { OR: [{ fullName: { contains: q, mode: "insensitive" } }, { username: { contains: en, mode: "insensitive" } }] } : {}) },
       select: { id: true, fullName: true, title: true, role: { select: { name: true } }, department: { select: { name: true } } }, orderBy: { fullName: "asc" }, take: 20,
     });
     return NextResponse.json({ items: rows.map((r) => ({ id: r.id, label: r.fullName, sub: [r.title ?? r.role.name, r.department?.name].filter(Boolean).join(" · ") })) });

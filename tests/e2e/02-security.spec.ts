@@ -44,7 +44,7 @@ test("ورود نامعتبر پیام یکسان می‌دهد و پس از ۵ 
 
 test("کارمند با تغییر URL یا شناسه به رکورد و فایل غیرمجاز نمی‌رسد", async ({ page }) => {
   const mgr = await db.user.findUniqueOrThrow({ where: { username: "t.manager" } });
-  const other = await db.case.findFirstOrThrow({ where: { createdById: { not: undefined }, members: { none: {} }, NOT: { responsible: undefined } }, orderBy: { createdAt: "desc" } });
+  const other = await db.case.findFirstOrThrow({ where: { members: { none: {} } }, orderBy: { createdAt: "desc" } });
   const doc = await db.document.findFirstOrThrow({ where: { caseId: { not: null }, deletedAt: null }, orderBy: { createdAt: "desc" } });
   await login(page, "t.employee");
   await page.goto(`/cases/${other.id}`);

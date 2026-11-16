@@ -8,7 +8,7 @@ import { FormDialog } from "@/components/ui/form-dialog";
 import { DL, EmptyState, LinkTabs, Notice, PageHeader, Panel } from "@/components/ui/page";
 import { Seal, StatusSeal } from "@/components/ui/seal";
 import { Timeline } from "@/components/ui/timeline";
-import { can, requirePagePerm } from "@/lib/auth/guard";
+import { can, requirePagePerm, getSessionUser } from "@/lib/auth/guard";
 import { cn } from "@/lib/cn";
 import { db } from "@/lib/db";
 import { caseFields, deadlineFields, taskFields } from "@/lib/form-defs";
@@ -22,6 +22,13 @@ import { CASE_TRANSITIONS, closingSummary } from "@/server/cases";
 import { createDeadlineAction, deadlineStatusAction, verifyDeadlineAction } from "../../deadlines/actions";
 import { createTaskAction } from "../../tasks/actions";
 import { addPartyAction, assignCaseAction, caseMemberAction, changeCaseStatusAction, removePartyAction, updateCaseAction } from "../actions";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const u = await getSessionUser();
+  if (!u) return { title: "پرونده" };
+  const r = await db.case.findFirst({ where: { id: (await params).id, AND: [caseScope(u)] }, select: { title: true } });
+  return { title: r?.title ?? "پرونده" };
+}
 
 export default async function CasePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string }> }) {
   const user = await requirePagePerm("case.view");

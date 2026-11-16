@@ -8,7 +8,7 @@ import { DL, EmptyState, Notice, PageHeader, Panel } from "@/components/ui/page"
 import { Seal, StatusSeal } from "@/components/ui/seal";
 import { SmartForm } from "@/components/ui/smart-form";
 import { Timeline } from "@/components/ui/timeline";
-import { can, requirePagePerm } from "@/lib/auth/guard";
+import { can, requirePagePerm, getSessionUser } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
 import { formatJalali, relativeDay } from "@/lib/jalali";
 import { PRIORITY, TASK_STATUS } from "@/lib/labels";
@@ -17,6 +17,13 @@ import { faNum } from "@/lib/text";
 import { documentScope, taskScope, userNames } from "@/server/access";
 import { activityFor } from "@/server/activity";
 import { commentTaskAction, reassignTaskAction, reviewTaskAction, taskProgressAction, taskStatusAction, updateTaskAction } from "../actions";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const u = await getSessionUser();
+  if (!u) return { title: "وظیفه" };
+  const r = await db.task.findFirst({ where: { id: (await params).id, AND: [taskScope(u)] }, select: { title: true } });
+  return { title: r?.title ?? "وظیفه" };
+}
 
 export default async function TaskPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await requirePagePerm("task.view");

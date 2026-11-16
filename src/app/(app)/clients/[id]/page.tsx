@@ -8,7 +8,7 @@ import { FormDialog } from "@/components/ui/form-dialog";
 import { DL, EmptyState, LinkTabs, PageHeader, Panel } from "@/components/ui/page";
 import { Seal, StatusSeal } from "@/components/ui/seal";
 import { Timeline } from "@/components/ui/timeline";
-import { can, requirePagePerm } from "@/lib/auth/guard";
+import { can, requirePagePerm, getSessionUser } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
 import { dateOnlyInput, formatDateOnly, formatJalali } from "@/lib/jalali";
 import { CASE_STATUS, CONFIDENTIALITY } from "@/lib/labels";
@@ -17,6 +17,13 @@ import { caseScope, clientScope, documentScope, userNames } from "@/server/acces
 import { activityFor } from "@/server/activity";
 import { archiveClientAction, updateClientAction } from "../actions";
 import { clientFields } from "../client-fields";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const u = await getSessionUser();
+  if (!u) return { title: "مراجعه‌کننده" };
+  const r = await db.client.findFirst({ where: { id: (await params).id, AND: [clientScope(u)] }, select: { displayName: true } });
+  return { title: r?.displayName ?? "مراجعه‌کننده" };
+}
 
 export default async function ClientPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string }> }) {
   const user = await requirePagePerm("client.view");
