@@ -73,3 +73,16 @@ export function countBy(list: Period[], dates: Date[]): number[] {
     return i < 0 ? acc : acc.map((n, k) => (k === i ? n + 1 : n));
   }, list.map(() => 0));
 }
+
+/** آغاز دوره‌های پیاپی از نخستین دوره شامل from تا پیش از to (بازگشتی؛ بیشینه چند ده دوره) */
+function startsUntil(bucket: Bucket, cur: Date, to: Date): Date[] {
+  return cur >= to ? [] : [cur, ...startsUntil(bucket, STEP[bucket](cur), to)];
+}
+
+/** دوره‌های پوشاننده بازه [from, to): نخستین و آخرین دوره به لبه بازه بریده می‌شوند تا شمارش بیرون از بازه را نگیرد */
+export function rangePeriods(bucket: Bucket, from: Date, to: Date): Period[] {
+  return startsUntil(bucket, START[bucket](from), to).map((s) => {
+    const end = STEP[bucket](s);
+    return { start: s < from ? from : s, end: end > to ? to : end, ...LABELS[bucket](s) };
+  });
+}

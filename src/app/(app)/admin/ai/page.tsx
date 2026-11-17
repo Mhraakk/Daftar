@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { RefreshCw } from "lucide-react";
 import { ConnectionTest } from "@/components/ai/connection-test";
+import { ColumnChart, LineChart } from "@/components/charts";
 import { ActionButton } from "@/components/ui/action-button";
 import { Notice, PageHeader, Panel, Stat } from "@/components/ui/page";
 import { Seal } from "@/components/ui/seal";
@@ -11,6 +12,8 @@ import { formatJalali, relativeTime } from "@/lib/jalali";
 import { faNum } from "@/lib/text";
 import { EFFORTS, getAiSettings, isExternalProvider, publicAiSettings } from "@/server/ai/config";
 import { getQueueState } from "@/server/ai/jobs";
+import { aiUsage } from "@/server/usage-charts";
+import { resolveUi } from "@/theme/prefs";
 import { saveAiSettingsAction, syncSkillsAction } from "./actions";
 
 export const metadata = { title: "هوش مصنوعی" };
@@ -27,9 +30,13 @@ const FULL = 2 as const;
 const NOTE_ROWS = 3;
 const SHORT_SHA = 7;
 
+/** بازه نمودارهای مصرف (هفته) */
+const USAGE_WEEKS = 8;
+const sum = (xs: number[]): number => xs.reduce((a, b) => a + b, 0);
+
 export default async function AiAdminPage() {
   const user = await requirePagePerm("ai.configure");
-  const [settings, queue, jobs, modes, plugins, sources] = await Promise.all([
+  const [settings, queue, jobs, modes, plugins, sources, usage, ui] = await Promise.all([
     getAiSettings(), getQueueState(),
     db.aiInteraction.findMany({ orderBy: { createdAt: "desc" }, take: RECENT_JOBS, select: { id: true, kind: true, title: true, provider: true, model: true, status: true, inputTokens: true, outputTokens: true, durationMs: true, createdAt: true, userId: true } }),
     db.legalSkill.groupBy({ by: ["mode"], where: { enabled: true }, _count: true }),
@@ -37,6 +44,8 @@ export default async function AiAdminPage() {
     import("node:fs").then((fs) => {
       try { return (JSON.parse(fs.readFileSync(`${process.cwd()}/vendor/legal-skills/SOURCES.json`, "utf8")) as { sources: { id: string; repo: string; commit: string; license: string }[] }).sources; } catch { return []; }
     }),
+    aiUsage(USAGE_WEEKS),
+    resolveUi(user.id),
   ]);
   const users = Object.fromEntries((await db.user.findMany({ where: { id: { in: [...new Set(jobs.map((j) => j.userId))] } }, select: { id: true, fullName: true } })).map((u) => [u.id, u.fullName]));
   const pub = publicAiSettings(settings);
@@ -49,6 +58,18 @@ export default async function AiAdminPage() {
         <Stat label="محل پردازش" value={external ? "بیرون از دفتر" : "شبکه داخلی"} tone={external ? "warning" : "success"} hint={settings.baseUrl} />
         <Stat label="سرویس پس‌زمینه" value={queue.workerAlive ? "فعال" : "پاسخ نمی‌دهد"} tone={queue.workerAlive ? "success" : "danger"} hint={queue.heartbeatAt ? `آخرین ضربان: ${relativeTime(new Date(queue.heartbeatAt))}` : "هنوز ضربانی ثبت نشده"} />
         <Stat label="صف" value={`${faNum(queue.queued)} / ${faNum(queue.running)}`} hint="در انتظار / در حال اجرا" />
+      </div>
+      <div className="mb-4 grid gap-4 xl:grid-cols-2">
+        <Panel title="اجراها و خطاهای هوش مصنوعی در ۸ هفته اخیر" bodyClass="chart-in-panel">
+          <LineChart title="اجراها و خطاهای هوش مصنوعی" unit="اجرا" dir={ui.chartTimeAxis} labels={usage.labels} longLabels={usage.long}
+            series={[{ name: "همه اجراها", values: usage.runs, token: "chart-1" }, { name: "ناموفق", values: usage.failed, token: "chart-neg" }]}
+            summary={`${faNum(sum(usage.runs))} اجرا و ${faNum(sum(usage.failed))} خطا در ۸ هفته اخیر (هفته از شنبه).`} />
+        </Panel>
+        <Panel title="توکن مصرفی در هفته" bodyClass="chart-in-panel">
+          <ColumnChart title="توکن مصرفی در هفته" unit="توکن" dir={ui.chartTimeAxis} seriesLabel="توکن ورودی و خروجی"
+            data={usage.labels.map((label, i) => ({ label, long: usage.long[i], value: usage.tokens[i] }))}
+            summary={`${faNum(sum(usage.tokens))} توکن در ۸ هفته؛ میانگین زمان پاسخ در هفته جاری ${faNum(Number((usage.avgSeconds.at(-1) ?? 0).toFixed(1)))} ثانیه.`} />
+        </Panel>
       </div>
       <div className="grid gap-4 xl:grid-cols-[1fr_380px]">
         <Panel title="ارائه‌دهنده و سیاست داده">

@@ -3,12 +3,11 @@
 // و جدول داده‌ها برای هر نمودار. راهنمای ابزار با ChartTips (سمت مرورگر) اضافه می‌شود ولی هیچ مقداری فقط در آن نیست.
 //   واقعی = خاکستری پررنگ (--chart-actual)، دوره قبل = خاکستری روشن (--chart-prev)، تأکید = --chart-1،
 //   اختلاف مثبت/منفی = --chart-pos/--chart-neg همراه علامت + و −، رنگ‌های دسته‌ای به ترتیب ثابت chart-1…6.
-import { useId } from "react";
 import { axisLabel, compact, percent, signed, signedPercent } from "@/lib/chart/format";
 import { linear, type AxisDir } from "@/lib/chart/scale";
 import { startOfJalaliWeek } from "@/lib/chart/time";
 import { cn } from "@/lib/cn";
-import { addDays, formatJalali, jParts, J_MONTHS, J_WEEKDAYS_SHORT } from "@/lib/jalali";
+import { addDays, formatJalali, jParts, J_MONTHS, J_WEEKDAYS, J_WEEKDAYS_SHORT } from "@/lib/jalali";
 import { faNum } from "@/lib/text";
 
 export const SERIES_TOKENS = ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6"] as const;
@@ -73,10 +72,16 @@ export interface LegendItem { label: string; color: string; kind?: "box" | "line
 export interface TableData { head: string[]; rows: (string | number)[][]; numeric?: number[] }
 
 /** قاب مشترک هر نمودار: عنوان («شکل ۱ — …»)، خلاصه، راهنما، نمودار و جدول داده‌ها */
+const HASH_SEED = 7;
+const HASH_MUL = 31;
+const HASH_BASE = 36;
+/** شناسه پایدار از عنوان و خلاصه نمودار؛ بدون hook تا رندر ایستا (PDF) با هر نسخه React کار کند */
+const chartId = (key: string): string => `dfc-${[...key].reduce((h, ch) => (h * HASH_MUL + (ch.codePointAt(0) ?? 0)) >>> 0, HASH_SEED).toString(HASH_BASE)}`;
+
 export function ChartFrame({ title, caption, summary, legend, table, className, children }: {
   title: string; caption?: string; summary: string; legend?: LegendItem[]; table: TableData; className?: string; children: React.ReactNode;
 }) {
-  const id = useId();
+  const id = chartId(`${title}|${caption ?? ""}|${summary}`);
   const numeric = table.numeric ?? table.head.map((_, i) => i).slice(1);
   return (
     <figure className={cn("dfc", className)} aria-labelledby={`${id}-t`} aria-describedby={`${id}-s`}>
@@ -377,6 +382,49 @@ export function CalendarHeatmap({ title, caption, summary, from, to, values, uni
 }
 
 export interface TimelineRow { label: string; start: Date; end?: Date | null; token?: SeriesToken; href?: string; note?: string }
+
+const HOURS_PER_DAY = 24;
+const HOUR_LABEL_EVERY = 3;
+
+/** نقشه حرارتی روز هفته × ساعت (شنبه تا جمعه، ساعت ۰ تا ۲۳ به وقت تهران)؛ ساعت‌ها در جهت محور زمان چیده می‌شوند */
+export function HourHeatmap({ title, caption, summary, values, unit, dir = "rtl", cell = HEAT_CELL }: {
+  title: string; caption?: string; summary: string; values: number[][]; unit: string; dir?: AxisDir; cell?: number;
+}) {
+  const nonzero = values.flat().filter((v) => v > 0).sort((a, b) => a - b);
+  const cuts = QUARTILES.map((q) => nonzero[Math.floor(q * (nonzero.length - 1))] ?? 0);
+  const level = (v: number) => (v <= 0 ? -1 : cuts.filter((c) => v > c).length);
+  const hours = Array.from({ length: HOURS_PER_DAY }, (_, h) => h);
+  const slot = (w: number, h: number) => values[w]?.[h] ?? 0;
+  const name = (w: number, h: number) => `${J_WEEKDAYS[w]} ساعت ${faNum(h)}`;
+  const busiest = J_WEEKDAYS.flatMap((_, w) => hours.map((h) => ({ w, h, v: slot(w, h) }))).filter((x) => x.v > 0).sort((a, b) => b.v - a.v).slice(0, MAX_TABLE_ROWS);
+  return (
+    <ChartFrame title={title} caption={caption} summary={summary} table={{ head: ["روز و ساعت", unit], rows: busiest.map((x) => [name(x.w, x.h), x.v]) }}>
+      <div className="dfc-heat-wrap" style={{ ["--cell" as string]: `${cell}px`, direction: dir }}>
+        <div className="dfc-heat-days" aria-hidden style={{ marginTop: "1.2rem" }}>{J_WEEKDAYS_SHORT.map((w) => <span key={w}>{w}</span>)}</div>
+        <div>
+          <div className="dfc-heat-months" aria-hidden>{hours.map((h) => <span key={h}>{h % HOUR_LABEL_EVERY === 0 ? faNum(h) : ""}</span>)}</div>
+          <div className="dfc-heat" role="list" aria-label={`${title}: ۷ روز در ۲۴ ساعت`}>
+            {hours.flatMap((h) => J_WEEKDAYS.map((_, w) => {
+              const v = slot(w, h);
+              const l = level(v);
+              const label = `${name(w, h)}: ${faNum(v)} ${unit}`;
+              return (
+                <span key={`${w}-${h}`} role="listitem" className="dfc-cell" tabIndex={v > 0 ? 0 : -1} aria-label={label} title={label}
+                  data-tip={tip(name(w, h), [{ label: unit, value: faNum(v) }])} style={l >= 0 ? { background: tokenColor("chart-1", HEAT_LEVELS[l]) } : undefined} />
+              );
+            }))}
+          </div>
+        </div>
+      </div>
+      <div className="dfc-scale" aria-hidden>
+        <span>کم</span>
+        <span className="dfc-cell" />
+        {HEAT_LEVELS.map((a) => <span key={a} className="dfc-cell" style={{ background: tokenColor("chart-1", a) }} />)}
+        <span>زیاد</span>
+      </div>
+    </ChartFrame>
+  );
+}
 
 /** خط زمانی (گانت): هر ردیف از آغاز تا پایان؛ رویدادهای تک‌روزه نقطه؛ خط «امروز» */
 export function Timeline({ title, caption, summary, rows, from, to, today = new Date() }: {

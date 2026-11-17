@@ -62,7 +62,7 @@ export const CHART_CSS = `
 .dfc-heat-months{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cell);gap:3px;height:1rem;font-size:.625rem;color:rgb(var(--chart-axis));white-space:nowrap}
 .dfc-cell{width:var(--cell);height:var(--cell);border-radius:3px;background:rgb(var(--surface-2));outline:none}
 .dfc-cell.is-out{visibility:hidden}
-.dfc-scale{display:flex;align-items:center;gap:3px;font-size:.6875rem;color:rgb(var(--ink-3));margin-top:.5rem}
+.dfc-scale{--cell:12px;display:flex;align-items:center;gap:3px;font-size:.6875rem;color:rgb(var(--ink-3));margin-top:.5rem}
 .dfc-tl{position:relative}
 .dfc-tl-row{display:grid;grid-template-columns:minmax(6rem,28%) 1fr;align-items:center;gap:.625rem;min-height:1.75rem}
 .dfc-tl-track{position:relative;height:1.75rem}

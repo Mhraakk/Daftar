@@ -135,6 +135,11 @@ export function printChartVars(): string {
   return CHART_TOKENS.map((t) => `--${t}:${rgbTriplet(SKINS[PRINT_SKIN].colors[t])};`).join("");
 }
 
+/** همه متغیرهای پوسته چاپی روی :root، برای HTML بیرون از برنامه (PDF گزارش) که نمودارها در آن رندر می‌شوند */
+export function printRootCss(): string {
+  return `:root{${declarations(SKINS[PRINT_SKIN], PRINT_SKIN)}}`;
+}
+
 /** CSS همه پوسته‌ها برای درج در <head>؛ جابه‌جایی پوسته در مرورگر فقط با تغییر data-skin انجام می‌شود */
 export function skinCss(): string {
   const skins = SKIN_IDS.map((id) => `${id === DEFAULT_SKIN ? ":root," : ""}[data-skin="${id}"]{${declarations(SKINS[id], id)}}`);

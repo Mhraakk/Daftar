@@ -13,7 +13,7 @@ import { listCases } from "@/server/cases";
 import { listClients } from "@/server/clients";
 import { buildWorkbook, type SheetDef } from "@/server/excel";
 import { esc, htmlToPdf } from "@/server/pdf";
-import { officeReport, resolveRange } from "@/server/reports";
+import { reportExport } from "@/server/report-export";
 import { listTasks } from "@/server/tasks";
 
 export const runtime = "nodejs";
@@ -63,33 +63,8 @@ export const GET = apiHandler<{ params: Promise<{ slug: string[] }> }>("report.e
   }
   if (kind === "report" || kind === "report-pdf") {
     if (!can(user, "report.view")) throw new ForbiddenError();
-    const rep = await officeReport(user, resolveRange(sp.period));
-    const t = rep.totals;
-    const summary = [["مراجعان جدید", t.newClients], ["پرونده‌های جدید", t.newCases], ["پرونده‌های مختومه", t.closedCases], ["اسناد ثبت‌شده", t.docs], ["نامه وارده", t.corrIn], ["نامه صادره", t.corrOut], ["مکاتبه داخلی", t.corrInt], ["وظایف ایجادشده", t.tasksCreated], ["وظایف انجام‌شده", t.tasksDone], ["وظایف معوق (اکنون)", t.overdueTasks], ["مهلت‌های انجام‌شده", t.deadlinesDone], ["مهلت‌های ازدست‌رفته", t.deadlinesMissed], ["مهلت‌های معوق (اکنون)", t.overdueDeadlines], ["ارجاع‌های در انتظار اقدام", t.pendingReferrals]] as [string, number][];
-    if (kind === "report") {
-      return xlsx(user, `گزارش عملکرد — ${rep.range.label}`, [
-        { name: "خلاصه", columns: [{ header: "شاخص", key: "k", width: 32 }, { header: "مقدار", key: "v", width: 14 }], rows: summary.map(([k, v]) => ({ k, v })) },
-        { name: "کارمندان", columns: [{ header: "کارمند", key: "name", width: 26 }, { header: "واحد", key: "department", width: 20 }, { header: "پرونده جاری", key: "cases" }, { header: "وظیفه باز", key: "open" }, { header: "انجام‌شده در دوره", key: "done" }, { header: "معوق", key: "overdue" }], rows: rep.employees },
-        { name: "واحدها", columns: [{ header: "واحد", key: "name", width: 24 }, { header: "تعداد کارمند", key: "staff" }, { header: "پرونده جاری", key: "cases" }, { header: "وظیفه باز", key: "open" }, { header: "انجام‌شده", key: "done" }, { header: "معوق", key: "overdue" }], rows: rep.departments },
-        { name: "وضعیت پرونده‌ها", columns: [{ header: "وضعیت", key: "k", width: 22 }, { header: "تعداد", key: "v" }], rows: rep.casesByStatus.map((x) => ({ k: CASE_STATUS[x.key].label, v: x.count })) },
-        { name: "اسناد", columns: [{ header: "نوع سند", key: "k", width: 26 }, { header: "تعداد", key: "v" }], rows: rep.docsByCategory.map((x) => ({ k: x.key, v: x.count })) },
-        { name: "روند هفتگی", columns: [{ header: "هفته (شروع)", key: "label", width: 16 }, { header: "پرونده جدید", key: "cases" }, { header: "وظیفه انجام‌شده", key: "tasks" }], rows: rep.weeks },
-      ], "office-report");
-    }
-    const office = await getOffice();
-    const tbl = (head: string[], rows: (string | number)[][]) => `<table class="report"><thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${esc(typeof c === "number" ? faNum(c) : c)}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="${head.length}" class="muted">داده‌ای ثبت نشده است.</td></tr>`}</tbody></table>`;
-    const body = `<div class="head"><div><b>${esc(office.officeName)}</b><div class="small muted">گزارش عملکرد دفتر</div></div><div class="small">دوره: ${esc(rep.range.label)}<br>تاریخ تهیه: ${formatJalali(new Date(), "datetime")}</div></div>
-      <h1>گزارش عملکرد — ${esc(rep.range.label)}</h1>
-      <h2>خلاصه شاخص‌ها</h2>${tbl(["شاخص", "مقدار"], summary)}
-      <h2>گردش کار</h2><p>میانگین زمان انجام وظایف: ${rep.workflow.avgDays === null ? "—" : `${faNum(Number(rep.workflow.avgDays.toFixed(1)))} روز`} · نرخ انجام در موعد: ${rep.workflow.onTimeRate === null ? "—" : `${faNum(Math.round(rep.workflow.onTimeRate * 100))}٪`} (بر پایه ${faNum(rep.workflow.sample)} وظیفه انجام‌شده)</p>
-      <h2>بار کاری کارمندان</h2>${tbl(["کارمند", "واحد", "پرونده جاری", "وظیفه باز", "انجام‌شده در دوره", "معوق"], rep.employees.map((e) => [e.name, e.department, e.cases, e.open, e.done, e.overdue]))}
-      <h2>بار کاری واحدها</h2>${tbl(["واحد", "کارمند", "پرونده جاری", "وظیفه باز", "انجام‌شده", "معوق"], rep.departments.map((d) => [d.name, d.staff, d.cases, d.open, d.done, d.overdue]))}
-      <h2>وضعیت پرونده‌ها</h2>${tbl(["وضعیت", "تعداد"], rep.casesByStatus.map((x) => [CASE_STATUS[x.key].label, x.count]))}
-      <h2>اسناد به تفکیک نوع</h2>${tbl(["نوع سند", "تعداد"], rep.docsByCategory.map((x) => [x.key, x.count]))}
-      <p class="small muted">حجم اسناد ثبت‌شده در دوره: ${formatBytes(Number(t.docBytes))} · همه ارقام از رکوردهای واقعی سامانه محاسبه شده است.</p>`;
-    const pdf = await htmlToPdf({ title: "گزارش عملکرد", bodyHtml: body, footerNote: `${office.officeName} — گزارش عملکرد ${rep.range.label}` });
-    await audit({ actorId: user.id, action: "report.exported", entityType: "Export", entityLabel: `گزارش عملکرد ${rep.range.label} (PDF)` });
-    return file(pdf, `office-report-${stamp()}.pdf`, "application/pdf");
+    const f = await reportExport(kind, user, sp);
+    return file(f.data, f.name, f.type);
   }
   if (kind === "case-history" && slug[1]) {
     const c = await db.case.findFirst({ where: { id: slug[1], AND: [caseScope(user)] }, include: { client: true, parties: true } });

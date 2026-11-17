@@ -219,6 +219,9 @@
     background-size: 5px 5px, 5px 5px; background-position: left 0.95rem center, left 0.65rem center; }
   .input-error { @apply border-mohr focus:border-mohr focus:ring-mohr/20; }
 
+  /* نمودار درون پنل: عنوان پنل دیده می‌شود و عنوان نمودار فقط برای فناوری‌های کمکی (aria-labelledby) می‌ماند */
+  .chart-in-panel .dfc-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
   .tbl { @apply w-full border-separate border-spacing-0 text-base; }
   .tbl thead th { @apply sticky top-0 z-[1] whitespace-nowrap border-b border-line-strong/60 bg-surface-2 px-3 py-2.5 text-start text-xs font-bold text-ink-2; }
   .tbl tbody td { @apply border-b border-line px-3 py-2.5 align-middle; }
