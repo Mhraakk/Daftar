@@ -122,4 +122,18 @@ export const ACTION_LABELS: Record<string, string> = {
   "settings.updated": "تغییر تنظیمات", "backup.created": "تهیه پشتیبان", "backup.verified": "راستی‌آزمایی پشتیبان", "backup.restored": "بازیابی پشتیبان",
   "report.exported": "خروجی گزارش", "connector.updated": "تغییر اتصال بیرونی", "automation.updated": "تغییر قاعده اتوماسیون",
   "legal_source.created": "افزودن منبع حقوقی", "legal_source.verified": "تأیید منبع حقوقی", "security.forbidden": "تلاش دسترسی غیرمجاز",
+  "petition_type.imported": "ورود فرم دادخواست", "petition_type.updated": "ویرایش نوع دادخواست", "petition_type.published": "انتشار نوع دادخواست",
+  "petition_type.archived": "بایگانی نوع دادخواست", "petition_type.unpublished": "بازگشت نوع دادخواست به پیش‌نویس",
 };
+export const PETITION_KIND: Record<string, { label: string; hint: string }> = {
+  INITIAL: { label: "بدوی", hint: "دادخواست نخستین برای طرح دعوا" },
+  OBJECTION: { label: "اعتراضی", hint: "واخواهی، تجدیدنظر، فرجام، اعتراض ثالث، اعاده دادرسی" },
+  INCIDENTAL: { label: "طاری", hint: "ورود و جلب ثالث، دعوای متقابل، تأمین خواسته، دستور موقت" },
+};
+export const PETITION_TYPE_STATUS: Record<string, { label: string; tone: Tone }> = {
+  DRAFT: { label: "پیش‌نویس", tone: "warning" },
+  PUBLISHED: { label: "منتشرشده", tone: "success" },
+  ARCHIVED: { label: "بایگانی", tone: "neutral" },
+};
+export const PETITION_SOURCE: Record<string, string> = { FORM: "فرم نمونه", LAW: "برگرفته از متن قانون" };
+export const VALUE_TYPE: Record<string, string> = { MALI: "مالی", GHEIR_MALI: "غیرمالی", BY_SUBJECT: "بر حسب موضوع" };

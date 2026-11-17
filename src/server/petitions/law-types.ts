@@ -46,7 +46,7 @@ export const LAW_PETITION_TYPES: LawPetitionType[] = [
       { label: "حکم یا قرار مورد تجدیدنظر", article: "341", anchor: "حکم یا قراری که از آن درخواست تجدیدنظر شده است", field: "decision.number" },
       { label: "دادگاه صادرکننده رأی", article: "341", anchor: "دادگاه صادرکننده رای", field: "decision.court" },
       { label: "تاریخ ابلاغ رأی", article: "341", anchor: "تاریخ ابلاغ رای", field: "decision.serviceDate" },
-      { label: "دلایل تجدیدنظرخواهی", article: "341", anchor: "دلیل تجدیدنظرخواهی", field: "body" },
+      { label: "دلایل تجدیدنظرخواهی", article: "341", anchor: "دلایل تجدیدنظرخواهی", field: "body" },
       { label: "مدرک مثبت سمت نماینده (در صورت تقدیم توسط نماینده)", article: "342", anchor: "پیوست دادخواست نماید" },
       { label: "دادخواست و پیوست‌ها در دو نسخه و به تعداد طرف دعوا به‌علاوه یک", article: "343", anchor: "در دو نسخه" },
     ],

@@ -199,9 +199,10 @@ export function fieldOf(label: string): FieldKey | null {
   return LABELS[labelKey(label)] ?? null;
 }
 
-// Item markers like "-1" or "- 5" that number list entries: matches "-1هزینه", rejects "13".
-// https://regex101.com/?regex=-%5Cs*%5Cd%2B%5Cs*&testString=-1%D9%87%D8%B2%DB%8C%D9%86%D9%87%20-2%D9%87%D8%B2%DB%8C%D9%86%D9%87
-const ITEM_MARKER = /-\s*\d+\s*/;
+// Item markers that number list entries, "-1" / "- 5" or (once, in the forms) "8-" glued to the next word:
+// matches "-1هزینه" and " 8-اتیان", rejects "13" and "1403/05/01".
+// https://regex101.com/?regex=-%5Cs*%5Cd%2B%5Cs*%7C%5Cs%5Cd%2B-%28%3F%3D%5B%5Cu0600-%5Cu06FF%5D%29&testString=-7%20%D8%B3%D8%A7%DB%8C%D8%B1%20%D9%85%D8%B3%D8%AA%D9%86%D8%AF%D8%A7%D8%AA%208-%D8%A7%D8%AA%DB%8C%D8%A7%D9%86&flavor=javascript
+const ITEM_MARKER = /-\s*\d+\s*|\s\d+-(?=[\u0600-\u06FF])/;
 
 /** فهرست شماره‌دار «-1… -2…» (ممکن است در چند خط شکسته شده باشد) → اقلام */
 export function splitNumbered(lines: string[]): string[] {

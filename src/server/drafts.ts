@@ -17,11 +17,31 @@ import { indexEntity } from "./search-index";
 
 const label = (d: { title: string; code: string }) => `${d.title} (${d.code})`;
 const EDITABLE: DraftStatus[] = ["DRAFT", "CHANGES_REQUESTED"];
+const TITLE_MIN = 3;
+const TITLE_MAX = 200;
+const FIELD_MAX = 20_000;
+const HTML_MAX = 2_000_000;
+const BAD_REQUEST = 400;
+/** شمار فیلدهای تکمیل‌نشده‌ای که در پیام مانع نهایی‌سازی نام برده می‌شود */
+const SHOWN_FIELDS = 4;
+const VERSION_NOTES: Record<string, string> = { TEMPLATE: "ایجاد از قالب", AI: "پیش‌نویس تولیدشده با هوش مصنوعی", MANUAL: "ایجاد" };
+// One HTML tag: matches "<p>" and "</strong>", rejects "a < b".
+// https://regex101.com/?regex=%3C%5B%5E%3E%5D%2B%3E&testString=%3Cp%3E%D9%85%D8%AA%D9%86%3C%2Fp%3E&flavor=javascript
+const HTML_TAG = /<[^>]+>/g;
+// A party role on the opposing side: matches "خوانده" and "متهم / مشتکی‌عنه", rejects "خواهان".
+// https://regex101.com/?regex=%D8%AE%D9%88%D8%A7%D9%86%D8%AF%D9%87%7C%D9%85%D8%B4%D8%AA%DA%A9%DB%8C%7C%D9%85%D8%AA%D9%87%D9%85&testString=%D8%AE%D9%88%D8%A7%D9%86%D8%AF%D9%87&flavor=javascript
+const OPPONENT_ROLE = /خوانده|مشتکی|متهم/;
+// A role that is never a party to the claim: matches "وکیل" and "کارشناس", rejects "خوانده".
+// https://regex101.com/?regex=%D9%88%DA%A9%DB%8C%D9%84%7C%D8%B4%D8%A7%D9%87%D8%AF%7C%DA%A9%D8%A7%D8%B1%D8%B4%D9%86%D8%A7%D8%B3&testString=%DA%A9%D8%A7%D8%B1%D8%B4%D9%86%D8%A7%D8%B3&flavor=javascript
+const NON_PARTY_ROLE = /وکیل|شاهد|کارشناس/;
+// An absolute web address: matches "https://example.ir/a" and "HTTP://x", rejects "ftp://x" and "example.ir".
+// https://regex101.com/?regex=%5Ehttps%3F%3A%5C%2F%5C%2F&testString=https%3A%2F%2Fexample.ir%2Fa&flavor=javascript&flags=i
+const HTTP_URL = /^https?:\/\//i;
 
-async function reindex(id: string) {
+export async function reindex(id: string) {
   const d = await db.legalDraft.findUnique({ where: { id } });
   if (!d) return;
-  await indexEntity({ entityType: "draft", entityId: id, title: d.title, subtitle: `${d.code} · ${LEGAL_DOC_TYPES[d.docType] ?? ""}`, body: d.contentHtml.replace(/<[^>]+>/g, " "), caseId: d.caseId, clientId: d.clientId, ownerId: d.authorId, link: `/drafts/${id}` });
+  await indexEntity({ entityType: "draft", entityId: id, title: d.title, subtitle: `${d.code} · ${LEGAL_DOC_TYPES[d.docType] ?? ""}`, body: d.contentHtml.replace(HTML_TAG, " "), caseId: d.caseId, clientId: d.clientId, ownerId: d.authorId, link: `/drafts/${id}` });
 }
 
 /** مقادیر خودکار فیلدهای قالب از پرونده، مراجعه‌کننده، دفتر و کاربر */
@@ -34,7 +54,7 @@ export async function autoFieldValues(user: SessionUser, caseId: string | null, 
     if (c) {
       cid = c.clientId;
       Object.assign(v, { "case.number": c.number, "case.title": c.title, "case.courtName": c.courtName ?? "", "case.courtBranch": c.courtBranch ?? "", "case.courtCaseNumber": c.courtCaseNumber ? toFaDigits(c.courtCaseNumber) : "", "case.archiveNumber": c.archiveNumber ? toFaDigits(c.archiveNumber) : "" });
-      const opp = c.parties.find((p) => !p.clientId && /خوانده|مشتکی|متهم/.test(p.role)) ?? c.parties.find((p) => !p.clientId && !/وکیل|شاهد|کارشناس/.test(p.role));
+      const opp = c.parties.find((p) => !p.clientId && OPPONENT_ROLE.test(p.role)) ?? c.parties.find((p) => !p.clientId && !NON_PARTY_ROLE.test(p.role));
       if (opp) Object.assign(v, { "opponent.name": opp.name, "opponent.nationalId": opp.nationalId ? toFaDigits(opp.nationalId) : "", "opponent.address": opp.address ?? "", "opponent.phone": opp.phone ? toFaDigits(opp.phone) : "" });
     }
   }
@@ -58,42 +78,71 @@ export async function prepareTemplate(templateId: string, caseId: string | null,
 }
 
 export const createDraftSchema = z.object({
-  title: z.string().trim().min(3, "عنوان سند باید دست‌کم ۳ نویسه باشد.").max(200),
+  title: z.string().trim().min(TITLE_MIN, "عنوان سند باید دست‌کم ۳ نویسه باشد.").max(TITLE_MAX),
   docType: z.string().refine((v) => v in LEGAL_DOC_TYPES, "نوع سند نامعتبر است."),
   caseId: z.string().optional().transform((v) => v || null),
   clientId: z.string().optional().transform((v) => v || null),
   templateId: z.string().optional().transform((v) => v || null),
-  values: z.record(z.string().max(20000)).default({}),
-  contentHtml: z.string().max(2_000_000).optional(),
+  values: z.record(z.string().max(FIELD_MAX)).default({}),
+  contentHtml: z.string().max(HTML_MAX).optional(),
   aiAssisted: z.boolean().default(false),
 });
 
-export async function createDraft(input: z.infer<typeof createDraftSchema>, user: SessionUser) {
-  let { caseId, clientId } = input;
-  if (caseId) clientId = (await assertCaseAccess(user, caseId)).clientId;
-  else if (clientId) await assertClientAccess(user, clientId);
-  let html = input.contentHtml ? sanitizeLegalHtml(input.contentHtml) : "";
-  let source = input.aiAssisted ? "AI" : "MANUAL";
-  if (input.templateId) {
-    const t = await db.legalTemplate.findFirst({ where: { id: input.templateId, isActive: true }, include: { versions: { orderBy: { versionNo: "desc" }, take: 1 } } });
-    if (!t?.versions[0]) throw new AppError("قالب یافت نشد یا غیرفعال است.");
-    const auto = await autoFieldValues(user, caseId, clientId);
-    html = sanitizeLegalHtml(fillFields(t.versions[0].contentHtml, { ...auto, ...Object.fromEntries(Object.entries(input.values).filter(([, v]) => v.trim())) }));
-    source = "TEMPLATE";
-  }
+export interface NewDraft {
+  title: string;
+  docType: string;
+  caseId: string | null;
+  clientId: string | null;
+  templateId: string | null;
+  html: string;
+  aiAssisted: boolean;
+  source: string;
+  note: string;
+  petitionTypeId?: string | null;
+  petitionData?: Prisma.InputJsonValue;
+}
+
+/** ثبت سند و نسخه ۱ آن (دسترسی پرونده/مراجعه‌کننده باید پیش‌تر سنجیده شده باشد) */
+export async function insertDraft(n: NewDraft, user: SessionUser) {
   const d = await db.$transaction(async (tx) => {
     const code = await nextNumber("DRAFT", tx);
     const row = await tx.legalDraft.create({
-      data: { code, title: input.title, docType: input.docType, caseId, clientId, templateId: input.templateId, authorId: user.id, contentHtml: html, aiAssisted: input.aiAssisted, currentVersion: 1, versions: { create: { versionNo: 1, contentHtml: html, source, authorId: user.id, note: source === "TEMPLATE" ? "ایجاد از قالب" : source === "AI" ? "پیش‌نویس تولیدشده با هوش مصنوعی" : "ایجاد" } } },
+      data: {
+        code, title: n.title, docType: n.docType, caseId: n.caseId, clientId: n.clientId, templateId: n.templateId, authorId: user.id, contentHtml: n.html, aiAssisted: n.aiAssisted,
+        petitionTypeId: n.petitionTypeId ?? null, petitionData: n.petitionData, currentVersion: 1,
+        versions: { create: { versionNo: 1, contentHtml: n.html, source: n.source, authorId: user.id, note: n.note } },
+      },
     });
-    await audit({ actorId: user.id, action: "draft.created", entityType: "LegalDraft", entityId: row.id, entityLabel: label(row), caseId, clientId, meta: { docType: row.docType, templateId: input.templateId, aiAssisted: row.aiAssisted } }, tx);
+    await audit({ actorId: user.id, action: "draft.created", entityType: "LegalDraft", entityId: row.id, entityLabel: label(row), caseId: n.caseId, clientId: n.clientId, meta: { docType: row.docType, templateId: n.templateId, petitionTypeId: n.petitionTypeId ?? null, aiAssisted: row.aiAssisted } }, tx);
     return row;
   });
   await reindex(d.id);
   return { id: d.id, code: d.code };
 }
 
-function assertEditor(d: { authorId: string; status: DraftStatus }, user: SessionUser) {
+/** پرونده و مراجعه‌کننده سند: پرونده بر مراجعه‌کننده مقدم است و دسترسی هر دو سنجیده می‌شود */
+export async function resolveDraftOwner(user: SessionUser, caseId: string | null, clientId: string | null): Promise<{ caseId: string | null; clientId: string | null }> {
+  if (caseId) return { caseId, clientId: (await assertCaseAccess(user, caseId)).clientId };
+  if (clientId) await assertClientAccess(user, clientId);
+  return { caseId: null, clientId };
+}
+
+export async function createDraft(input: z.infer<typeof createDraftSchema>, user: SessionUser) {
+  const { caseId, clientId } = await resolveDraftOwner(user, input.caseId, input.clientId);
+  const base = { html: input.contentHtml ? sanitizeLegalHtml(input.contentHtml) : "", source: input.aiAssisted ? "AI" : "MANUAL" };
+  const content = input.templateId ? await fromTemplate(input.templateId, input.values, user, caseId, clientId) : base;
+  return insertDraft({ title: input.title, docType: input.docType, caseId, clientId, templateId: input.templateId, html: content.html, aiAssisted: input.aiAssisted, source: content.source, note: VERSION_NOTES[content.source] ?? VERSION_NOTES.MANUAL }, user);
+}
+
+async function fromTemplate(templateId: string, values: Record<string, string>, user: SessionUser, caseId: string | null, clientId: string | null) {
+  const t = await db.legalTemplate.findFirst({ where: { id: templateId, isActive: true }, include: { versions: { orderBy: { versionNo: "desc" }, take: 1 } } });
+  if (!t?.versions[0]) throw new AppError("قالب یافت نشد یا غیرفعال است.");
+  const auto = await autoFieldValues(user, caseId, clientId);
+  return { html: sanitizeLegalHtml(fillFields(t.versions[0].contentHtml, { ...auto, ...Object.fromEntries(Object.entries(values).filter(([, v]) => v.trim())) })), source: "TEMPLATE" };
+}
+
+/** سند در وضعیت قابل ویرایش است و کاربر مجوز تنظیم سند دارد */
+export function assertEditor(d: { authorId: string; status: DraftStatus }, user: SessionUser) {
   if (!can(user, "draft.create")) throw new ForbiddenError();
   if (!EDITABLE.includes(d.status)) throw new AppError(`سند در وضعیت «${DRAFT_STATUS[d.status].label}» قابل ویرایش نیست.`, "LOCKED");
 }
@@ -104,7 +153,7 @@ export async function saveDraft(id: string, version: number, contentHtml: string
   assertEditor(d, user);
   const html = sanitizeLegalHtml(contentHtml);
   const res = await db.$transaction(async (tx) => {
-    const data: Prisma.LegalDraftUpdateManyMutationInput = { contentHtml: html, version: { increment: 1 }, ...(title?.trim() ? { title: title.trim().slice(0, 200) } : {}) };
+    const data: Prisma.LegalDraftUpdateManyMutationInput = { contentHtml: html, version: { increment: 1 }, ...(title?.trim() ? { title: title.trim().slice(0, TITLE_MAX) } : {}) };
     let versionNo = d.currentVersion;
     if (mode === "MANUAL") {
       const last = await tx.legalDraftVersion.findFirst({ where: { draftId: id }, orderBy: { versionNo: "desc" } });
@@ -141,10 +190,10 @@ export async function restoreDraftVersion(id: string, versionNo: number, user: S
 export async function submitDraft(id: string, reviewerId: string, user: SessionUser) {
   const d = await assertDraftAccess(user, id);
   assertEditor(d, user);
-  if (reviewerId === d.authorId || reviewerId === user.id) throw new AppError("تنظیم‌کننده سند نمی‌تواند بررسی‌کننده آن باشد.", "VALIDATION", 400, { reviewerId: "شخص دیگری انتخاب کنید." });
+  if (reviewerId === d.authorId || reviewerId === user.id) throw new AppError("تنظیم‌کننده سند نمی‌تواند بررسی‌کننده آن باشد.", "VALIDATION", BAD_REQUEST, { reviewerId: "شخص دیگری انتخاب کنید." });
   const reviewer = await db.user.findFirst({ where: { id: reviewerId, isActive: true, role: { permissions: { some: { permissionKey: "draft.review" } } } } });
-  if (!reviewer) throw new AppError("کاربر انتخاب‌شده مجوز بررسی و تأیید اسناد را ندارد.", "VALIDATION", 400, { reviewerId: "نامعتبر است." });
-  if (!d.contentHtml.replace(/<[^>]+>/g, "").trim()) throw new AppError("سند خالی است.");
+  if (!reviewer) throw new AppError("کاربر انتخاب‌شده مجوز بررسی و تأیید اسناد را ندارد.", "VALIDATION", BAD_REQUEST, { reviewerId: "نامعتبر است." });
+  if (!d.contentHtml.replace(HTML_TAG, "").trim()) throw new AppError("سند خالی است.");
   await db.$transaction(async (tx) => {
     const last = await tx.legalDraftVersion.findFirst({ where: { draftId: id }, orderBy: { versionNo: "desc" } });
     let n = last?.versionNo ?? 0;
@@ -188,14 +237,14 @@ export function finalizeBlockers(d: { status: DraftStatus; contentHtml: string; 
   if (d.status !== "APPROVED") b.push("سند باید ابتدا توسط بررسی‌کننده مجاز تأیید شود.");
   if (d.approvedById && d.approvedById === d.authorId) b.push("تأییدکننده و تنظیم‌کننده نباید یک نفر باشند.");
   const left = unfilledFields(d.contentHtml);
-  if (left.length) b.push(`${toFaDigits(left.length)} فیلد تکمیل‌نشده در متن باقی است: ${left.slice(0, 4).map((f) => `«${KNOWN_FIELDS[f] ?? f}»`).join("، ")}${left.length > 4 ? " و…" : ""}`);
+  if (left.length) b.push(`${toFaDigits(left.length)} فیلد تکمیل‌نشده در متن باقی است: ${left.slice(0, SHOWN_FIELDS).map((f) => `«${KNOWN_FIELDS[f] ?? f}»`).join("، ")}${left.length > SHOWN_FIELDS ? " و…" : ""}`);
   return b;
 }
 
 export async function addDraftSource(input: { draftId: string; citation: string; url: string | null; note: string | null; legalSourceId?: string | null; origin?: string }, user: SessionUser) {
   const d = await assertDraftAccess(user, input.draftId);
   if (d.status === "FINAL") throw new AppError("سند نهایی قابل تغییر نیست.");
-  if (input.url && !/^https?:\/\//i.test(input.url)) throw new AppError("نشانی منبع باید با http یا https آغاز شود.", "VALIDATION", 400, { url: "نامعتبر است." });
+  if (input.url && !HTTP_URL.test(input.url)) throw new AppError("نشانی منبع باید با http یا https آغاز شود.", "VALIDATION", BAD_REQUEST, { url: "نامعتبر است." });
   await db.draftSource.create({ data: { draftId: d.id, citation: input.citation, url: input.url, note: input.note, legalSourceId: input.legalSourceId ?? null, origin: input.origin ?? "USER" } });
 }
 export async function setDraftSourceVerified(sourceId: string, verified: boolean, user: SessionUser) {
