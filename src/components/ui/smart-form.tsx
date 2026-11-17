@@ -11,7 +11,7 @@ import { useToast } from "./toast";
 export interface FieldDef {
   name: string;
   label: string;
-  type?: "text" | "textarea" | "select" | "jdate" | "time" | "lookup" | "checkbox" | "number" | "password" | "tags" | "multicheck";
+  type?: "text" | "textarea" | "select" | "jdate" | "time" | "lookup" | "checkbox" | "number" | "password" | "tags" | "multicheck" | "lines";
   required?: boolean;
   placeholder?: string;
   hint?: string;
@@ -43,7 +43,7 @@ export function SmartForm({
   const toast = useToast();
   const [values, setValues] = useState<Values>(() => {
     const v: Values = {};
-    for (const f of fields) v[f.name] = initial[f.name] ?? (f.type === "checkbox" ? false : f.type === "multicheck" || f.type === "tags" ? [] : "");
+    for (const f of fields) v[f.name] = initial[f.name] ?? (f.type === "checkbox" ? false : f.type === "multicheck" || f.type === "tags" || f.type === "lines" ? [] : "");
     return v;
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -66,7 +66,8 @@ export function SmartForm({
     if (Object.keys(errs).length) { setErrors(errs); setFormError("لطفاً موارد مشخص‌شده را تکمیل کنید."); return; }
     setFormError(null);
     const payload: Values = { ...hidden };
-    for (const f of fields) if (visible(f)) payload[f.name] = values[f.name];
+    // فهرست سطر به سطر: سطرهای خالی هنگام ارسال حذف می‌شوند
+    for (const f of fields) if (visible(f)) payload[f.name] = f.type === "lines" ? ((values[f.name] as string[]) ?? []).map((x) => x.trim()).filter(Boolean) : values[f.name];
     start(async () => {
       let res: ActionResult<unknown>;
       try { res = await action(payload); }
@@ -95,7 +96,7 @@ export function SmartForm({
           const id = `${uid}-${f.name}`;
           const err = errors[f.name];
           const v = values[f.name];
-          const wide = f.span === 2 || f.type === "textarea" || f.type === "multicheck";
+          const wide = f.span === 2 || f.type === "textarea" || f.type === "multicheck" || f.type === "lines";
           if (f.type === "checkbox") {
             return (
               <label key={f.name} htmlFor={id} className={cn("flex cursor-pointer items-start gap-2.5 rounded-md border border-line bg-surface-2/60 px-3 py-2.5", wide && "sm:col-span-2")}>
@@ -107,7 +108,10 @@ export function SmartForm({
           return (
             <div key={f.name} className={cn("min-w-0", wide && cols === 2 && "sm:col-span-2")}>
               <label htmlFor={id} className={cn("mb-1 block text-sm font-medium text-ink-2", f.required && "after:ms-0.5 after:text-mohr after:content-['*']")}>{f.label}</label>
-              {f.type === "textarea" ? (
+              {f.type === "lines" ? (
+                <textarea id={id} rows={f.rows ?? 4} value={((v as string[]) ?? []).join("\n")} placeholder={f.placeholder ?? "هر مورد در یک سطر"}
+                  onChange={(e) => set(f.name, e.target.value.split("\n"))} className={cn("input", err && "input-error")} />
+              ) : f.type === "textarea" ? (
                 <textarea id={id} rows={f.rows ?? 3} value={String(v ?? "")} placeholder={f.placeholder} autoFocus={f.autoFocus}
                   onChange={(e) => set(f.name, e.target.value)} className={cn("input", err && "input-error")} />
               ) : f.type === "select" ? (

@@ -12,7 +12,8 @@ import { createCase } from "@/server/cases";
 import { createClient } from "@/server/clients";
 import { getPetitionType, listPetitionTypes, setPetitionTypeStatus, suggestPetitionTypes, updatePetitionType } from "@/server/petitions/catalog";
 import { petitionDataSchema, type PetitionData } from "@/server/petitions/data";
-import { createPetitionDraft, petitionReport, savePetition } from "@/server/petitions/drafting";
+import { addLibrarySource } from "@/server/drafts";
+import { createPetitionDraft, petitionDeadline, petitionReport, savePetition } from "@/server/petitions/drafting";
 import { importPetitionForm } from "@/server/petitions/import-form";
 import { seedPetitionTypes } from "@/server/petitions/seed";
 import { asUser, nationalId, prisma, tag } from "./helpers";
@@ -222,5 +223,32 @@ describe("importing a new form", () => {
     expect((row.importReport as { cells: unknown[] }).cells.length).toBeGreaterThan(5);
     expect((await importPetitionForm({ data: changed, fileName: "again.pdf" }, manager)).id).toBe(r.id);
     await expect(importPetitionForm({ data: Buffer.from("not a pdf"), fileName: "x.txt" }, manager)).rejects.toThrow();
+  });
+});
+
+describe("citing the law library in a petition", () => {
+  it("adds a valid article once as a LIBRARY source and refuses repealed articles", async () => {
+    const d = await createPetitionDraft(mk({ petitionTypeId: await typeId(await formCodeOf("ابطال چک")), caseId }), legal);
+    const art51 = await prisma.legalSource.findFirstOrThrow({ where: { lawCode: "ACP", articleNo: "51" } });
+    await addLibrarySource(d.id, art51.id, legal);
+    const src = await prisma.draftSource.findFirstOrThrow({ where: { draftId: d.id, legalSourceId: art51.id } });
+    expect(src).toMatchObject({ origin: "LIBRARY", verified: false });
+    expect(src.citation).toContain("ماده 51");
+    await expect(addLibrarySource(d.id, art51.id, legal)).rejects.toThrow("پیش‌تر");
+    const repealed = await prisma.legalSource.create({ data: { kind: "LAW", title: `ماده منسوخ آزمون ${T}`, text: "متن منسوخ", status: "REPEALED" } });
+    try {
+      await expect(addLibrarySource(d.id, repealed.id, legal)).rejects.toThrow("منسوخ");
+      await expect(addLibrarySource(d.id, art51.id, employee)).rejects.toThrow();
+    } finally {
+      await prisma.legalSource.delete({ where: { id: repealed.id } });
+    }
+  });
+
+  it("computes the live deadline from unsaved studio data without storing it", async () => {
+    const d = await createPetitionDraft(mk({ petitionTypeId: await typeId("LAW-APPEAL"), caseId: appealCaseId }), legal);
+    const r = await petitionReport(d.id, legal);
+    const live = await petitionDeadline(r.spec, { ...r.data, decision: { ...r.data.decision, serviceDate: formatJalali(new Date(), "date") } });
+    expect(live.status).toBe("OPEN");
+    expect((await dataOf(d.id)).decision.serviceDate).toBe("");
   });
 });

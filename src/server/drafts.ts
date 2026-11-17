@@ -3,7 +3,7 @@ import { z } from "zod";
 import { audit } from "@/lib/audit";
 import { can, type SessionUser } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
-import { AppError, ConflictError, ForbiddenError } from "@/lib/errors";
+import { AppError, ConflictError, ForbiddenError, NotFoundError } from "@/lib/errors";
 import { formatJalali } from "@/lib/jalali";
 import { DRAFT_STATUS, LEGAL_DOC_TYPES } from "@/lib/labels";
 import { notify } from "@/lib/notify";
@@ -12,6 +12,7 @@ import { extractFields, fillFields, KNOWN_FIELDS, unfilledFields } from "@/lib/t
 import { toEnDigits, toFaDigits } from "@/lib/text";
 import { assertCaseAccess, assertClientAccess, assertDraftAccess, draftScope } from "./access";
 import { getOffice } from "./admin";
+import { citationOf } from "./legal-library";
 import { sanitizeLegalHtml } from "./sanitize";
 import { indexEntity } from "./search-index";
 
@@ -246,6 +247,14 @@ export async function addDraftSource(input: { draftId: string; citation: string;
   if (d.status === "FINAL") throw new AppError("سند نهایی قابل تغییر نیست.");
   if (input.url && !HTTP_URL.test(input.url)) throw new AppError("نشانی منبع باید با http یا https آغاز شود.", "VALIDATION", BAD_REQUEST, { url: "نامعتبر است." });
   await db.draftSource.create({ data: { draftId: d.id, citation: input.citation, url: input.url, note: input.note, legalSourceId: input.legalSourceId ?? null, origin: input.origin ?? "USER" } });
+}
+/** استناد از کتابخانه حقوقی: ماده منسوخ پذیرفته نمی‌شود و هر منبع یک بار در هر سند می‌آید */
+export async function addLibrarySource(draftId: string, legalSourceId: string, user: SessionUser) {
+  const s = await db.legalSource.findUnique({ where: { id: legalSourceId }, select: { id: true, title: true, reference: true, articleNo: true, lawCode: true, status: true, sourceUrl: true } });
+  if (!s) throw new NotFoundError("منبع در کتابخانه یافت نشد.");
+  if (s.status === "REPEALED") throw new AppError("ماده منسوخ برای استناد افزوده نمی‌شود.");
+  if (await db.draftSource.findFirst({ where: { draftId, legalSourceId } })) throw new AppError("این منبع پیش‌تر به سند افزوده شده است.");
+  await addDraftSource({ draftId, citation: citationOf(s), url: s.sourceUrl && HTTP_URL.test(s.sourceUrl) ? s.sourceUrl : null, note: null, legalSourceId: s.id, origin: "LIBRARY" }, user);
 }
 export async function setDraftSourceVerified(sourceId: string, verified: boolean, user: SessionUser) {
   if (!can(user, "draft.review")) throw new ForbiddenError("تأیید منبع نیازمند مجوز بررسی اسناد است.");

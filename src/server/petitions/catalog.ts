@@ -129,7 +129,8 @@ export const petitionTypeUpdateSchema = z.object({
   eligible: optionalText,
   defendant: optionalText,
   notes: optionalText,
-  valueType: z.enum(["MALI", "GHEIR_MALI", "BY_SUBJECT"]).nullable().default(null),
+  // گزینه «بدون نوع» در فرم ویرایش رشته خالی می‌فرستد
+  valueType: z.preprocess((v) => (v === "" ? null : v), z.enum(["MALI", "GHEIR_MALI", "BY_SUBJECT"]).nullable().default(null)),
   evidence: list,
   evidenceInfo: list,
   fees: list,

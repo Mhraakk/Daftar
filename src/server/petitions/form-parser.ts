@@ -209,6 +209,23 @@ export function splitNumbered(lines: string[]): string[] {
   return lines.join(" ").split(ITEM_MARKER).map((s) => s.trim()).filter(Boolean);
 }
 
+// Separator inside a comma-joined list (the PDF puts the comma before the next word): matches " ،" and "، ", rejects " و ".
+// https://regex101.com/?regex=%5Cs*%D8%8C%5Cs*&testString=%D8%AF%D8%B1%D8%AE%D9%88%D8%A7%D8%B3%D8%AA%20%D8%A7%D8%B3%D8%AA%D8%B9%D9%84%D8%A7%D9%85%20%D8%8C%D8%AA%D8%AD%D9%82%DB%8C%D9%82%D8%A7%D8%AA%20%D9%85%D8%AD%D9%84%DB%8C&flavor=javascript
+const LIST_SEP = /\s*،\s*/;
+/** اقدام‌هایی که در برخی فرم‌ها بی‌جداکننده پشت هم آمده‌اند («شماره پرونده استنادی شهادت شهود و مطلعین») */
+const KNOWN_INVESTIGATIONS = ["شماره پرونده استنادی", "شهادت شهود و مطلعین", "تحقیقات محلی", "معاینه محلی", "درخواست استعلام", "جلب نظر کارشناس", "اتیان سوگند", "استعلام نظر پزشکی قانونی"];
+
+function splitFused(item: string): string[] {
+  const found = KNOWN_INVESTIGATIONS.filter((k) => item.includes(k));
+  const rest = found.reduce((t, k) => t.replace(k, ""), item).trim();
+  return found.length > 1 && !rest ? [...found].sort((a, b) => item.indexOf(a) - item.indexOf(b)) : [item];
+}
+
+/** تحقیقات و اقدامات: فهرست شماره‌دار یا جداشده با «،»؛ اقدام‌های شناخته‌شده چسبیده از هم جدا می‌شوند */
+export function splitInvestigations(lines: string[]): string[] {
+  return splitNumbered(lines).flatMap((s) => s.split(LIST_SEP)).map((s) => s.trim()).filter(Boolean).flatMap(splitFused);
+}
+
 // Separators between ancillary claims: matches " -" , "–" and "،", rejects "دستور موقت".
 // https://regex101.com/?regex=%5Cs*%5B-%E2%80%93%D8%8C%5D%5Cs*&testString=%D8%AF%D8%B3%D8%AA%D9%88%D8%B1%20%D9%85%D9%88%D9%82%D8%AA%20-%D8%AA%D8%A3%D9%85%DB%8C%D9%86
 const ANCILLARY_SEP = /\s*[-–،]\s*/;
@@ -429,7 +446,7 @@ export function parseForm(cells: Cell[]): ParsedForm {
     evidence: parseEvidence(get("evidence")),
     evidenceInfo: get("evidenceInfo").flatMap((l) => l.split(ITEM_MARKER)).map((s) => s.trim()).filter(Boolean),
     fees: splitNumbered(get("fees")),
-    investigations: splitNumbered(get("investigations")),
+    investigations: splitInvestigations(get("investigations")),
     ancillary: splitAncillary(get("ancillary")),
     bodyTemplate: body.template,
     blanks: body.blanks,

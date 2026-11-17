@@ -17,7 +17,7 @@ const NON_DIGIT = /\D/g;
 
 const ESCAPES: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 const CLOSING = "با تشکر و تجدید احترام";
-const EMPTY_BLANK = "…………";
+export const EMPTY_BLANK = "…………";
 const BRANCH = "شعبه";
 const FA_NUMBER = new Intl.NumberFormat("fa-IR");
 
@@ -89,6 +89,12 @@ export const BLANK_BINDINGS: Record<string, (d: PetitionData) => string> = {
   "نام خوانده": (d) => joinNames(d.defendants),
   "نام مجلوب ثالث": (d) => joinNames(d.defendants),
 };
+
+/** هر تکه با اندیس فرد در split با گروه گیرنده، برچسب جای خالی است */
+const PART_STRIDE = 2;
+/** تکه‌های یک سطر قالب به ترتیب: متن ساده یا برچسب جای خالی (برای نمایش برجسته در کاتالوگ و استودیو) */
+export const templateParts = (line: string): { text: string; blank: boolean }[] =>
+  line.split(BLANK).map((text, i) => ({ text, blank: i % PART_STRIDE === 1 })).filter((p) => p.text !== "");
 
 export const blankKeys = (template: string): string[] => [...new Set([...template.matchAll(BLANK)].map((m) => m[1].trim()))];
 

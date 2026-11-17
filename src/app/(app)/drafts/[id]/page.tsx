@@ -1,6 +1,8 @@
-import { ExternalLink, History, Plus, Sparkles, Trash2 } from "lucide-react";
+import { BookOpenText, ExternalLink, FileSignature, History, Plus, Sparkles, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Ring } from "@/components/charts";
+import { LibrarySourcePicker } from "@/components/drafts/library-source-picker";
 import { ActionButton } from "@/components/ui/action-button";
 import { LinkButton } from "@/components/ui/button";
 import { FormDialog } from "@/components/ui/form-dialog";
@@ -10,15 +12,17 @@ import { Timeline } from "@/components/ui/timeline";
 import { can, requirePagePerm, getSessionUser } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
 import { formatJalali } from "@/lib/jalali";
-import { DRAFT_STATUS, LEGAL_DOC_TYPES } from "@/lib/labels";
+import { DRAFT_STATUS, LEGAL_DOC_TYPES, SOURCE_STATUS } from "@/lib/labels";
 import { faNum } from "@/lib/text";
 import { draftScope, userNames } from "@/server/access";
 import { activityFor } from "@/server/activity";
 import { finalizeBlockers } from "@/server/drafts";
+import { petitionReport } from "@/server/petitions/drafting";
 import { addSourceAction, removeSourceAction, restoreDraftAction, verifySourceAction } from "../actions";
 import { DraftWorkspace } from "./workspace";
 
 const TIMELINE_LIMIT = 50;
+const RING_SIZE = 52;
 const NOTE_ROWS = 2;
 // eslint-disable-next-line ts-patterns/no-magic-numbers -- FieldDef.span needs the literal type 2
 const FULL = 2 as const;
@@ -40,14 +44,16 @@ export default async function DraftPage({ params }: { params: Promise<{ id: stri
     include: {
       case: { select: { id: true, number: true, title: true } }, client: { select: { id: true, displayName: true } }, template: { select: { id: true, name: true } },
       versions: { orderBy: { versionNo: "desc" }, select: { versionNo: true, note: true, source: true, authorId: true, createdAt: true } },
-      reviews: { orderBy: { createdAt: "desc" } }, sources: { orderBy: { createdAt: "asc" } },
+      reviews: { orderBy: { createdAt: "desc" } }, sources: { orderBy: { createdAt: "asc" }, include: { legalSource: { select: { id: true, status: true } } } },
+      petitionType: { select: { id: true, title: true } },
     },
   });
   if (!d) notFound();
-  const [names, timeline, fin] = await Promise.all([
+  const [names, timeline, fin, petition] = await Promise.all([
     userNames([d.authorId, d.reviewerId, d.approvedById, ...d.versions.map((v) => v.authorId), ...d.reviews.map((r) => r.reviewerId)]),
     activityFor({ entityType: "LegalDraft", entityId: id }, TIMELINE_LIMIT),
     d.status === "FINAL" ? db.activityLog.findFirst({ where: { entityType: "LegalDraft", entityId: id, action: "draft.finalized" }, orderBy: { createdAt: "desc" } }) : null,
+    d.petitionType ? petitionReport(id, user) : null,
   ]);
   const editableStatus = d.status === "DRAFT" || d.status === "CHANGES_REQUESTED";
   const editable = editableStatus && can(user, "draft.create");
@@ -70,6 +76,21 @@ export default async function DraftPage({ params }: { params: Promise<{ id: stri
             perms={perms} blockers={finalizeBlockers(d)} finalDocId={(fin?.meta as { documentId?: string } | null)?.documentId ?? null} />
         </div>
         <aside className="flex flex-col gap-4">
+          {petition && d.petitionType && (
+            <Panel title="دادخواست" icon={<FileSignature />}>
+              <div className="flex items-center gap-3">
+                <Ring ratio={petition.validation.required ? petition.validation.ok / petition.validation.required : 1} label="بررسی ماده ۵۱ و ۵۳" size={RING_SIZE}
+                  token={petition.validation.missing ? "chart-1" : "chart-pos"} center={`${faNum(petition.validation.ok)}/${faNum(petition.validation.required)}`} />
+                <div className="min-w-0 flex-1 text-sm">
+                  <Link href={`/petitions/${d.petitionType.id}`} className="block truncate font-bold text-lapis hover:underline">{d.petitionType.title}</Link>
+                  <p className="text-ink-2">{petition.validation.missing ? `${faNum(petition.validation.missing)} الزام ناقص` : "الزام‌های شکلی کامل است"}</p>
+                  {petition.deadline.dueDateLabel && <p className="text-xs text-ink-3">روز آخر مهلت: {petition.deadline.dueDateLabel}</p>}
+                </div>
+              </div>
+              <LinkButton href={`/drafts/${d.id}/petition`} size="sm" variant="primary" className="mt-3 w-full">باز کردن استودیوی دادخواست</LinkButton>
+              {editable && <p className="mt-2 text-xs leading-5 text-ink-3">متن این سند از داده استودیو ساخته می‌شود؛ ویرایش مستقیم متن، با ذخیره بعدی در استودیو بازنویسی می‌شود.</p>}
+            </Panel>
+          )}
           {editable && can(user, "ai.use") && (
             <Panel title="دستیار هوشمند" icon={<Sparkles />}>
               <p className="mb-2 text-xs text-ink-2">بازنویسی رسمی متن این پیش‌نویس؛ نتیجه پس از بررسی شما به‌صورت نسخه تازه اعمال می‌شود.</p>
@@ -98,15 +119,21 @@ export default async function DraftPage({ params }: { params: Promise<{ id: stri
               </li>))}</ul>
           </Panel>
           <Panel title={`منابع و مستندات (${faNum(d.sources.length)})`}
-            action={d.status !== "FINAL" && can(user, "draft.create") && <FormDialog trigger="افزودن" triggerVariant="ghost" triggerSize="sm" icon={<Plus />} title="افزودن منبع" size="sm" cols={1} action={addSourceAction} hidden={{ draftId: id }} successMessage="منبع افزوده شد."
+            action={d.status !== "FINAL" && can(user, "draft.create") && <div className="flex items-center gap-1"><LibrarySourcePicker draftId={id} cited={d.sources.flatMap((s) => (s.legalSourceId ? [s.legalSourceId] : []))} /><FormDialog trigger="افزودن" triggerVariant="ghost" triggerSize="sm" icon={<Plus />} title="افزودن منبع" size="sm" cols={1} action={addSourceAction} hidden={{ draftId: id }} successMessage="منبع افزوده شد."
               description="هر استناد قانونی یا رویه‌ای باید قابل ردیابی به منبع معتبر باشد."
-              fields={[{ name: "citation", label: "متن ارجاع", required: true, placeholder: "مثلاً ماده ۳۳۶ قانون آیین دادرسی مدنی" }, { name: "url", label: "نشانی منبع رسمی", ltr: true, placeholder: "https://…" }, { name: "note", label: "توضیح", type: "textarea", rows: NOTE_ROWS }]} />}>
+              fields={[{ name: "citation", label: "متن ارجاع", required: true, placeholder: "مثلاً ماده ۳۳۶ قانون آیین دادرسی مدنی" }, { name: "url", label: "نشانی منبع رسمی", ltr: true, placeholder: "https://…" }, { name: "note", label: "توضیح", type: "textarea", rows: NOTE_ROWS }]} /></div>}>
             {d.sources.length === 0 ? <p className="text-sm text-ink-3">منبعی ثبت نشده است. استنادهای قانونی متن را اینجا با نشانی منبع ثبت کنید تا بررسی‌کننده بتواند آن‌ها را تطبیق دهد.</p> : (
               <ul className="flex flex-col gap-2">{d.sources.map((s) => (
                 <li key={s.id} className="rounded-md border border-line p-2.5 text-sm">
                   <p className="font-medium">{s.citation}</p>
                   {s.url && <a href={s.url} target="_blank" rel="noopener noreferrer" className="ltr flex items-center gap-1 truncate text-xs text-lapis hover:underline"><ExternalLink className="size-3" />{s.url}</a>}
                   {s.note && <p className="text-xs text-ink-2">{s.note}</p>}
+                  {s.legalSource && (
+                    <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
+                      <Link href={`/research/library/${s.legalSource.id}`} className="inline-flex items-center gap-1 text-lapis hover:underline"><BookOpenText className="size-3" />متن در کتابخانه</Link>
+                      {s.legalSource.status !== "VALID" && <Seal tone="danger">{SOURCE_STATUS[s.legalSource.status]?.label ?? s.legalSource.status}</Seal>}
+                    </p>
+                  )}
                   <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                     <Seal tone={s.verified ? "success" : "warning"}>{s.verified ? "تطبیق داده‌شده" : "تطبیق داده‌نشده"}</Seal><span className="text-2xs text-ink-3">{ORIGIN[s.origin] ?? s.origin}</span>
                     <span className="flex-1" />

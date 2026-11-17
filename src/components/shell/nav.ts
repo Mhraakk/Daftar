@@ -30,6 +30,7 @@ export const NAV: NavGroup[] = [
     icon: "Landmark",
     items: [
       { href: "/drafts", label: "اسناد حقوقی", icon: "PenLine", perm: "draft.view", badge: "reviews" },
+      { href: "/petitions", label: "دادخواست‌ها", icon: "FileSignature", perm: "draft.view" },
       { href: "/templates", label: "قالب‌ها", icon: "LayoutTemplate", perm: "template.view" },
       { href: "/assistant", label: "دستیار هوشمند", icon: "Sparkles", perm: "ai.use" },
       { href: "/skills", label: "مهارت‌های حقوقی", icon: "Scale", perm: "skill.run" },

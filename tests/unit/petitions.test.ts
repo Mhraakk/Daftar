@@ -8,11 +8,12 @@ import { describe, expect, it } from "vitest";
 import { DEADLINE_RULES } from "../../prisma/seed-data/deadline-rules";
 import { sha256 } from "@/lib/storage";
 import type { ExtractedLaw } from "@/server/law-import";
-import { emptyParty, petitionDataSchema, toSpec, type PetitionData, type PetitionSpec, type PetitionTypeRow } from "@/server/petitions/data";
-import { blankify, cleanCellText, parseValue, splitNumbered, type ParsedForm } from "@/server/petitions/form-parser";
+import { countSteps, stepOf, systemRows } from "@/components/petitions/studio-model";
+import { emptyParty, emptyPetitionData, petitionDataSchema, plainSpec, toSpec, type PetitionData, type PetitionSpec, type PetitionTypeRow } from "@/server/petitions/data";
+import { blankify, cleanCellText, parseValue, splitInvestigations, splitNumbered, type ParsedForm } from "@/server/petitions/form-parser";
 import { formCode, parseFormFile } from "@/server/petitions/import-form";
 import { LAW_PETITION_TYPES, type LawPetitionType } from "@/server/petitions/law-types";
-import { BLANK_BINDINGS, blankKeys, fillBody, formatAmount, renderPetitionHtml, userBlanks } from "@/server/petitions/render";
+import { BLANK_BINDINGS, blankKeys, fillBody, formatAmount, renderPetitionHtml, sideLabels, templateParts, userBlanks } from "@/server/petitions/render";
 import { ANCHORS, validatePetition, type PetitionCheck } from "@/server/petitions/validate";
 import { sanitizeLegalHtml } from "@/server/sanitize";
 
@@ -124,6 +125,10 @@ describe("form parser pure functions", () => {
 
   it("splits numbered lists, including a marker typed after its number", () => {
     expect(splitNumbered(["-1 شهادت شهود و مطلعین -2 تحقیقات محلی", "-3 معاینه محلی 4-اتیان سوگند"])).toEqual(["شهادت شهود و مطلعین", "تحقیقات محلی", "معاینه محلی", "اتیان سوگند"]);
+    // فهرست جداشده با «،» (ویرگول پیش از واژه بعد) و دو اقدام شناخته‌شده چسبیده به هم
+    expect(splitInvestigations(["درخواست استعلام ،تحقیقات محلی ،شماره پرونده استنادی شهادت شهود و مطلعین ،اتیان سوگند، سایر دلایل و منضمات"]))
+      .toEqual(["درخواست استعلام", "تحقیقات محلی", "شماره پرونده استنادی", "شهادت شهود و مطلعین", "اتیان سوگند", "سایر دلایل و منضمات"]);
+    expect(splitInvestigations(["-1 جلب نظر کارشناس -2 معاینه محلی"])).toEqual(["جلب نظر کارشناس", "معاینه محلی"]);
   });
 
   it("reads value checkboxes and the financial / non-financial kind", () => {
@@ -296,5 +301,44 @@ describe("petition sheet", () => {
     expect(formatAmount("1200000")).toBe("۱٬۲۰۰٬۰۰۰");
     expect(formatAmount("۱۲٬۰۰۰ ریال")).toBe("۱۲٬۰۰۰");
     expect(formatAmount("")).toBe("");
+  });
+});
+
+describe("petition studio model", () => {
+  it("sends every unfinished check of an empty petition to the step that can fix it", () => {
+    const stray = specs.flatMap((spec) => validatePetition(spec, emptyPetitionData()).checks
+      .filter((c) => (c.status === "missing" || c.status === "warning") && stepOf(c.field) === "review")
+      .map((c) => `${spec.title}: ${c.id} (${c.field})`));
+    expect(stray).toEqual([]);
+  });
+
+  it("counts missing checks per step and none once the petition is complete", () => {
+    const spec = specOf("ابطال چک");
+    const empty = countSteps(validatePetition(spec, emptyPetitionData()).checks);
+    expect(empty.parties).toBe(2);
+    expect(empty.claim).toBeGreaterThan(0);
+    expect(countSteps(validatePetition(spec, complete(spec)).checks)).toEqual({});
+  });
+
+  it("builds the copy-for-system rows in the order of the filing form", () => {
+    const spec = specOf("ابطال چک");
+    const d = complete(spec);
+    const rows = systemRows(spec, d, sideLabels(spec));
+    expect(rows.map((r) => r.label)).toEqual(["خواهان", "خوانده", "خواسته", "بهای خواسته", "دلایل و منضمات", "مرجع رسیدگی", "شرح دادخواست"]);
+    expect(rows[0].value).toContain("مریم احمدی، فرزند حسن");
+    expect(rows[3].value).toBe(`${formatAmount(d.claim.value)} ریال`);
+    expect(rows[6].value).toBe(fillBody(spec, d).text);
+  });
+
+  it("splits a template line into text and blanks, and sends only spec columns to the browser", () => {
+    expect(templateParts("ریاست محترم {{مرجع رسیدگی}} با سلام")).toEqual([
+      { text: "ریاست محترم ", blank: false }, { text: "مرجع رسیدگی", blank: true }, { text: " با سلام", blank: false },
+    ]);
+    const spec = specOf("ابطال چک");
+    const withRowColumns = { ...spec, createdAt: new Date(), sourceSha256: "x" } as PetitionSpec;
+    const plain = plainSpec(withRowColumns);
+    expect(Object.keys(plain)).not.toContain("createdAt");
+    expect(Object.keys(plain)).not.toContain("sourceSha256");
+    expect(plain).toEqual(spec);
   });
 });

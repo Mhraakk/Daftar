@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { runAction } from "@/lib/action";
 import { petitionTypeUpdateSchema, setPetitionTypeStatus, updatePetitionType } from "@/server/petitions/catalog";
-import { PETITION_TYPE_STATUSES } from "@/server/petitions/data";
-import { createPetitionDraft, createPetitionSchema, petitionReport, savePetition } from "@/server/petitions/drafting";
+import { PETITION_TYPE_STATUSES, petitionDataSchema } from "@/server/petitions/data";
+import { createPetitionDraft, createPetitionSchema, petitionDeadline, petitionReport, savePetition } from "@/server/petitions/drafting";
 
 const ID_MAX = 40;
 const id = z.string().min(1).max(ID_MAX);
@@ -27,6 +27,14 @@ export async function petitionReportAction(raw: unknown) {
   return runAction(z.object({ id }), "draft.view", raw, async (input, user) => {
     const report = await petitionReport(input.id, user);
     return { validation: report.validation, deadline: report.deadline };
+  });
+}
+
+/** مهلت برای داده ذخیره‌نشده استودیو (پیش‌نمایش زنده؛ چیزی ذخیره نمی‌شود) */
+export async function petitionDeadlineAction(raw: unknown) {
+  return runAction(z.object({ id, data: z.unknown() }), "draft.view", raw, async (input, user) => {
+    const report = await petitionReport(input.id, user);
+    return petitionDeadline(report.spec, petitionDataSchema.parse(input.data));
   });
 }
 

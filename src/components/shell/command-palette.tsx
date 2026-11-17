@@ -3,7 +3,7 @@
 // قانون و تغییر چیدمان/پوسته — همه در یک فهرست با صفحه‌کلید. فقط کارهایی که کاربر مجوزش را دارد نمایش داده می‌شود.
 import * as Dialog from "@radix-ui/react-dialog";
 import {
-  AlarmClockPlus, BookOpenText, CornerDownLeft, FilePlus2, FolderPlus, History, LayoutPanelLeft, ListPlus, Palette, Pin, Search, Sparkles, UserPlus, type LucideIcon,
+  AlarmClockPlus, BookOpenText, CornerDownLeft, FilePlus2, FileSignature, FolderPlus, History, LayoutPanelLeft, ListPlus, Palette, Pin, Search, Sparkles, UserPlus, type LucideIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -18,6 +18,7 @@ interface Hit { id: string; type: string; typeLabel: string; title: string; subt
 
 const ACTIONS: { id: string; label: string; href: string; perm: string; icon: LucideIcon; keywords: string }[] = [
   { id: "new-draft", label: "تنظیم سند حقوقی (دادخواست، لایحه، اظهارنامه)", href: "/drafts/new", perm: "draft.create", icon: FilePlus2, keywords: "جدید سند دادخواست لایحه" },
+  { id: "new-petition", label: "دادخواست جدید (بدوی، اعتراضی، طاری)", href: "/petitions", perm: "draft.create", icon: FileSignature, keywords: "دادخواست تجدیدنظر واخواهی فرجام اعاده دادرسی ورود ثالث جلب ثالث دعوای متقابل تامین خواسته دستور موقت" },
   { id: "new-case", label: "پرونده جدید", href: "/cases/new", perm: "case.create", icon: FolderPlus, keywords: "ایجاد پرونده" },
   { id: "new-client", label: "ثبت مراجعه‌کننده", href: "/clients/new", perm: "client.create", icon: UserPlus, keywords: "موکل مراجع جدید" },
   { id: "new-task", label: "وظیفه جدید", href: "/tasks?new=1", perm: "task.create", icon: ListPlus, keywords: "کار جدید" },

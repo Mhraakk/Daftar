@@ -157,6 +157,15 @@ export function toSpec(row: PetitionTypeRow): PetitionSpec {
   };
 }
 
+const SPEC_KEYS = [
+  "id", "code", "title", "kind", "subKind", "category", "court", "courtBasis", "eligible", "defendant", "valueType", "valueOptions", "evidence", "evidenceInfo",
+  "fees", "investigations", "ancillary", "bodyTemplate", "blanks", "optionalClauses", "requirements", "rules", "notes", "source", "sourceLabel", "lawCode",
+  "articleRefs", "deadlineRuleKey", "status",
+] as const satisfies readonly (keyof PetitionSpec)[];
+
+/** فقط ستون‌های طرح PetitionSpec (بدون تاریخ‌ها و ستون‌های داخلی ردیف Prisma) برای ارسال به استودیوی مرورگر */
+export const plainSpec = (s: PetitionSpec): PetitionSpec => Object.fromEntries(SPEC_KEYS.map((k) => [k, s[k]])) as unknown as PetitionSpec;
+
 /** الزام اجباری بودن هر مدرک (فرم‌ها: true/false/نامعلوم) */
 export function evidenceRequired(spec: PetitionSpec, label: string): boolean | null {
   return spec.requirements.flatMap((r) => ("evidence" in r && r.evidence.label === label ? [r.evidence.required] : [])).at(0) ?? null;
