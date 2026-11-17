@@ -6,11 +6,14 @@ import { DEADLINE_RULES } from "./seed-data/deadline-rules";
 import { CONNECTORS } from "./seed-data/connectors";
 import { seedTemplates } from "./seed-data/templates";
 import { ACP_IMPORT, importLaw } from "../src/server/law-import";
+import { seedPetitionTypes } from "../src/server/petitions/seed";
 
 const db = new PrismaClient();
 
 async function main() {
-  // مجوزها
+  // مجوزها؛ کلیدهای تازه (در این اجرا اضافه‌شده) به نقش‌های سیستمی دارای آن در پیش‌فرض داده می‌شود
+  const knownKeys = new Set((await db.permission.findMany({ select: { key: true } })).map((p) => p.key));
+  const newKeys = knownKeys.size ? PERMISSIONS.map((p) => p[0]).filter((k) => !knownKeys.has(k)) : [];
   for (const [key, group, label] of PERMISSIONS) {
     await db.permission.upsert({ where: { key }, create: { key, group, label }, update: { group, label } });
   }
@@ -24,6 +27,9 @@ async function main() {
     } else if (r.key === "admin") {
       await db.rolePermission.deleteMany({ where: { roleId: existing.id } });
       await db.rolePermission.createMany({ data: r.permissions.map((permissionKey) => ({ roleId: existing.id, permissionKey })) });
+    } else {
+      const grant = r.permissions.filter((k) => newKeys.includes(k));
+      if (grant.length) await db.rolePermission.createMany({ data: grant.map((permissionKey) => ({ roleId: existing.id, permissionKey })), skipDuplicates: true });
     }
   }
 
@@ -52,6 +58,10 @@ async function main() {
   // متن قانون آیین دادرسی مدنی (از PDF دفتر؛ همه مواد «تأییدنشده» تا تطبیق با متن رسمی)
   const acp = await importLaw(db, ACP_IMPORT);
   console.log(`✔ ق.آ.د.م: ${acp.created} ماده جدید، ${acp.updated} به‌روزرسانی، ${acp.unchanged} بدون تغییر.`);
+
+  // انواع دادخواست: ۲۹ فرم نمونه دفتر و انواع اعتراضی/طاری برگرفته از متن قانون
+  const pt = await seedPetitionTypes(db);
+  console.log(`✔ انواع دادخواست: ${pt.forms} فرم + ${pt.law} نوع قانونی (${pt.created} جدید، ${pt.updated} به‌روزرسانی، ${pt.kept} ویرایش‌شده دستی).`);
 
   // اتصال‌های بیرونی (همه غیرفعال تا پیکربندی)
   for (const c of CONNECTORS) {

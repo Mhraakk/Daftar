@@ -122,6 +122,7 @@ model Client {
   nationalId   String?    @unique
   fatherName   String?
   birthDate    DateTime?  @db.Date
+  occupation   String?
   mobile       String?
   phone        String?
   email        String?
@@ -228,6 +229,12 @@ model CaseParty {
   nationalId String?
   phone      String?
   address    String?
+  // مشخصات لازم برای برگ دادخواست (ماده ۵۱ ق.آ.د.م): نام پدر، سن، شغل؛ شخص حقوقی: نام و اقامتگاه
+  partyType  String    @default("PERSON")
+  fatherName String?
+  occupation String?
+  birthDate  DateTime? @db.Date
+  postalCode String?
   clientId   String?
   client     Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
   createdAt  DateTime @default(now())
@@ -845,6 +852,10 @@ model LegalDraft {
   approvedAt     DateTime?
   finalizedAt    DateTime?
   aiAssisted     Boolean        @default(false)
+  petitionTypeId String?
+  petitionType   PetitionType?  @relation(fields: [petitionTypeId], references: [id], onDelete: SetNull)
+  // داده ساخت‌یافته دادخواست (طرفین، خواسته، دلایل، مرجع، جاهای خالی متن) — منبع ساخت برگ دادخواست
+  petitionData   Json?
   currentVersion Int            @default(0)
   version        Int            @default(1)
   archivedAt     DateTime?
@@ -860,6 +871,58 @@ model LegalDraft {
   @@index([caseId])
   @@index([authorId])
   @@index([reviewerId, status])
+}
+
+// نوع دادخواست: برگرفته از فرم رسمی (Fk01/00) یا از متن قانون؛ قالب تنظیم دادخواست در استودیو.
+// kind: INITIAL (بدوی) | OBJECTION (اعتراضی) | INCIDENTAL (طاری)؛ status: DRAFT | PUBLISHED | ARCHIVED
+model PetitionType {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  title           String
+  kind            String
+  subKind         String?
+  category        String
+  court           String?
+  courtBasis      String?
+  eligible        String?
+  defendant       String?
+  valueType       String?
+  valueOptions    Json      @default("[]")
+  evidence        String[]  @default([])
+  evidenceInfo    String[]  @default([])
+  fees            String[]  @default([])
+  investigations  String[]  @default([])
+  ancillary       String[]  @default([])
+  bodyTemplate    String
+  blanks          Json      @default("[]")
+  optionalClauses Json      @default("[]")
+  requirements    Json      @default("[]")
+  notes           String?
+  rules           Json      @default("{}")
+  formCode        String?
+  source          String
+  sourceLabel     String?
+  sourceFileKey   String?
+  sourceFileName  String?
+  sourceSha256    String?
+  lawCode         String?
+  articleRefs     String[]  @default([])
+  deadlineRuleKey String?
+  keywords        String[]  @default([])
+  status          String    @default("DRAFT")
+  version         Int       @default(1)
+  importReport    Json?
+  editedAt        DateTime?
+  createdById     String?
+  publishedById   String?
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  drafts LegalDraft[]
+
+  @@index([kind, status])
+  @@index([category])
 }
 
 model LegalDraftVersion {

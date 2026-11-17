@@ -78,6 +78,13 @@ function block(el: HTMLElement, out: (Paragraph | Table)[], listLevel = 0) {
   }
 }
 
+/** دسته بایگانی سند نهایی؛ دادخواست تجدیدنظر و واخواهی هم در «دادخواست» بایگانی می‌شوند */
+const ARCHIVE_CATEGORY: Record<string, string> = {
+  PETITION: "دادخواست", APPEAL: "دادخواست", OBJECTION: "دادخواست", DECLARATION: "اظهارنامه", COMPLAINT: "شکواییه",
+  DEFENSE_BRIEF: "لایحه", SUPPLEMENTARY_BRIEF: "لایحه",
+};
+export const archiveCategory = (docType: string): string => ARCHIVE_CATEGORY[docType] ?? "سایر";
+
 export async function htmlToDocx(html: string, meta: { title: string; footer: string }): Promise<Buffer> {
   const root = parse(`<div>${html}</div>`).firstChild as HTMLElement;
   const children: (Paragraph | Table)[] = [];
@@ -147,7 +154,7 @@ export async function finalizeDraft(id: string, user: SessionUser) {
       const code = await nextNumber("DOCUMENT", tx);
       const row = await tx.document.create({
         data: {
-          code, title: `${d.title} (نسخه نهایی)`, category: LEGAL_DOC_TYPES[d.docType] && ["دادخواست", "اظهارنامه", "شکواییه"].includes(LEGAL_DOC_TYPES[d.docType]) ? LEGAL_DOC_TYPES[d.docType] : d.docType.includes("BRIEF") ? "لایحه" : "سایر",
+          code, title: `${d.title} (نسخه نهایی)`, category: archiveCategory(d.docType),
           description: `سند حقوقی نهایی ${d.code} — تأییدشده در ${formatJalali(d.approvedAt, "date")}`, tags: ["سند نهایی", LEGAL_DOC_TYPES[d.docType] ?? ""].filter(Boolean),
           caseId: d.caseId, clientId: d.clientId, createdById: user.id,
           versions: { create: [

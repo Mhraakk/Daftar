@@ -89,7 +89,7 @@ describe("ACP article texts match the printed page", () => {
 });
 
 describe("deadline rules agree with the articles they cite", () => {
-  const DAY_WORDS: Record<string, string> = { "7": "یک هفته", "10": "ده روز", "20": "بیست روز" };
+  const DAY_WORDS: Record<string, string> = { "3": "سه روز", "7": "یک هفته", "10": "ده روز", "20": "بیست روز" };
   const MONTH_WORDS: Record<string, string> = { "1": "یک ماه", "2": "دو ماه" };
   const acpRules = DEADLINE_RULES.filter((r) => r.lawCode === "ACP");
 
