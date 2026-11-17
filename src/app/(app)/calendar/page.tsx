@@ -44,8 +44,8 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
       <PageHeader title="تقویم" subtitle="رویدادها، مهلت‌ها و سررسید وظایف در یک نما"
         actions={<>
           <div className="flex overflow-hidden rounded-md border border-line-strong text-sm">
-            <Link href={q({ scope: "mine" })} className={cn("px-3 py-2", scope === "mine" ? "bg-night text-white" : "bg-surface hover:bg-surface-2")}>تقویم من</Link>
-            <Link href={q({ scope: "all" })} className={cn("px-3 py-2", scope === "all" ? "bg-night text-white" : "bg-surface hover:bg-surface-2")}>{can(user, "calendar.view_all") ? "کل دفتر" : "واحد و پرونده‌های من"}</Link>
+            <Link href={q({ scope: "mine" })} className={cn("px-3 py-2", scope === "mine" ? "bg-night text-on-night" : "bg-surface hover:bg-surface-2")}>تقویم من</Link>
+            <Link href={q({ scope: "all" })} className={cn("px-3 py-2", scope === "all" ? "bg-night text-on-night" : "bg-surface hover:bg-surface-2")}>{can(user, "calendar.view_all") ? "کل دفتر" : "واحد و پرونده‌های من"}</Link>
           </div>
           {can(user, "calendar.manage") && (
             <FormDialog trigger="رویداد جدید" icon={<CalendarPlus />} title="ثبت رویداد" size="lg" action={createEventAction} successMessage="رویداد ثبت شد."
@@ -82,7 +82,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
               return (
                 <Link key={i} href={q({ d })} scroll={false} aria-label={`${d} ${J_MONTHS[jm - 1]}، ${list.length} مورد`}
                   className={cn("flex min-h-[92px] flex-col gap-1 border-b border-s border-line p-1.5 transition-colors hover:bg-firuze-50/50", d === sel && "bg-firuze-50 ring-1 ring-inset ring-firuze", off && d !== sel && "bg-mohr-50/30")}>
-                  <span className={cn("num flex size-6 items-center justify-center self-start rounded-full text-sm", isToday && "bg-night font-bold text-white", off && !isToday && "text-mohr")}>{toFaDigits(d)}</span>
+                  <span className={cn("num flex size-6 items-center justify-center self-start rounded-full text-sm", isToday && "bg-night font-bold text-on-night", off && !isToday && "text-mohr")}>{toFaDigits(d)}</span>
                   {holiday && <span className="truncate text-2xs text-mohr">{holiday}</span>}
                   {list.slice(0, 3).map((it) => (
                     <span key={it.kind + it.id} className={cn("flex items-center gap-1 truncate text-2xs leading-4", it.done && "text-ink-3 line-through")}>

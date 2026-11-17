@@ -1,11 +1,12 @@
 import type { PermissionKey } from "@/lib/permissions";
 
 export interface NavItem { href: string; label: string; icon: string; perm?: PermissionKey; badge?: "cartable" | "tasks" | "messages" | "deadlines" | "reviews" }
-export interface NavGroup { title: string; items: NavItem[] }
+export interface NavGroup { title: string; icon: string; items: NavItem[] }
 
 export const NAV: NavGroup[] = [
   {
     title: "میز کار",
+    icon: "BriefcaseBusiness",
     items: [
       { href: "/", label: "پیشخوان", icon: "LayoutDashboard" },
       { href: "/cartable", label: "کارتابل", icon: "Inbox", perm: "correspondence.view", badge: "cartable" },
@@ -17,6 +18,7 @@ export const NAV: NavGroup[] = [
   },
   {
     title: "پرونده‌ها و اسناد",
+    icon: "FolderKanban",
     items: [
       { href: "/clients", label: "مراجعان", icon: "Users", perm: "client.view" },
       { href: "/cases", label: "پرونده‌ها", icon: "FolderOpen", perm: "case.view" },
@@ -25,6 +27,7 @@ export const NAV: NavGroup[] = [
   },
   {
     title: "کارگاه حقوقی",
+    icon: "Landmark",
     items: [
       { href: "/drafts", label: "اسناد حقوقی", icon: "PenLine", perm: "draft.view", badge: "reviews" },
       { href: "/templates", label: "قالب‌ها", icon: "LayoutTemplate", perm: "template.view" },
@@ -35,6 +38,7 @@ export const NAV: NavGroup[] = [
   },
   {
     title: "مدیریت",
+    icon: "SlidersHorizontal",
     items: [
       { href: "/reports", label: "گزارش‌ها", icon: "ChartNoAxesColumn", perm: "report.view" },
       { href: "/admin/users", label: "کارمندان", icon: "UserCog", perm: "user.manage" },

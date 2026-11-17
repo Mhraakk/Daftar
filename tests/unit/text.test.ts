@@ -5,7 +5,9 @@ describe("متن فارسی", () => {
   it("تبدیل ارقام", () => {
     expect(toEnDigits("۱۲۳٤٥٦")).toBe("123456");
     expect(toFaDigits("P-1405-00012")).toBe("P-۱۴۰۵-۰۰۰۱۲");
-    expect(faNum(1234567)).toBe("۱,۲۳۴,۵۶۷");
+    expect(faNum(1234567)).toBe("۱٬۲۳۴٬۵۶۷");
+    expect(faNum(1234567.5)).toBe("۱٬۲۳۴٬۵۶۷٫۵");
+    expect(faNum(BigInt(5_000_000_000))).toBe("۵٬۰۰۰٬۰۰۰٬۰۰۰");
   });
   it("نرمال‌سازی: ی/ک عربی، اعراب، نیم‌فاصله، همزه و ارقام", () => {
     expect(normalizeFa("كتابِ عليٌ")).toBe(normalizeFa("کتاب علی"));

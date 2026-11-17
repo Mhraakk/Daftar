@@ -33,7 +33,7 @@ const FieldTokens = Extension.create({
 function Btn({ on, active, label, children, disabled }: { on: () => void; active?: boolean; label: string; children: React.ReactNode; disabled?: boolean }) {
   return (
     <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={on} disabled={disabled} title={label} aria-label={label} aria-pressed={active}
-      className={cn("flex size-8 items-center justify-center rounded text-ink-2 transition-colors hover:bg-ink/10 disabled:opacity-35 [&_svg]:size-4", active && "bg-night text-white hover:bg-night")}>{children}</button>
+      className={cn("flex size-8 items-center justify-center rounded text-ink-2 transition-colors hover:bg-ink/10 disabled:opacity-35 [&_svg]:size-4", active && "bg-night text-on-night hover:bg-night")}>{children}</button>
   );
 }
 const Sep = () => <span className="mx-1 h-5 w-px bg-line-strong" aria-hidden />;

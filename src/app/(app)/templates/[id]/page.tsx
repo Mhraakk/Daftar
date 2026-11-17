@@ -50,7 +50,7 @@ export default async function TemplatePage({ params, searchParams }: { params: P
             ? <TemplateVersionEditor key={latest.id} id={t.id} html={latest.contentHtml} />
             : <>
                 {shown.versionNo !== latest.versionNo && <div className="mb-3"><Notice tone="warning">نمایش نسخه قدیمی {faNum(shown.versionNo)}. <Link href={`/templates/${id}`} className="font-bold underline">بازگشت به آخرین نسخه</Link></Notice></div>}
-                <div className="mx-auto w-full max-w-[210mm] rounded border border-line-strong bg-white px-6 py-8 shadow-pop sm:px-[22mm]"><div className="legal-doc" dir="rtl" dangerouslySetInnerHTML={{ __html: shown.contentHtml.replace(/\{\{([^{}<>]+)\}\}/g, '<span class="field-token">{{$1}}</span>') }} /></div>
+                <div className="mx-auto w-full max-w-[210mm] rounded border border-line-strong sheet-paper px-6 py-8 shadow-pop sm:px-[22mm]"><div className="legal-doc" dir="rtl" dangerouslySetInnerHTML={{ __html: shown.contentHtml.replace(/\{\{([^{}<>]+)\}\}/g, '<span class="field-token">{{$1}}</span>') }} /></div>
               </>}
         </div>
         <aside className="flex flex-col gap-4">

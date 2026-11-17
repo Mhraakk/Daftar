@@ -31,7 +31,7 @@ export default async function ComparePage({ params, searchParams }: { params: Pr
           <label key={String(n)} className="block w-full sm:w-auto"><span className="mb-1 block text-sm text-ink-2">{l}</span>
             <select name={String(n)} defaultValue={String(val)} className="input w-full sm:w-auto sm:min-w-[220px] sm:max-w-md">{d.versions.map((v) => <option key={v.versionNo} value={v.versionNo}>نسخه {faNum(v.versionNo)} — {formatJalali(v.createdAt, "datetime")}{v.note ? ` — ${v.note}` : ""}</option>)}</select></label>
         ))}
-        <button className="h-10 rounded-md bg-lapis px-4 font-medium text-white hover:bg-lapis-600">مقایسه</button>
+        <button className="h-10 rounded-md bg-lapis px-4 font-medium text-on-lapis hover:bg-lapis-600">مقایسه</button>
       </form>
       <div className="panel p-2" dir="rtl">
         {lines.length === 0 ? <p className="p-6 text-center text-ink-3">هر دو نسخه خالی‌اند.</p> : lines.map((l, i) => (

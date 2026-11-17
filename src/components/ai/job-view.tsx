@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActionButton } from "@/components/ui/action-button";
 import { Notice } from "@/components/ui/page";
 import { Seal } from "@/components/ui/seal";
-import { toFaDigits } from "@/lib/text";
+import { faNum, toFaDigits } from "@/lib/text";
 import type { JobSnapshot } from "@/server/ai/snapshot";
 import { cancelAiJobAction } from "@/app/(app)/skills/actions";
 
@@ -66,8 +66,8 @@ export function JobView({ initial, path, canCancel, showOutput = true }: { initi
         {job.status === "RUNNING" && <span className="flex items-center gap-1"><Loader2 className="size-4 animate-spin" />{secs(elapsed)} ثانیه</span>}
         <span className="flex items-center gap-1" dir="ltr"><Cpu className="size-4" />{job.model}</span>
         {job.durationMs !== null && !ACTIVE.has(job.status) && <span>زمان: {secs(job.durationMs)} ثانیه</span>}
-        {job.inputTokens !== null && <span>ورودی: {toFaDigits(job.inputTokens.toLocaleString("en-US"))} توکن</span>}
-        {job.outputTokens !== null && <span>خروجی: {toFaDigits(job.outputTokens.toLocaleString("en-US"))} توکن</span>}
+        {job.inputTokens !== null && <span>ورودی: {faNum(job.inputTokens)} توکن</span>}
+        {job.outputTokens !== null && <span>خروجی: {faNum(job.outputTokens)} توکن</span>}
         {canCancel && ACTIVE.has(job.status) && (
           <ActionButton action={cancelAiJobAction} payload={{ id: job.id, path }} size="sm" variant="ghost" confirm={{ title: "لغو اجرا", body: "تولید پاسخ متوقف و این اجرا لغو می‌شود." }} successMessage="لغو شد.">
             <Ban />لغو

@@ -10,6 +10,9 @@ import { db } from "@/lib/db";
 import { formatDateOnly } from "@/lib/jalali";
 import { faNum } from "@/lib/text";
 import { getOffice } from "@/server/admin";
+import { getOfficeUi } from "@/theme/prefs";
+import { LAYOUT_IDS, LAYOUTS_META, SKIN_IDS, SKINS_META } from "@/theme/skins";
+import { saveOfficeUiAction } from "./ui-actions";
 import { addHolidayAction, removeHolidayAction, saveOfficeAction, saveRuleAction, verifyRuleAction } from "../actions";
 
 export const metadata = { title: "تنظیمات دفتر" };
@@ -22,7 +25,7 @@ const FULL = 2 as const;
 
 export default async function SettingsPage() {
   const user = await requirePagePerm("settings.manage");
-  const [office, holidays, rules] = await Promise.all([getOffice(), db.holiday.findMany({ orderBy: { date: "asc" }, where: { date: { gte: new Date(Date.now() - PAST_HOLIDAY_DAYS * DAY_MS) } } }), db.deadlineRule.findMany({ orderBy: { title: "asc" } })]);
+  const [office, officeUi, holidays, rules] = await Promise.all([getOffice(), getOfficeUi(), db.holiday.findMany({ orderBy: { date: "asc" }, where: { date: { gte: new Date(Date.now() - PAST_HOLIDAY_DAYS * DAY_MS) } } }), db.deadlineRule.findMany({ orderBy: { title: "asc" } })]);
   const linked = rules.filter((r) => r.lawCode && r.articleNos.length);
   const articles = linked.length
     ? await db.legalSource.findMany({ where: { OR: linked.map((r) => ({ lawCode: r.lawCode, articleNo: { in: r.articleNos } })) }, select: { id: true, lawCode: true, articleNo: true, title: true, text: true, verified: true, status: true } })
@@ -31,11 +34,20 @@ export default async function SettingsPage() {
   const ruleFields = [{ name: "title", label: "عنوان", required: true, span: FULL }, { name: "days", label: "مدت (روز) — مقیم ایران", type: "number" as const, required: true }, { name: "monthsAbroad", label: "مدت (ماه) — مقیم خارج", type: "number" as const }, { name: "basis", label: "مستند قانونی", required: true, span: FULL }, { name: "description", label: "توضیح", type: "textarea" as const, rows: DESCRIPTION_ROWS }];
   return (
     <>
-      <PageHeader title="تنظیمات دفتر" subtitle="مشخصات دفتر، تعطیلات رسمی و قواعد مهلت‌های قانونی" />
+      <PageHeader title="تنظیمات دفتر" subtitle="مشخصات دفتر، ظاهر پیش‌فرض، تعطیلات رسمی و قواعد مهلت‌های قانونی" />
       <div className="grid gap-4 xl:grid-cols-2">
         <Panel title="مشخصات دفتر">
           <SmartForm action={saveOfficeAction} submitLabel="ذخیره" successMessage="مشخصات دفتر ذخیره شد." initial={office as unknown as Record<string, unknown>}
             fields={[{ name: "officeName", label: "نام دفتر", required: true, span: FULL }, { name: "officeCode", label: "کد دفتر", ltr: true }, { name: "city", label: "شهر" }, { name: "phone", label: "تلفن", ltr: true }, { name: "letterheadNote", label: "زیرنویس سربرگ" }, { name: "address", label: "نشانی", span: FULL }]} />
+        </Panel>
+        <Panel title="ظاهر پیش‌فرض دفتر">
+          <p className="mb-3 text-sm text-ink-2">برای صفحه ورود و کارمندانی که چیدمان یا پوسته را خودشان انتخاب نکرده‌اند. هر کاربر از منوی خود یا صفحه «حساب کاربری» می‌تواند ترکیب دلخواهش را برگزیند.</p>
+          <SmartForm action={saveOfficeUiAction} submitLabel="ذخیره ظاهر پیش‌فرض" successMessage="ظاهر پیش‌فرض دفتر ذخیره شد." initial={officeUi as unknown as Record<string, unknown>}
+            fields={[
+              { name: "layout", label: "چیدمان", type: "select", required: true, options: LAYOUT_IDS.map((l) => ({ value: l, label: `${LAYOUTS_META[l].label} — ${LAYOUTS_META[l].hint}` })) },
+              { name: "skin", label: "پوسته", type: "select", required: true, options: SKIN_IDS.map((s) => ({ value: s, label: `${SKINS_META[s].label} — ${SKINS_META[s].hint}` })) },
+              { name: "chartTimeAxis", label: "جهت محور زمان نمودارها", type: "select", required: true, span: FULL, hint: "راست‌به‌چپ: زمان مانند جهت خواندن فارسی از راست به چپ پیش می‌رود.", options: [{ value: "rtl", label: "راست به چپ (پیش‌فرض)" }, { value: "ltr", label: "چپ به راست" }] },
+            ]} />
         </Panel>
         <Panel title={`تعطیلات رسمی (${faNum(holidays.length)})`} action={<FormDialog trigger="افزودن تعطیلی" triggerVariant="secondary" triggerSize="sm" title="افزودن تعطیلی رسمی" size="sm" cols={1} action={addHolidayAction} successMessage="افزوده شد."
           fields={[{ name: "date", label: "تاریخ", type: "jdate", required: true }, { name: "title", label: "عنوان", required: true, placeholder: "مثلاً عید نوروز" }]} />}>

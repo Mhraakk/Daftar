@@ -146,8 +146,8 @@ export function DraftWorkspace(props: {
         {editable ? <input value={title} onChange={(e) => { setTitle(e.target.value); latest.current.title = e.target.value; setState("dirty"); }} className="input h-9 min-w-[200px] max-w-md flex-1 font-bold" aria-label="عنوان سند" />
           : <span className="flex min-w-[120px] flex-1 items-center gap-1.5 text-sm text-ink-2"><Lock className="size-4" />{st === "FINAL" ? "سند نهایی و قفل است." : st === "APPROVED" ? "تأییدشده؛ برای ویرایش باید به پیش‌نویس برگردد." : "در حال بررسی؛ ویرایش تا پایان بررسی قفل است."}</span>}
         <div className="flex overflow-hidden rounded-md border border-line-strong text-sm">
-          {editable && <button onClick={() => setMode("edit")} className={cn("px-3 py-1.5", mode === "edit" ? "bg-night text-white" : "bg-surface hover:bg-surface-2")}>ویرایش</button>}
-          <button onClick={() => setMode("preview")} className={cn("px-3 py-1.5", mode === "preview" ? "bg-night text-white" : "bg-surface hover:bg-surface-2")}>پیش‌نمایش چاپ</button>
+          {editable && <button onClick={() => setMode("edit")} className={cn("px-3 py-1.5", mode === "edit" ? "bg-night text-on-night" : "bg-surface hover:bg-surface-2")}>ویرایش</button>}
+          <button onClick={() => setMode("preview")} className={cn("px-3 py-1.5", mode === "preview" ? "bg-night text-on-night" : "bg-surface hover:bg-surface-2")}>پیش‌نمایش چاپ</button>
         </div>
         {editable && (
           <span className={cn("flex items-center gap-1.5 text-xs", state === "error" ? "text-mohr" : "text-ink-3")} role="status" aria-live="polite" data-save-state={state}>
@@ -177,7 +177,7 @@ export function DraftWorkspace(props: {
 
       {mode === "edit" && editable
         ? <RichEditor value={initialHtml} onChange={onChange} onSaveShortcut={() => void save("MANUAL")} externalValue={ext} />
-        : <div className="mx-auto w-full max-w-[210mm] rounded border border-line-strong bg-white px-6 py-8 shadow-pop sm:px-[22mm] sm:py-[25mm] print:border-0 print:p-0 print:shadow-none"><div className="legal-doc" dir="rtl" dangerouslySetInnerHTML={{ __html: html }} /></div>}
+        : <div className="mx-auto w-full max-w-[210mm] rounded border border-line-strong sheet-paper px-6 py-8 shadow-pop sm:px-[22mm] sm:py-[25mm] print:border-0 print:p-0 print:shadow-none"><div className="legal-doc" dir="rtl" dangerouslySetInnerHTML={{ __html: html }} /></div>}
       <p className="no-print text-xs text-ink-3">{toFaDigits(words)} واژه · متن هر ۲٫۵ ثانیه خودکار ذخیره می‌شود؛ «ثبت نسخه» نسخه‌ای شماره‌دار برای مقایسه و بازگردانی می‌سازد.</p>
 
       <Modal open={dialog === "submit"} onOpenChange={(o) => !o && setDialog(null)} title="ارسال سند برای بررسی" description="ویرایش سند تا پایان بررسی قفل می‌شود. تنظیم‌کننده نمی‌تواند بررسی‌کننده سند خود باشد." size="sm">

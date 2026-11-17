@@ -46,7 +46,7 @@ export default async function BackupPage() {
         <Panel title="بازیابی کامل">
           <p className="text-sm leading-7 text-ink-2">«آزمون بازیابی» پشتیبان را در یک پایگاه داده موقت بازیابی و شمار رکوردها، ارتباط اسناد با پرونده‌ها و فایل‌ها را کنترل می‌کند؛ داده‌های جاری تغییری نمی‌کند.</p>
           <p className="mt-2 text-sm leading-7 text-ink-2">بازیابی واقعی (جایگزینی داده‌های جاری) عملیاتی حساس است و فقط از خط فرمان سرور مرکزی انجام می‌شود:</p>
-          <pre className="ltr mt-2 overflow-x-auto rounded-md bg-night p-3 text-left text-xs leading-6 text-white">./scripts/restore.sh backups/daftar-…tar.gz</pre>
+          <pre className="ltr mt-2 overflow-x-auto rounded-md bg-night p-3 text-left text-xs leading-6 text-on-night">./scripts/restore.sh backups/daftar-…tar.gz</pre>
           <p className="mt-2 text-xs text-ink-3">راهنمای کامل در DEPLOYMENT.md</p>
         </Panel>
       </div>

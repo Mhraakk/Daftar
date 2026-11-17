@@ -13,9 +13,11 @@ export function toFaDigits(input: string | number): string {
   return String(input).replace(/[0-9]/g, (d) => FA_DIGITS[Number(d)]);
 }
 
-/** عدد با جداکننده هزارگان و ارقام فارسی */
+const FA_NUMBER = new Intl.NumberFormat("fa-IR");
+
+/** عدد با ارقام فارسی و جداکننده هزارگان «٬» (U+066C) و ممیز «٫» (U+066B)، مانند ۱٬۲۳۴٬۵۶۷٫۵ */
 export function faNum(n: number | bigint): string {
-  return toFaDigits(Number(n).toLocaleString("en-US"));
+  return FA_NUMBER.format(n);
 }
 
 /**

@@ -57,7 +57,7 @@ test("۲. مسئول پذیرش پرونده ایجاد و سند بارگذار
   await page.getByRole("button", { name: "بارگذاری و ثبت سند" }).click();
   await page.waitForURL(/\/documents\/c[a-z0-9]+$/);
   await expect(page.getByText("متن استخراج و نمایه شد")).toBeVisible();
-  await expect(page.getByText(docMarker)).toBeVisible();
+  await expect(page.locator("pre").getByText(docMarker)).toBeVisible();
 
   // فایل با محتوای ناسازگار با پسوند رد می‌شود
   await page.goto(`/documents/new?caseId=${caseUrl.split("/").pop()}`);

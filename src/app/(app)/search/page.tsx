@@ -33,7 +33,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         <div className="panel min-w-0">
           <form action="/search" className="flex gap-2 border-b border-line p-3">
             <div className="relative flex-1"><SearchIcon className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" /><input name="q" defaultValue={q} autoFocus placeholder="عبارت جست‌وجو…" className="input h-11 ps-9" aria-label="عبارت جست‌وجو" /></div>
-            <button className="h-11 rounded-md bg-lapis px-5 font-medium text-white hover:bg-lapis-600">جست‌وجو</button>
+            <button className="h-11 rounded-md bg-lapis px-5 font-medium text-on-lapis hover:bg-lapis-600">جست‌وجو</button>
           </form>
           {q.length >= 2 && (
             <div className="flex flex-wrap gap-1.5 border-b border-line px-3 py-2.5">

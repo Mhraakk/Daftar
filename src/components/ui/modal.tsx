@@ -14,9 +14,9 @@ export function Modal({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       {trigger && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 animate-fade-in bg-night/45 backdrop-blur-[1px]" />
+        <Dialog.Overlay className="fixed inset-0 z-50 animate-fade-in bg-scrim/40 backdrop-blur-[2px]" />
         <Dialog.Content dir="rtl"
-          className={cn("fixed inset-x-3 top-[6vh] z-50 mx-auto flex max-h-[88vh] animate-rise-in flex-col rounded-xl border border-line bg-surface shadow-pop", w)}>
+          className={cn("fixed inset-x-3 top-[6vh] z-50 mx-auto flex max-h-[88vh] animate-rise-in flex-col rounded-card border border-line bg-surface shadow-pop", w)}>
           <div className="ledger-rule flex items-start justify-between gap-4 px-5 pb-4 pt-4">
             <div>
               <Dialog.Title className="text-lg font-bold">{title}</Dialog.Title>

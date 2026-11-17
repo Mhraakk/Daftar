@@ -60,11 +60,12 @@ test("ارجاع‌دهنده بازگشتی را می‌بیند، اقدام �
 
 test("پیام داخلی ارسال، خوانده و وضعیت خوانده‌شدن ثبت می‌شود", async ({ page }) => {
   const s = `هماهنگی جلسه ${tag}`;
+  const body = `جلسه فردا ساعت ۱۰ برگزار می‌شود (${tag}).`;
   await login(page, "t.manager");
   await page.goto("/messages/new");
   await page.getByLabel(/علی رضایی/).check();
   await page.getByLabel("موضوع").fill(s);
-  await page.getByLabel("متن").fill("جلسه فردا ساعت ۱۰ برگزار می‌شود.");
+  await page.getByLabel("متن").fill(body);
   await page.getByRole("button", { name: "ارسال" }).click();
   await page.waitForURL(/box=sent/);
   await expect(page.getByText(s).first()).toBeVisible();
@@ -74,7 +75,8 @@ test("پیام داخلی ارسال، خوانده و وضعیت خوانده�
   await login(page, "t.legal");
   await page.goto("/messages");
   await page.getByText(s).first().click();
-  await expect(page.getByText("جلسه فردا ساعت ۱۰ برگزار می‌شود.")).toBeVisible();
+  await page.waitForURL(/\/messages\/c[a-z0-9]+/);
+  await expect(page.locator("main").getByText(body, { exact: true })).toBeVisible();
   await page.context().clearCookies();
   await login(page, "t.manager");
   await page.goto("/messages?box=sent");

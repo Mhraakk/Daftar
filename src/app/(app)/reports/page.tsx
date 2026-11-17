@@ -52,7 +52,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
     <>
       <PageHeader title="گزارش‌ها و تحلیل" subtitle={`دوره: ${rep.range.label} · همه ارقام از رکوردهای واقعی سامانه محاسبه می‌شود.`}
         actions={<>
-          <div className="flex overflow-hidden rounded-md border border-line-strong text-sm">{PERIODS.map(([k, l]) => <Link key={k} href={`/reports?period=${k}`} className={cn("px-3 py-2", k === period ? "bg-night text-white" : "bg-surface hover:bg-surface-2")}>{l}</Link>)}</div>
+          <div className="flex overflow-hidden rounded-md border border-line-strong text-sm">{PERIODS.map(([k, l]) => <Link key={k} href={`/reports?period=${k}`} className={cn("px-3 py-2", k === period ? "bg-night text-on-night" : "bg-surface hover:bg-surface-2")}>{l}</Link>)}</div>
           {can(user, "report.export") && <><LinkButton href={`/api/export/report?period=${period}`}>خروجی Excel</LinkButton><LinkButton href={`/api/export/report-pdf?period=${period}`} variant="primary">خروجی PDF</LinkButton></>}
         </>} />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

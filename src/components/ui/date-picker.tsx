@@ -54,7 +54,7 @@ export function JalaliDateInput({
                 <button key={i} type="button"
                   onClick={() => { onChange(`${view.jy}/${p2(view.jm)}/${p2(d)}`); setOpen(false); }}
                   className={cn("num h-9 rounded text-sm transition-colors hover:bg-firuze-50",
-                    i % 7 === 6 && "text-mohr", isToday && "ring-1 ring-inset ring-firuze", sel && "bg-firuze font-bold text-white hover:bg-firuze")}>
+                    i % 7 === 6 && "text-mohr", isToday && "ring-1 ring-inset ring-firuze", sel && "bg-firuze font-bold text-on-firuze hover:bg-firuze")}>
                   {toFaDigits(d)}
                 </button>
               );

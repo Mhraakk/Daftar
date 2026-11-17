@@ -70,9 +70,14 @@ model User {
   failedLogins       Int          @default(0)
   lockedUntil        DateTime?
   lastLoginAt        DateTime?
+  // ظاهر سامانه: چیدمان و پوسته انتخابی کاربر (null = پیش‌فرض دفتر در Setting «ui»)
+  uiLayout           String?
+  uiSkin             String?
+  uiPrefs            Json         @default("{}")
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
 
+  recents          UserRecent[]
   sessions         Session[]
   notifications    Notification[]
   activities       ActivityLog[]
@@ -1215,4 +1220,21 @@ model AutomationRule {
   createdById String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+// رکوردهای اخیر و سنجاق‌شده هر کاربر (ستون «اخیر» در چیدمان ستون‌ها و فرمان‌یاب)
+model UserRecent {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entityType String
+  entityId   String
+  title      String
+  subtitle   String?
+  link       String
+  pinned     Boolean  @default(false)
+  visitedAt  DateTime @default(now())
+
+  @@unique([userId, entityType, entityId])
+  @@index([userId, visitedAt])
 }
