@@ -6,6 +6,7 @@ import { z } from "zod";
 import { audit } from "@/lib/audit";
 import { can, type SessionUser } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
+import { ROLE_SIDE, type Side } from "@/lib/party-roles";
 import { AppError, ConflictError, ForbiddenError, NotFoundError } from "@/lib/errors";
 import { diffTehranDays, parseJalali } from "@/lib/jalali";
 import { toFaDigits } from "@/lib/text";
@@ -23,9 +24,7 @@ const MANAGE = "petition.manage";
 /** نام و نام خانوادگی دست‌کم دو واژه است */
 const MIN_NAME_PARTS = 2;
 
-type Side = "A" | "B" | "T";
 /** سمت هر نقش طرف پرونده (labels.PARTY_ROLES): A خواهان‌گونه، B خوانده‌گونه، T ثالث */
-const ROLE_SIDE: Record<string, Side> = { "خواهان": "A", "شاکی": "A", "تجدیدنظرخواه": "A", "خوانده": "B", "متهم / مشتکی‌عنه": "B", "تجدیدنظرخوانده": "B", "ثالث": "T" };
 const WITNESS_ROLE = "شاهد";
 /** نوع‌هایی که طرف آن‌ها هر دو سمت دعوای اصلی است */
 const BOTH_SIDES_AS_DEFENDANTS = new Set(["THIRD_PARTY_ENTRY", "THIRD_PARTY_OBJECTION"]);

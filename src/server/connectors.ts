@@ -1,6 +1,7 @@
 // اتصال‌های بیرونی دفتر. هر اتصال جداگانه پیکربندی می‌شود، پیش‌فرض خاموش است و خطای آن بقیه سامانه را متوقف نمی‌کند:
 // - legal_web: ورود متن از نشانی‌های رسمی مجاز (فهرست سفید دامنه‌ها) به کتابخانه حقوقی، با تاریخ بازیابی و وضعیت «تأییدنشده»
 // - messenger_bot: ارسال اعلان‌های مهم به پیام‌رسان با Bot API سازگار با تلگرام (مانند «بله» یا تلگرام)
+import { randomInt } from "node:crypto";
 import { parse as parseHtml } from "node-html-parser";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
@@ -8,6 +9,7 @@ import { audit } from "@/lib/audit";
 import { db } from "@/lib/db";
 import { AppError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/auth/guard";
+import { toEnDigits } from "@/lib/text";
 import { isPrivateHost } from "@/server/ai/config";
 import { decryptSecret, encryptSecret } from "@/server/ai/secret";
 
@@ -164,6 +166,88 @@ export async function testMessenger(user: SessionUser, fetchImpl: typeof fetch =
     await db.connector.update({ where: { key: "messenger_bot" }, data: { status: "ERROR", lastError: msg.slice(0, MAX_ERROR) } });
     throw new AppError(`ارسال ناموفق بود: ${msg}`);
   }
+}
+
+// ───────── اتصال حساب کاربر به پیام‌رسان ─────────
+
+const LINK_CODE_SPACE = 1_000_000;
+const LINK_CODE_DIGITS = 6;
+const LINK_TTL_MIN = 15;
+const MS_PER_MIN = 60_000;
+const UPDATES_LIMIT = 100;
+const CHAT_ID_MIN = 3;
+const CHAT_ID_MAX = 20;
+const MASK_KEEP = 4;
+const BAD_REQUEST = 400;
+
+interface BotUpdate { message?: { chat?: { id?: number | string }; text?: string } }
+
+async function botCall<T>(cfg: MessengerConfig, token: string, method: string, fetchImpl: typeof fetch): Promise<T> {
+  const res = await fetchImpl(`${trimSlash(cfg.baseUrl)}/bot${token}/${method}`, { signal: AbortSignal.timeout(FETCH_TIMEOUT_SEC * MS_PER_SEC) });
+  const body = (await res.json().catch(() => ({}))) as { ok?: boolean; result?: T; description?: string };
+  if (!res.ok || body.ok === false || body.result === undefined) throw new AppError(`پاسخ پیام‌رسان: ${body.description ?? `HTTP ${res.status}`}`);
+  return body.result;
+}
+
+async function botName(cfg: MessengerConfig, token: string, fetchImpl: typeof fetch): Promise<string | null> {
+  try {
+    return (await botCall<{ username?: string }>(cfg, token, "getMe", fetchImpl)).username ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function enabledMessenger(): Promise<{ cfg: MessengerConfig; token: string }> {
+  const conn = await getConnector("messenger_bot");
+  if (!conn.enabled || !conn.secretEnc) throw new AppError("اتصال پیام‌رسان در تنظیمات دفتر فعال نیست.");
+  return { cfg: messengerConfig(conn.config), token: decryptSecret(conn.secretEnc) };
+}
+
+/** شناسه گفت‌وگو عدد است (گروه با علامت منفی)؛ ارقام فارسی هم پذیرفته می‌شود */
+export function normalizeChatId(raw: string): string | null {
+  const v = toEnDigits(raw.trim());
+  const digits = v.startsWith("-") ? v.slice(1) : v;
+  const ok = digits.length >= CHAT_ID_MIN && digits.length <= CHAT_ID_MAX && [...digits].every((c) => c >= "0" && c <= "9");
+  return ok ? v : null;
+}
+export const maskChatId = (id: string): string => `…${id.slice(-MASK_KEEP)}`;
+
+/** کد یک‌بارمصرف پانزده‌دقیقه‌ای: کاربر آن را برای ربات دفتر می‌فرستد و سپس «تأیید اتصال» را می‌زند */
+export async function startMessengerLink(user: SessionUser, fetchImpl: typeof fetch = fetch, now = new Date()): Promise<{ code: string; until: Date; bot: string | null }> {
+  const { cfg, token } = await enabledMessenger();
+  const code = `DFT-${String(randomInt(LINK_CODE_SPACE)).padStart(LINK_CODE_DIGITS, "0")}`;
+  const until = new Date(now.getTime() + LINK_TTL_MIN * MS_PER_MIN);
+  await db.user.update({ where: { id: user.id }, data: { messengerLinkCode: code, messengerLinkUntil: until } });
+  return { code, until, bot: await botName(cfg, token, fetchImpl) };
+}
+
+/** یافتن پیام کاربر با کد در به‌روزرسانی‌های ربات و ثبت شناسه همان گفت‌وگو */
+export async function confirmMessengerLink(user: SessionUser, fetchImpl: typeof fetch = fetch, now = new Date()): Promise<{ chat: string }> {
+  const { cfg, token } = await enabledMessenger();
+  const row = await db.user.findUniqueOrThrow({ where: { id: user.id }, select: { messengerLinkCode: true, messengerLinkUntil: true } });
+  const code = row.messengerLinkCode;
+  if (!code || !row.messengerLinkUntil || row.messengerLinkUntil < now) throw new AppError("کد اتصال منقضی شده یا ساخته نشده است؛ کد تازه بگیرید.");
+  const updates = await botCall<BotUpdate[]>(cfg, token, `getUpdates?limit=${UPDATES_LIMIT}`, fetchImpl);
+  const chatId = [...updates].reverse().map((u) => u.message).find((m) => m?.text?.includes(code) && m.chat?.id !== undefined)?.chat?.id;
+  if (chatId === undefined) throw new AppError("پیامی با این کد به ربات نرسیده است. کد را دقیقاً برای ربات دفتر بفرستید و دوباره تلاش کنید.");
+  const chat = String(chatId);
+  await db.user.update({ where: { id: user.id }, data: { messengerChatId: chat, messengerLinkCode: null, messengerLinkUntil: null } });
+  await audit({ actorId: user.id, action: "user.messenger_linked", entityType: "User", entityId: user.id, entityLabel: user.fullName, meta: { chat: maskChatId(chat), via: "code" } });
+  try {
+    await sendBotMessage(cfg, token, chat, `«دفتر»: از این پس اعلان‌های مهم ${user.fullName} در همین گفت‌وگو ارسال می‌شود.`, fetchImpl);
+  } catch {
+    // پیام تأیید اختیاری است؛ اتصال ثبت شده است
+  }
+  return { chat: maskChatId(chat) };
+}
+
+/** ثبت دستی یا حذف شناسه گفت‌وگوی خود کاربر */
+export async function setOwnChatId(user: SessionUser, raw: string | null): Promise<void> {
+  const input = raw?.trim() ?? "";
+  const chat = input ? normalizeChatId(input) : null;
+  if (input && !chat) throw new AppError("شناسه گفت‌وگو باید عدد باشد (برای گروه با علامت منفی).", "VALIDATION", BAD_REQUEST, { chatId: "نامعتبر است." });
+  await db.user.update({ where: { id: user.id }, data: { messengerChatId: chat, messengerLinkCode: null, messengerLinkUntil: null } });
+  await audit({ actorId: user.id, action: chat ? "user.messenger_linked" : "user.messenger_unlinked", entityType: "User", entityId: user.id, entityLabel: user.fullName, meta: chat ? { chat: maskChatId(chat), via: "manual" } : {} });
 }
 
 /** ارسال اعلان‌های مهم به پیام‌رسان (اجرا در worker). خطا فقط در وضعیت اتصال ثبت می‌شود و اعلان درون‌برنامه بی‌تأثیر می‌ماند. */

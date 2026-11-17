@@ -147,7 +147,10 @@ export async function tick() {
   const r = await fireReminders();
   const d = await escalateDeadlines();
   const t = await escalateTasks();
-  if (r || d || t) console.log(`[worker] reminders=${r} overdueDeadlines=${d} overdueTasks=${t}`);
+  // اعلان‌های مهم به پیام‌رسان؛ اگر اتصال خاموش باشد بی‌درنگ صفر برمی‌گرداند و خطای آن فقط در وضعیت اتصال ثبت می‌شود
+  const { pushNotifications } = await import("../server/connectors");
+  const p = await pushNotifications();
+  if (r || d || t || p) console.log(`[worker] reminders=${r} overdueDeadlines=${d} overdueTasks=${t} pushed=${p}`);
 }
 
 interface Health { startedAt: number; lastTickAt: number; ticks: number; aiRunning: () => number }

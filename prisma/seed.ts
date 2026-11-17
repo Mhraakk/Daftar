@@ -67,6 +67,9 @@ async function main() {
   for (const c of CONNECTORS) {
     await db.connector.upsert({ where: { key: c.key }, create: c, update: { name: c.name, kind: c.kind } });
   }
+  // ردیف‌های نسخه‌های پیشین (Google و telegram_bot) که پیاده‌سازی ندارند حذف می‌شوند تا در تنظیمات گمراه‌کننده نباشند
+  const stale = await db.connector.deleteMany({ where: { key: { notIn: CONNECTORS.map((c) => c.key) } } });
+  if (stale.count) console.log(`✔ ${stale.count} اتصال بدون پیاده‌سازی حذف شد.`);
 
   await seedTemplates(db);
   await db.setting.upsert({ where: { key: "office" }, create: { key: "office", value: { officeName: "دفتر خدمات الکترونیک قضایی" } }, update: {} });

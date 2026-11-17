@@ -1,8 +1,6 @@
-// اتصال‌های بیرونی قابل پیکربندی. هیچ‌کدام بدون مجوز و اطلاعات دسترسی معتبرِ دفتر فعال نمی‌شوند.
+// اتصال‌های بیرونی پیاده‌سازی‌شده. هیچ‌کدام بدون پیکربندی و اطلاعات دسترسی معتبرِ دفتر فعال نمی‌شوند.
+// اتصال‌های Google (Drive، Gmail، Calendar) در این نسخه پیاده‌سازی نشده‌اند و عمداً در فهرست نیستند (مستندات: NOT STARTED).
 export const CONNECTORS = [
-  { key: "legal_web", name: "منابع حقوقی رسمی (وب)", kind: "LEGAL_WEB" },
-  { key: "google_drive", name: "Google Drive", kind: "GOOGLE" },
-  { key: "gmail", name: "Gmail", kind: "GOOGLE" },
-  { key: "google_calendar", name: "Google Calendar", kind: "GOOGLE" },
-  { key: "telegram_bot", name: "Telegram Bot", kind: "TELEGRAM" },
+  { key: "legal_web", name: "منابع حقوقی رسمی (ورود متن از وب)", kind: "LEGAL_WEB" },
+  { key: "messenger_bot", name: "اعلان در پیام‌رسان (Bot API بله / تلگرام)", kind: "MESSENGER" },
 ];

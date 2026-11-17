@@ -1,6 +1,7 @@
 import { AlarmClock, FileUp, ListPlus, Pencil, Scale, Sparkles, Trash2, UserCheck, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CaseTimelineChart, NextActionsPanel, RelatedPanel } from "@/components/cases/insights";
 import { NoteBox } from "@/components/note-box";
 import { ActionButton } from "@/components/ui/action-button";
 import { LinkButton } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { DL, EmptyState, LinkTabs, Notice, PageHeader, Panel } from "@/component
 import { Seal, StatusSeal } from "@/components/ui/seal";
 import { Timeline } from "@/components/ui/timeline";
 import { can, requirePagePerm, getSessionUser } from "@/lib/auth/guard";
+import { nextActions } from "@/lib/case-next-actions";
 import { cn } from "@/lib/cn";
 import { db } from "@/lib/db";
 import { caseFields, deadlineFields, taskFields } from "@/lib/form-defs";
@@ -18,6 +20,7 @@ import { OPT } from "@/lib/options";
 import { faNum, formatBytes } from "@/lib/text";
 import { caseScope, corrScope, documentScope, draftScope, userNames } from "@/server/access";
 import { activityFor } from "@/server/activity";
+import { caseTimeline, conflictCheck, relatedCases } from "@/server/case-insights";
 import { CASE_TRANSITIONS, closingSummary } from "@/server/cases";
 import { createDeadlineAction, deadlineStatusAction, verifyDeadlineAction } from "../../deadlines/actions";
 import { createTaskAction } from "../../tasks/actions";
@@ -60,6 +63,17 @@ export default async function CasePage({ params, searchParams }: { params: Promi
   ]);
   const names = await userNames([c.responsibleId, c.createdById, ...tasks.map((t) => t.assigneeId), ...deadlines.map((d) => d.assigneeId), ...notes.map((n) => n.authorId), ...drafts.map((d) => d.authorId), ...docs.map((d) => d.createdById)]);
   const timeline = tab === "timeline" ? await activityFor({ caseId: id }, TIMELINE_LIMIT) : [];
+  const overview = tab === "overview";
+  const insightCase = { id, clientId: c.clientId, courtCaseNumber: c.courtCaseNumber, client: { displayName: c.client.displayName, nationalId: c.client.nationalId }, parties: c.parties };
+  const [related, conflicts, lastActivity] = overview
+    ? await Promise.all([relatedCases(user, insightCase), conflictCheck(user, insightCase), db.activityLog.findFirst({ where: { caseId: id }, orderBy: { createdAt: "desc" }, select: { createdAt: true } })])
+    : [[], [], null];
+  const actions = overview ? nextActions({
+    caseId: id, status: c.status, hasResponsible: !!c.responsibleId, courtCaseNumber: c.courtCaseNumber,
+    deadlines, tasks, documents: docs.length, parties: c.parties, events, lastActivityAt: lastActivity?.createdAt ?? c.updatedAt, canDraft: can(user, "draft.create"),
+    drafts: drafts.map((d) => ({ id: d.id, title: d.title, status: d.status, petition: !!d.petitionTypeId })),
+  }, now) : [];
+  const chart = overview ? caseTimeline({ createdAt: c.createdAt, closedAt: c.closedAt, deadlines, tasks, events }, now) : null;
   const base = `/cases/${id}`;
   const locked = c.status === "ARCHIVED" || c.status === "CLOSED";
   const canEdit = can(user, "case.edit") && c.status !== "ARCHIVED";
@@ -127,6 +141,7 @@ export default async function CasePage({ params, searchParams }: { params: Promi
       {tab === "overview" && (
         <div className="grid gap-4 xl:grid-cols-3">
           <div className="flex flex-col gap-4 xl:col-span-2">
+            {!locked && <NextActionsPanel actions={actions} />}
             <Panel title="مشخصات پرونده">
               <DL cols={3} items={[
                 { label: "مرجع قضایی", value: c.courtName }, { label: "شعبه", value: c.courtBranch }, { label: "کلاسه پرونده قضایی", value: c.courtCaseNumber && <span className="ltr num">{c.courtCaseNumber}</span> },
@@ -162,8 +177,10 @@ export default async function CasePage({ params, searchParams }: { params: Promi
                 </ul>
               )}
             </Panel>
+            {chart && <CaseTimelineChart timeline={chart} now={now} />}
           </div>
           <div className="flex flex-col gap-4">
+            <RelatedPanel related={related} conflicts={conflicts} />
             <Panel title="مسئول و اعضا" action={can(user, "case.assign") && c.status !== "ARCHIVED" && (
               <FormDialog trigger="افزودن عضو" triggerVariant="ghost" triggerSize="sm" title="افزودن عضو به پرونده" description="اعضا به اطلاعات این پرونده دسترسی خواهند داشت." action={caseMemberAction} hidden={{ id, add: true }} cols={1} successMessage="عضو افزوده شد."
                 fields={[{ name: "userId", label: "کارمند", type: "lookup", lookup: "user", required: true }]} />)}>

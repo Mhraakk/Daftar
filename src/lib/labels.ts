@@ -120,11 +120,18 @@ export const ACTION_LABELS: Record<string, string> = {
   "draft.changes_requested": "درخواست اصلاح سند", "draft.finalized": "نهایی‌سازی سند", "draft.exported": "خروجی سند", "draft.restored": "بازگردانی نسخه پیش‌نویس",
   "ai.request": "درخواست از دستیار هوشمند", "skill.run": "اجرای مهارت حقوقی", "skill.reviewed": "بازبینی خروجی مهارت",
   "settings.updated": "تغییر تنظیمات", "backup.created": "تهیه پشتیبان", "backup.verified": "راستی‌آزمایی پشتیبان", "backup.restored": "بازیابی پشتیبان",
-  "report.exported": "خروجی گزارش", "connector.updated": "تغییر اتصال بیرونی", "automation.updated": "تغییر قاعده اتوماسیون",
+  "report.exported": "خروجی گزارش", "connector.updated": "تغییر اتصال بیرونی", "user.messenger_linked": "اتصال به پیام‌رسان", "user.messenger_unlinked": "قطع اتصال پیام‌رسان", "automation.updated": "تغییر قاعده اتوماسیون",
   "legal_source.created": "افزودن منبع حقوقی", "legal_source.verified": "تأیید منبع حقوقی", "security.forbidden": "تلاش دسترسی غیرمجاز",
   "petition_type.imported": "ورود فرم دادخواست", "petition_type.updated": "ویرایش نوع دادخواست", "petition_type.published": "انتشار نوع دادخواست",
   "petition_type.archived": "بایگانی نوع دادخواست", "petition_type.unpublished": "بازگشت نوع دادخواست به پیش‌نویس",
 };
+export const CONNECTOR_STATUS: Record<string, { label: string; tone: Tone }> = {
+  NOT_CONFIGURED: { label: "پیکربندی نشده", tone: "neutral" },
+  CONFIGURED: { label: "پیکربندی شده", tone: "info" },
+  OK: { label: "برقرار", tone: "success" },
+  ERROR: { label: "خطا", tone: "danger" },
+};
+
 export const PETITION_KIND: Record<string, { label: string; hint: string }> = {
   INITIAL: { label: "بدوی", hint: "دادخواست نخستین برای طرح دعوا" },
   OBJECTION: { label: "اعتراضی", hint: "واخواهی، تجدیدنظر، فرجام، اعتراض ثالث، اعاده دادرسی" },

@@ -66,6 +66,9 @@ model User {
   managedDepartments Department[] @relation("DepartmentManager")
   isActive           Boolean      @default(true)
   messengerChatId    String?
+  // کد یک‌بارمصرف اتصال حساب به پیام‌رسان (کاربر آن را برای ربات می‌فرستد) و زمان انقضای آن
+  messengerLinkCode  String?
+  messengerLinkUntil DateTime?
   mustChangePassword Boolean      @default(false)
   failedLogins       Int          @default(0)
   lockedUntil        DateTime?

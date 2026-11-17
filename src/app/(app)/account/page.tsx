@@ -1,9 +1,11 @@
+import { MessengerLink } from "@/components/account/messenger-link";
 import { AppearancePicker } from "@/components/shell/appearance";
 import { DL, Notice, PageHeader, Panel } from "@/components/ui/page";
 import { SmartForm } from "@/components/ui/smart-form";
 import { requireUser } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
 import { formatJalali } from "@/lib/jalali";
+import { maskChatId } from "@/server/connectors";
 import { changePasswordAction } from "./actions";
 
 export const metadata = { title: "حساب کاربری" };
@@ -11,7 +13,8 @@ export const metadata = { title: "حساب کاربری" };
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ first?: string }> }) {
   const user = await requireUser();
   const { first } = await searchParams;
-  const row = await db.user.findUniqueOrThrow({ where: { id: user.id }, select: { lastLoginAt: true, createdAt: true, email: true, phone: true } });
+  const row = await db.user.findUniqueOrThrow({ where: { id: user.id }, select: { lastLoginAt: true, createdAt: true, email: true, phone: true, messengerChatId: true } });
+  const messenger = await db.connector.findUnique({ where: { key: "messenger_bot" }, select: { enabled: true } });
   const sessions = await db.session.count({ where: { userId: user.id, revokedAt: null, expiresAt: { gt: new Date() } } });
   return (
     <>
@@ -32,6 +35,9 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <Panel title="ظاهر سامانه" className="lg:col-span-2">
           <p className="mb-4 text-sm text-ink-2">چیدمان و پوسته را آزادانه ترکیب کنید؛ تغییر بی‌درنگ اعمال و برای حساب شما ذخیره می‌شود. میان‌بر: <kbd className="ltr rounded border border-line bg-surface-2 px-1 text-2xs">Ctrl K</kbd> و نوشتن «پوسته» یا «چیدمان».</p>
           <AppearancePicker />
+        </Panel>
+        <Panel title="اعلان در پیام‌رسان">
+          <MessengerLink enabled={!!messenger?.enabled} linked={row.messengerChatId ? maskChatId(row.messengerChatId) : null} />
         </Panel>
         <Panel title="تغییر رمز عبور">
           <SmartForm cols={1} action={changePasswordAction} submitLabel="تغییر رمز عبور" successMessage="رمز عبور تغییر کرد." successHref="/"
