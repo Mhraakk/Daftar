@@ -33,7 +33,9 @@ describe("skin css", () => {
   it("emits one block per skin with all variables", () => {
     const css = skinCss();
     SKIN_IDS.forEach((id) => expect(css).toContain(`[data-skin="${id}"]{`));
-    expect(css.match(CHART_PREV)).toHaveLength(SKIN_IDS.length);
+    // یک بار برای هر پوسته و یک بار در بلوک چاپ (رنگ‌های روشنِ سنجیده روی سفید)
+    expect(css.match(CHART_PREV)).toHaveLength(SKIN_IDS.length + 1);
+    expect(css).toContain("@media print{html[data-skin]{--chart-1:37 99 235;");
     expect(rgbTriplet("2563EB")).toBe("37 99 235");
   });
 });

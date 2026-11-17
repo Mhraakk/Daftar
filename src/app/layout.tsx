@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { CHART_CSS } from "@/components/charts/css";
 import { getSessionUser } from "@/lib/auth/guard";
 import { resolveUi } from "@/theme/prefs";
 import { SKINS, skinCss } from "@/theme/skins";
@@ -32,6 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="fa" dir="rtl" className={vazir.variable} data-layout={ui.layout} data-skin={ui.skin} data-time-axis={ui.chartTimeAxis} suppressHydrationWarning>
       <head>
         <style id="skins" dangerouslySetInnerHTML={{ __html: skinCss() }} />
+        <style id="charts" dangerouslySetInnerHTML={{ __html: CHART_CSS }} />
       </head>
       <body className="min-h-screen font-sans">{children}</body>
     </html>

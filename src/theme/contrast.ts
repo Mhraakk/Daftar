@@ -59,6 +59,7 @@ export const PAIRS: Pair[] = [
   { fg: "line-strong", bg: "surface", min: UI_MIN, use: "مرز کنترل‌ها" },
   { fg: "firuze", bg: "surface", min: UI_MIN, use: "حلقه تمرکز" },
   { fg: "chart-axis", bg: "surface", min: TEXT_MIN, use: "برچسب محور نمودار" },
+  ...(["chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6", "chart-actual", "chart-prev", "chart-pos", "chart-neg"] as const).map((fg) => ({ fg, bg: "surface" as const, min: UI_MIN, use: "نشانه نمودار" })),
 ];
 
 export interface Failure { pair: Pair; ratio: number }

@@ -3,5 +3,6 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
-  test: { include: ["tests/unit/**/*.test.ts", "tests/integration/**/*.test.ts"], environment: "node", testTimeout: 120_000, fileParallelism: false, env: { TZ: "UTC" } },
+  esbuild: { jsx: "automatic" },
+  test: { include: ["tests/unit/**/*.test.{ts,tsx}", "tests/integration/**/*.test.ts"], environment: "node", testTimeout: 120_000, fileParallelism: false, env: { TZ: "UTC" } },
 });

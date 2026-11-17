@@ -31,7 +31,7 @@ export const COLOR_TOKENS = [
   "mohr", "mohr-50", "on-mohr", "zafaran", "zafaran-50", "sabz", "sabz-50", "night", "night-2", "on-night",
   "chrome", "chrome-2", "chrome-ink", "chrome-ink-2", "chrome-line", "chrome-active", "chrome-active-ink",
   "shadow", "glow-1", "glow-2", "glow-3",
-  "chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6", "chart-pos", "chart-neg", "chart-grid", "chart-axis", "chart-prev",
+  "chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6", "chart-actual", "chart-pos", "chart-neg", "chart-grid", "chart-axis", "chart-prev",
 ] as const;
 export type ColorToken = (typeof COLOR_TOKENS)[number];
 
@@ -60,8 +60,8 @@ export const SKINS: Record<SkinId, SkinTokens> = {
       night: "111827", "night-2": "1F2937", "on-night": "FFFFFF",
       chrome: "FFFFFF", "chrome-2": "F3F5FA", "chrome-ink": "111827", "chrome-ink-2": "4B5565", "chrome-line": "E2E7F0", "chrome-active": "E8F0FF", "chrome-active-ink": "1D4ED8",
       shadow: "1E293B", "glow-1": "818CF8", "glow-2": "38BDF8", "glow-3": "F472B6",
-      "chart-1": "2563EB", "chart-2": "7C3AED", "chart-3": "0891B2", "chart-4": "D97706", "chart-5": "059669", "chart-6": "DB2777",
-      "chart-pos": "15803D", "chart-neg": "DC2626", "chart-grid": "E5E9F2", "chart-axis": "5B6678", "chart-prev": "A3AEC2",
+      "chart-1": "2563EB", "chart-2": "E05A24", "chart-3": "13916A", "chart-4": "C47F00", "chart-5": "D0508A", "chart-6": "0F7A0F", "chart-actual": "1E293B",
+      "chart-pos": "15803D", "chart-neg": "DC2626", "chart-grid": "E5E9F2", "chart-axis": "5B6678", "chart-prev": "7D879A",
     },
     radiusCard: "20px", radiusCtl: "12px", panelAlpha: "0.74", chromeAlpha: "0.62", blur: "24px", shadowAlpha: "0.10",
     canvas: "radial-gradient(55% 45% at 88% 0%, rgb(var(--glow-1) / .34), transparent 70%), radial-gradient(45% 40% at 8% 14%, rgb(var(--glow-2) / .28), transparent 70%), radial-gradient(60% 45% at 45% 100%, rgb(var(--glow-3) / .18), transparent 72%)",
@@ -74,8 +74,8 @@ export const SKINS: Record<SkinId, SkinTokens> = {
       night: "ECECF0", "night-2": "D4D4DA", "on-night": "111114",
       chrome: "1C1C21", "chrome-2": "26262C", "chrome-ink": "F4F4F5", "chrome-ink-2": "A6A6B2", "chrome-line": "34343C", "chrome-active": "F97316", "chrome-active-ink": "140B05",
       shadow: "000000", "glow-1": "F97316", "glow-2": "3B82F6", "glow-3": "A855F7",
-      "chart-1": "F97316", "chart-2": "60A5FA", "chart-3": "A78BFA", "chart-4": "34D399", "chart-5": "FBBF24", "chart-6": "F472B6",
-      "chart-pos": "4ADE80", "chart-neg": "F87171", "chart-grid": "2A2A31", "chart-axis": "9A9AA6", "chart-prev": "5A5A66",
+      "chart-1": "D95926", "chart-2": "199E70", "chart-3": "C98500", "chart-4": "D55181", "chart-5": "0CA30C", "chart-6": "9085E9", "chart-actual": "E4E4E7",
+      "chart-pos": "4ADE80", "chart-neg": "F87171", "chart-grid": "2A2A31", "chart-axis": "9A9AA6", "chart-prev": "7A7A87",
     },
     radiusCard: "18px", radiusCtl: "12px", panelAlpha: "1", chromeAlpha: "0.80", blur: "20px", shadowAlpha: "0.45",
     canvas: "radial-gradient(40% 32% at 100% 0%, rgb(var(--glow-1) / .10), transparent 70%), radial-gradient(35% 30% at 0% 100%, rgb(var(--glow-2) / .06), transparent 70%)",
@@ -88,8 +88,8 @@ export const SKINS: Record<SkinId, SkinTokens> = {
       night: "171513", "night-2": "2B2723", "on-night": "FAF7F0",
       chrome: "F3EEE3", "chrome-2": "ECE6D9", "chrome-ink": "171513", "chrome-ink-2": "4F483F", "chrome-line": "171513", "chrome-active": "171513", "chrome-active-ink": "FAF7F0",
       shadow: "171513", "glow-1": "A3201B", "glow-2": "1E3A6B", "glow-3": "8A5A06",
-      "chart-1": "171513", "chart-2": "A3201B", "chart-3": "1E3A6B", "chart-4": "8A5A06", "chart-5": "2E6A3F", "chart-6": "7A7163",
-      "chart-pos": "2E6A3F", "chart-neg": "A3201B", "chart-grid": "DDD4C3", "chart-axis": "625A50", "chart-prev": "B5AC9C",
+      "chart-1": "2F5FA8", "chart-2": "B4302A", "chart-3": "13866A", "chart-4": "B87700", "chart-5": "9B4A8C", "chart-6": "2F7D32", "chart-actual": "171513",
+      "chart-pos": "2E6A3F", "chart-neg": "A3201B", "chart-grid": "DDD4C3", "chart-axis": "625A50", "chart-prev": "8F8677",
     },
     radiusCard: "3px", radiusCtl: "2px", panelAlpha: "1", chromeAlpha: "1", blur: "0px", shadowAlpha: "0",
     canvas: "none",
@@ -102,8 +102,8 @@ export const SKINS: Record<SkinId, SkinTokens> = {
       night: "D6EEF2", "night-2": "B8DDE4", "on-night": "06141F",
       chrome: "081A27", "chrome-2": "0E2536", "chrome-ink": "E6F1F5", "chrome-ink-2": "94B4C1", "chrome-line": "1C3A4E", "chrome-active": "2DD4BF", "chrome-active-ink": "03201F",
       shadow: "000000", "glow-1": "2DD4BF", "glow-2": "38BDF8", "glow-3": "6366F1",
-      "chart-1": "2DD4BF", "chart-2": "7DA7F2", "chart-3": "FACC15", "chart-4": "FB7185", "chart-5": "A78BFA", "chart-6": "34D399",
-      "chart-pos": "34D399", "chart-neg": "FB7185", "chart-grid": "173447", "chart-axis": "86A8B6", "chart-prev": "3E6478",
+      "chart-1": "14A898", "chart-2": "D95926", "chart-3": "3987E5", "chart-4": "C98500", "chart-5": "D55181", "chart-6": "9085E9", "chart-actual": "D6EEF2",
+      "chart-pos": "34D399", "chart-neg": "FB7185", "chart-grid": "173447", "chart-axis": "86A8B6", "chart-prev": "5D879B",
     },
     radiusCard: "16px", radiusCtl: "10px", panelAlpha: "0.92", chromeAlpha: "0.84", blur: "16px", shadowAlpha: "0.35",
     canvas: `radial-gradient(50% 38% at 50% 0%, rgb(var(--glow-1) / .16), transparent 72%), ${GIRIH}`,
@@ -126,9 +126,19 @@ function declarations(s: SkinTokens, id: SkinId): string {
   return `${colors}--radius-card:${s.radiusCard};--radius-ctl:${s.radiusCtl};--panel-alpha:${s.panelAlpha};--chrome-alpha:${s.chromeAlpha};--blur:${s.blur};--shadow-alpha:${s.shadowAlpha};--canvas:${s.canvas};color-scheme:${SKINS_META[id].scheme};`;
 }
 
+const CHART_TOKENS = COLOR_TOKENS.filter((t) => t.startsWith("chart-"));
+/** پوسته‌ای که رنگ‌های نمودارش روی کاغذ سفید سنجیده شده و برای چاپ و PDF به کار می‌رود */
+export const PRINT_SKIN: SkinId = "glass";
+
+/** متغیرهای رنگ نمودار برای چاپ و PDF (همیشه روشن، سنجیده روی سفید) */
+export function printChartVars(): string {
+  return CHART_TOKENS.map((t) => `--${t}:${rgbTriplet(SKINS[PRINT_SKIN].colors[t])};`).join("");
+}
+
 /** CSS همه پوسته‌ها برای درج در <head>؛ جابه‌جایی پوسته در مرورگر فقط با تغییر data-skin انجام می‌شود */
 export function skinCss(): string {
-  return SKIN_IDS.map((id) => `${id === DEFAULT_SKIN ? ":root," : ""}[data-skin="${id}"]{${declarations(SKINS[id], id)}}`).join("\n");
+  const skins = SKIN_IDS.map((id) => `${id === DEFAULT_SKIN ? ":root," : ""}[data-skin="${id}"]{${declarations(SKINS[id], id)}}`);
+  return [...skins, `@media print{html[data-skin]{${printChartVars()}}}`].join("\n");
 }
 
 export const isSkin = (v: unknown): v is SkinId => typeof v === "string" && (SKIN_IDS as readonly string[]).includes(v);

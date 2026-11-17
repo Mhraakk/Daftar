@@ -224,6 +224,13 @@
   .tbl tbody td { @apply border-b border-line px-3 py-2.5 align-middle; }
   .tbl tbody tr:last-child td { @apply border-b-0; }
   .tbl tbody tr { @apply transition-colors hover:bg-surface-2/70; }
+  /* ظرف پیمایش خود جدول تا سرستون چسبان در پیمایش افقی و عمودی کار کند */
+  .tbl-scroll { @apply overflow-auto rounded-card border border-line; background: rgb(var(--surface) / var(--panel-alpha)); }
+  .tbl-scroll:focus-visible { outline-offset: -2px; }
+  .tbl .is-num { text-align: end; font-variant-numeric: tabular-nums; }
+  .tbl tbody th { @apply border-b border-line px-3 py-2.5 align-middle; }
+  .tbl tbody tr:last-child th { @apply border-b-0; }
+  .tbl tfoot td { @apply sticky bottom-0 border-t border-line-strong/60 bg-surface-2 px-3 py-2.5; }
 
   .num { font-variant-numeric: tabular-nums; }
   .ltr { direction: ltr; unicode-bidi: isolate; }
