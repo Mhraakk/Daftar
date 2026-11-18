@@ -1,10 +1,14 @@
 /* eslint-disable ts-patterns/no-magic-numbers -- assertions compare against literal expected values */
 // لایه هوش مصنوعی: رمزنگاری کلید، تشخیص شبکه داخلی، خواندن مهارت‌ها، فهرست بررسی قرارداد، تجزیه پیشنهاد مهلت
 // و دو آداپتور ارائه‌دهنده در برابر سرورهای آزمایشی محلی با پروتکل واقعی.
+import { readFileSync } from "node:fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { anthropicProvider } from "@/server/ai/anthropic";
-import { parseDateSuggestions } from "@/server/ai/assistant";
-import { isExternalProvider, isPrivateHost } from "@/server/ai/config";
+import { groundDateSuggestions, parseDateSuggestions } from "@/server/ai/assistant";
+import { ECHO_WARN, echoRatio } from "@/server/ai/echo";
+import { jsonObjectsIn } from "@/server/ai/model-json";
+import { aiSettingsFields } from "@/app/(app)/admin/ai/fields";
+import { aiSettingsSchema, DEFAULT_AI, isExternalProvider, isPrivateHost, publicAiSettings } from "@/server/ai/config";
 import { openAiCompatibleProvider } from "@/server/ai/openai-compatible";
 import { contractPreflight, preflightMarkdown } from "@/server/ai/preflight";
 import { decryptSecret, encryptSecret, secretHint } from "@/server/ai/secret";
@@ -119,6 +123,45 @@ describe("تجزیه پیشنهاد مهلت از پاسخ مدل", () => {
     expect(parseDateSuggestions("no json here")).toEqual([]);
     expect(parseDateSuggestions("[not valid json")).toEqual([]);
   });
+
+  // پاسخ واقعی Qwen2.5-1.5B در آزمون زنده (کوتاه‌شده): ارقام فارسی، تاریخ نادرست برای جمله قسط، تکرار و بریدگی در سقف توکن
+  const DOC = "ماده ۳ — ثمن معامله\n۳-۱. مبلغ ۳٬۰۰۰٬۰۰۰٬۰۰۰ ریال نقداً هنگام امضای این قرارداد پرداخت شد.\n۳-۲. مبلغ ۲٬۵۰۰٬۰۰۰٬۰۰۰ ریال حداکثر تا تاریخ ۱۴۰۵/۰۴/۱۵ به حساب فروشنده واریز می‌شود.\nماده ۵ — طرفین متعهدند در تاریخ ۱۴۰۵/۰۶/۲۰ ساعت ۱۰ صبح در دفترخانه حاضر شوند.\nماده ۶ — فروشنده مکلف است ظرف ۱۰ روز از تاریخ اعلام فسخ، کلیه وجوه دریافتی را مسترد کند.\nتنظیم‌شده در تاریخ ۱۴۰۵/۰۲/۱۰";
+  const item = (date: string, type: string, quote: string, relative = false) => `{"date": "${date}", "type": "${type}", "title": "ت", "quote": "${quote}", "relative": ${relative}}`;
+  const LIVE = `[\n${[
+    item("۱۴۰۵/۰۲/۱۰", "PETITION", "مبلغ ۳٬۰۰۰٬۰۰۰٬۰۰۰ ریال نقداً هنگام امضای این قرارداد پرداخت شد."),
+    item("۱۴۰۵/۰۲/۱۰", "PETITION", "مبلغ ۲٬۵۰۰٬۰۰۰٬۰۰۰ ریال حداکثر تا تاریخ ۱۴۰۵/۰۴/۱۵ به حساب فروشنده واریز می‌شود."),
+    item("۱۴۰۵/۰۶/۲۰", "HEARING", "فروشنده مکلف است ظرف ۱۰ روز از تاریخ اعلام فسخ، کلیه وجوه دریافتی را مسترد کند.", true),
+    item("۱۴۰۵/۰۶/۲۰", "HEARING", "فروشنده مکلف است ظرف ۱۰ روز از تاریخ اعلام فسخ، کلیه وجوه دریافتی را مسترد کند.", true),
+    item("۱۴۰۵/۰۹/۰۱", "OTHER", "تاریخی که در سند نیست"),
+    item("۱۴۰۵/۰۶/۲۰", "HEARING", "- خوانده: کیوان آزمون‌فر"),
+  ].join(",\n")},\n    {\n        "date": "۱۴۰۵/۰۶/۲۰",\n        "type": "HEARING",\n        "quote": "در صورت عدم حضور فروشنده در دفترخانه در موعد مقرر در ماده ۵، خریدار حق فسخ این قرارداد را دارد و فروشنده مکلف است ظرف ۱۰`;
+
+  it("پاسخ بریده‌شده در سقف توکن: موارد کامل پیش از بریدگی خوانده می‌شود", () => {
+    expect(parseDateSuggestions(LIVE).map((s) => s.date)).toEqual(["1405/02/10", "1405/02/10", "1405/06/20", "1405/06/20", "1405/09/01", "1405/06/20"]);
+  });
+  it("پیشنهاد بی‌پشتوانه در متن سند و جفت نادرست تاریخ و جمله کنار می‌رود؛ تکراری یک بار می‌آید", () => {
+    const g = groundDateSuggestions(parseDateSuggestions(LIVE), DOC);
+    expect(g.kept.map((s) => [s.date, s.relative])).toEqual([["1405/02/10", false], ["1405/06/20", true], ["1405/06/20", false]]);
+    expect(g).toMatchObject({ ungrounded: 2, duplicates: 1, requoted: 2 });
+  });
+  it("جمله بی‌تاریخ یا ناموجود در سند با متن پیرامون همان تاریخ در سند جایگزین می‌شود؛ «نسبی» بی‌بیان مدت پذیرفته نیست", () => {
+    const fake = groundDateSuggestions([{ date: "1405/06/20", type: "OTHER", title: "ت", quote: "ماده ۳ — ثمن معامله", relative: true }], DOC);
+    expect(fake.kept.map((s) => s.relative)).toEqual([false]);
+    expect(fake.kept[0]?.quote).toContain("دفترخانه حاضر شوند");
+    const g = groundDateSuggestions(parseDateSuggestions(LIVE), DOC);
+    expect(g.kept[0]?.quote).toContain("1405/02/10");
+    expect(g.kept[2]?.quote).toContain("دفترخانه حاضر شوند");
+    expect(g.kept[1]?.quote).toBe("فروشنده مکلف است ظرف ۱۰ روز از تاریخ اعلام فسخ، کلیه وجوه دریافتی را مسترد کند.");
+  });
+});
+
+describe("شیءهای JSON کامل در پاسخ مدل", () => {
+  it("آکولاد و گیومه درون رشته، متن آزاد پیرامون و شیء ناقص پایانی", () => {
+    const text = 'پاسخ: «نمونه» {"a": "x } y", "b": "say \\"hi\\" {"} و سپس [{"c": 1}, {"d": {"e": 2}}, {"f": "بریده';
+    expect(jsonObjectsIn(text)).toEqual([{ a: "x } y", b: 'say "hi" {' }, { c: 1 }, { d: { e: 2 } }]);
+    expect(jsonObjectsIn("بدون JSON")).toEqual([]);
+    expect(jsonObjectsIn("{bad} {\"ok\": true}")).toEqual([{ ok: true }]);
+  });
 });
 
 describe("آداپتور سازگار با OpenAI در برابر سرور آزمایشی", () => {
@@ -211,5 +254,39 @@ describe("آداپتور Anthropic (SDK رسمی) در برابر سرور آز�
     expect(e1).toMatchObject({ kind: "auth", retryable: false, status: 401 });
     stub.respond(jsonError(404, "model: claude-x not found", "not_found_error"));
     await expect(provider().stream({ system: "s", messages: [{ role: "user", content: "u" }] })).rejects.toMatchObject({ kind: "not_found" });
+  });
+});
+
+describe("فرم تنظیمات هوش مصنوعی", () => {
+  const fields = aiSettingsFields({ hasApiKey: false, apiKeyHint: null });
+  /** داده‌ای که فرم برای ارائه‌دهنده می‌فرستد: SmartForm فقط فیلدهای نمایان (شرط showIf برقرار) را ارسال می‌کند */
+  const sentFor = (provider: string): Record<string, unknown> => {
+    const values: Record<string, unknown> = { ...publicAiSettings(DEFAULT_AI), apiKey: "", clearApiKey: false, enabled: true, provider, model: "m", baseUrl: "http://127.0.0.1:8088/v1" };
+    return Object.fromEntries(fields.filter((f) => !f.showIf || values[f.showIf.field] === f.showIf.equals).map((f) => [f.name, values[f.name]]));
+  };
+  it.each(["anthropic", "openai_compatible"])("داده فرم برای %s از طرح‌واره ذخیره می‌گذرد", (provider) => {
+    const r = aiSettingsSchema.safeParse(sentFor(provider));
+    expect(r.error?.flatten().fieldErrors ?? {}).toEqual({});
+  });
+  it("فیلدهای ویژه هر ارائه‌دهنده برای دیگری ارسال نمی‌شود", () => {
+    expect(Object.keys(sentFor("openai_compatible"))).not.toContain("effort");
+    expect(Object.keys(sentFor("anthropic"))).not.toContain("temperature");
+    expect(Object.keys(sentFor("openai_compatible"))).toContain("temperature");
+  });
+});
+
+describe("تشخیص تکرار دستورالعمل مهارت در پاسخ", () => {
+  const skill = readFileSync("vendor/legal-skills/contract-review/SKILL.md", "utf8");
+  // آغاز پاسخ واقعی Qwen2.5-1.5B در آزمون زنده مهارت بررسی قرارداد
+  const LIVE_ECHO = ["### Pre-Review Checklist", "#### NDA Checklist", "| Category | Check For |", "|----------|-----------|",
+    "| Direction | One-way or mutual? |", "| Definition scope | \"All information\" too broad? Standard exceptions? |",
+    "| Term | 2 years short, 3-5 typical, indefinite for trade secrets |", "#### SaaS/MSA Checklist", "| Liability cap | 12+ months = standard |"].join("\n");
+  it("پاسخی که فهرست‌های خود مهارت را برگرداند علامت می‌خورد", () => {
+    expect(echoRatio(LIVE_ECHO, skill)).toBeGreaterThanOrEqual(ECHO_WARN);
+  });
+  it("بررسی واقعی سند (فارسی، با استناد به مواد قرارداد) تکرار شمرده نمی‌شود", () => {
+    const review = "## بررسی قرارداد از دید خریدار\n- ماده ۷: اسقاط کلیه خیارات حتی غبن، حق خریدار را محدود می‌کند.\n- ماده ۶: وجه التزام روزانه ۵٬۰۰۰٬۰۰۰ ریال فقط برای تأخیر در استرداد آمده است.";
+    expect(echoRatio(review, skill)).toBe(0);
+    expect(echoRatio("", skill)).toBe(0);
   });
 });

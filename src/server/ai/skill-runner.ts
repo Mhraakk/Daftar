@@ -18,6 +18,7 @@ import { createDraft } from "@/server/drafts";
 import { getAiSettings, isAiReady, isExternalProvider, type AiSettings, type PracticeRole } from "./config";
 import { conflictCheck, conflictText, type ConflictHit } from "./conflicts";
 import { byteLen, caseContextText, describeScope, documentBlock, documentsForAi, scopeSummary } from "./context";
+import { ECHO_WARN, echoRatio } from "./echo";
 import { enqueueAiJob, registerJobHandlers } from "./jobs";
 import { aiMarkdownToDraftHtml } from "./markdown";
 import { contractPreflight, preflightMarkdown, type PreflightResult } from "./preflight";
@@ -26,6 +27,8 @@ import type { AiMessage } from "./types";
 
 const BYTES_PER_TOKEN_ESTIMATE = 3;
 const CONTEXT_SAFETY = 0.85;
+/** سهم تکرار با دو رقم اعشار ذخیره می‌شود */
+const PERCENT = 100;
 const MAX_REQUEST_CHARS = 20_000;
 const MAX_DOCS = 12;
 const MAX_TITLE = 160;
@@ -226,7 +229,8 @@ export async function startSkillRun(input: StartSkillRunInput, user: SessionUser
 
 // ───────── ادامه گفت‌وگو ─────────
 
-type StoredMessage = AiMessage & { at: string };
+/** echo: سهم سطرهای پاسخ که از دستورالعمل تکرار شده (فقط وقتی از آستانه هشدار بیشتر است ذخیره می‌شود) */
+type StoredMessage = AiMessage & { at: string; echo?: number };
 const storedMessages = (v: Prisma.JsonValue): StoredMessage[] => (Array.isArray(v) ? (v as unknown as StoredMessage[]) : []);
 
 export async function assertRunAccess(runId: string, user: SessionUser) {
@@ -296,9 +300,14 @@ export async function skillRunToDraft(runId: string, user: SessionUser): Promise
 
 registerJobHandlers("skill.", async (job, result) => {
   if (!job.skillRunId) return;
-  const run = await db.skillRun.findUnique({ where: { id: job.skillRunId }, select: { messages: true } });
+  const [run, row] = await Promise.all([
+    db.skillRun.findUnique({ where: { id: job.skillRunId }, select: { messages: true } }),
+    db.aiInteraction.findUnique({ where: { id: job.id }, select: { request: true } }),
+  ]);
   if (!run) return;
-  const messages = [...storedMessages(run.messages), { role: "assistant" as const, content: result.text, at: new Date().toISOString() }];
+  const echo = echoRatio(result.text, (row?.request as { system?: string } | null)?.system ?? "");
+  const reply: StoredMessage = { role: "assistant", content: result.text, at: new Date().toISOString(), ...(echo >= ECHO_WARN ? { echo: Math.round(echo * PERCENT) / PERCENT } : {}) };
+  const messages = [...storedMessages(run.messages), reply];
   await db.skillRun.update({ where: { id: job.skillRunId }, data: { status: "DONE", output: result.text, messages: messages as unknown as Prisma.InputJsonArray } });
   return { link: `/skills/runs/${job.skillRunId}` };
 }, async (job, status) => {

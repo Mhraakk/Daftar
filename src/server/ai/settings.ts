@@ -14,7 +14,9 @@ export async function saveAiSettings(input: z.infer<typeof aiSettingsSchema>, ac
   const keyFields: Pick<AiSettings, "apiKeyEnc" | "apiKeyHint"> = newKey
     ? { apiKeyEnc: encryptSecret(newKey), apiKeyHint: secretHint(newKey) }
     : { apiKeyEnc: clearApiKey ? null : prev.apiKeyEnc, apiKeyHint: clearApiKey ? null : prev.apiKeyHint };
-  const next: AiSettings = { ...prev, ...rest, ...keyFields };
+  // فیلد ارسال‌نشده (ویژه ارائه‌دهنده‌ای که اکنون انتخاب نیست) مقدار ذخیره‌شده را نگه می‌دارد
+  const sent = Object.fromEntries(Object.entries(rest).filter(([, v]) => v !== undefined)) as Partial<AiSettings>;
+  const next: AiSettings = { ...prev, ...sent, ...keyFields };
   await db.setting.upsert({ where: { key: AI_SETTING_KEY }, create: { key: AI_SETTING_KEY, value: { ...next }, updatedById: actor.id }, update: { value: { ...next }, updatedById: actor.id } });
   await audit({
     actorId: actor.id, action: "ai.settings_updated", entityType: "Setting", entityId: AI_SETTING_KEY, entityLabel: "تنظیمات هوش مصنوعی",

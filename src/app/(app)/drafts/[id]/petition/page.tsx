@@ -10,6 +10,7 @@ import { db } from "@/lib/db";
 import { NotFoundError } from "@/lib/errors";
 import { DRAFT_STATUS, PETITION_KIND } from "@/lib/labels";
 import { draftScope } from "@/server/access";
+import { getAiSettings, isAiReady, isExternalProvider } from "@/server/ai/config";
 import { plainSpec } from "@/server/petitions/data";
 import { petitionReport } from "@/server/petitions/drafting";
 
@@ -52,6 +53,8 @@ export default async function PetitionStudioPage({ params }: { params: Promise<{
     );
   }
   const editable = EDITABLE.includes(d.status) && can(user, "draft.create");
+  const settings = await getAiSettings();
+  const ai = { available: can(user, "ai.use") && isAiReady(settings).ready, external: isExternalProvider(settings) };
   return (
     <>
       <PageHeader title={d.title} crumbs={crumbs}
@@ -62,7 +65,7 @@ export default async function PetitionStudioPage({ params }: { params: Promise<{
       {!editable && (
         <div className="mb-4"><Notice tone="info" title="فقط خواندنی">{EDITABLE.includes(d.status) ? "برای ویرایش، مجوز تنظیم سند لازم است." : `سند در وضعیت «${DRAFT_STATUS[d.status]?.label ?? d.status}» است؛ برای تغییر، ابتدا آن را به پیش‌نویس بازگردانید.`}</Notice></div>
       )}
-      <PetitionStudio draftId={id} version={d.version} editable={editable} spec={plainSpec(report.spec)} initialData={report.data} initialDeadline={report.deadline} />
+      <PetitionStudio draftId={id} version={d.version} editable={editable} spec={plainSpec(report.spec)} initialData={report.data} initialDeadline={report.deadline} ai={ai} />
     </>
   );
 }

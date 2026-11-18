@@ -27,10 +27,12 @@ const secs = (ms: number): string => toFaDigits(Math.max(0, Math.round(ms / MS_P
 export function JobView({ initial, path, canCancel, showOutput = true }: { initial: JobSnapshot; path: string; canCancel: boolean; showOutput?: boolean }) {
   const router = useRouter();
   const [job, setJob] = useState(initial);
-  const [now, setNow] = useState(() => Date.now());
+  // زمان فقط پس از بارگذاری در مرورگر خوانده می‌شود؛ مقدار آغازین یکسان (null) از ناهمخوانی hydration جلوگیری می‌کند
+  const [now, setNow] = useState<number | null>(null);
   const wasActive = useRef(ACTIVE.has(initial.status));
 
   useEffect(() => setJob(initial), [initial]);
+  useEffect(() => setNow(Date.now()), []);
 
   useEffect(() => {
     if (!ACTIVE.has(job.status)) return;
@@ -56,14 +58,14 @@ export function JobView({ initial, path, canCancel, showOutput = true }: { initi
 
   const st = STATUS[job.status] ?? { label: job.status, tone: "neutral" as const };
   const started = job.startedAt ? new Date(job.startedAt).getTime() : null;
-  const elapsed = started ? now - started : now - new Date(job.createdAt).getTime();
+  const elapsed = now === null ? null : now - (started ?? new Date(job.createdAt).getTime());
 
   return (
     <div className="flex flex-col gap-3" data-testid="job-view" data-status={job.status}>
       <div className="flex flex-wrap items-center gap-2 text-sm text-ink-2">
         <Seal tone={st.tone} dot>{st.label}</Seal>
         {job.status === "QUEUED" && <span className="flex items-center gap-1"><Clock className="size-4" />{job.queueAhead ? `${toFaDigits(job.queueAhead)} کار جلوتر در صف` : "نفر اول صف"}</span>}
-        {job.status === "RUNNING" && <span className="flex items-center gap-1"><Loader2 className="size-4 animate-spin" />{secs(elapsed)} ثانیه</span>}
+        {job.status === "RUNNING" && <span className="flex items-center gap-1"><Loader2 className="size-4 animate-spin" />{elapsed === null ? "در حال اجرا" : `${secs(elapsed)} ثانیه`}</span>}
         <span className="flex items-center gap-1" dir="ltr"><Cpu className="size-4" />{job.model}</span>
         {job.durationMs !== null && !ACTIVE.has(job.status) && <span>زمان: {secs(job.durationMs)} ثانیه</span>}
         {job.inputTokens !== null && <span>ورودی: {faNum(job.inputTokens)} توکن</span>}

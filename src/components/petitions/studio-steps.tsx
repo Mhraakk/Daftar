@@ -9,6 +9,7 @@ import { evidenceRequired, type PetitionData, type PetitionSpec } from "@/server
 import type { PetitionDeadline } from "@/server/petitions/drafting";
 import { EMPTY_BLANK, fillBody, formatAmount, userBlanks } from "@/server/petitions/render";
 import type { PetitionCheck } from "@/server/petitions/validate";
+import { BodySuggestions } from "./ai-body";
 import { DeadlineCard } from "./studio-review";
 import { AddButton, Card, Check, Field, PickList, removeAt, replaceAt, Segmented } from "./studio-ui";
 
@@ -202,7 +203,9 @@ export function CourtStep({ spec, data, onChange, disabled, checks, deadline, de
 
 const isLong = (label: string) => LONG_WORDS.some((w) => label.includes(w));
 
-export function BodyStep({ spec, data, onChange, disabled, checks }: StepProps) {
+export interface BodyAi { draftId: string; external: boolean; onApplied: () => void }
+
+export function BodyStep({ spec, data, onChange, disabled, checks, ai }: StepProps & { ai?: BodyAi }) {
   const blanks = userBlanks(spec);
   const body = fillBody(spec, data);
   const setBlank = (key: string, v: string) => onChange({ ...data, blanks: { ...data.blanks, [key]: v } });
@@ -220,6 +223,10 @@ export function BodyStep({ spec, data, onChange, disabled, checks }: StepProps) 
           </div>
         )}
       </Card>
+      {ai && blanks.length > 0 && (
+        <BodySuggestions draftId={ai.draftId} external={ai.external} disabled={disabled}
+          onApply={(values) => { onChange({ ...data, blanks: { ...data.blanks, ...values } }); ai.onApplied(); }} />
+      )}
       {spec.optionalClauses.length > 0 && (
         <Card title="بندهای اختیاری" note="هر بند در صورت انتخاب پیش از عبارت پایانی به متن افزوده می‌شود.">
           <div className="flex flex-col gap-1">

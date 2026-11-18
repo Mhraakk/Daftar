@@ -72,7 +72,11 @@ export const DEFAULT_AI: AiSettings = {
   officeNotes: "",
 };
 
-/** فرم ذخیره تنظیمات؛ کلید API فقط هنگام تغییر ارسال می‌شود */
+/**
+ * فرم ذخیره تنظیمات؛ کلید API فقط هنگام تغییر ارسال می‌شود. فیلدهای ویژه یک ارائه‌دهنده (effort و refusalFallback
+ * برای Claude، temperature برای سرور سازگار با OpenAI) فقط وقتی همان ارائه‌دهنده انتخاب شده در فرم نمایش و ارسال
+ * می‌شوند؛ نبودنشان یعنی مقدار ذخیره‌شده بماند.
+ */
 export const aiSettingsSchema = z.object({
   enabled: z.boolean(),
   provider: z.enum(["anthropic", "openai_compatible"]),
@@ -84,9 +88,9 @@ export const aiSettingsSchema = z.object({
   contextWindow: z.coerce.number().int().min(MIN_CONTEXT_WINDOW).max(MAX_CONTEXT_WINDOW),
   timeoutSec: z.coerce.number().int().min(MIN_TIMEOUT_SEC).max(MAX_TIMEOUT_SEC),
   concurrency: z.coerce.number().int().min(1).max(MAX_CONCURRENCY),
-  effort: z.enum(EFFORTS),
-  refusalFallback: z.boolean(),
-  temperature: z.coerce.number().min(0).max(MAX_TEMPERATURE),
+  effort: z.enum(EFFORTS).optional(),
+  refusalFallback: z.boolean().optional(),
+  temperature: z.coerce.number().min(0).max(MAX_TEMPERATURE).optional(),
   allowConfidential: z.boolean(),
   practiceRole: z.enum(USER_ROLES),
   attorneyContact: z.string().trim().max(MAX_CONTACT_LENGTH).default(""),

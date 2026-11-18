@@ -6,6 +6,7 @@ import { JobView } from "@/components/ai/job-view";
 import { ActionButton } from "@/components/ui/action-button";
 import { LinkButton } from "@/components/ui/button";
 import { DL, Notice, PageHeader, Panel } from "@/components/ui/page";
+import { faNum } from "@/lib/text";
 import { can, requireUser } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
 import { AppError } from "@/lib/errors";
@@ -28,7 +29,7 @@ export default async function AssistantJobPage({ params }: { params: Promise<{ i
   const { id } = await params;
   const job = await getJobForUser(id, user).catch((e: unknown) => { if (e instanceof AppError) notFound(); throw e; });
   const snapshot = await jobSnapshot(id, user);
-  const meta = (job.meta ?? {}) as { suggestions?: DateItem[]; documentIds?: string[] };
+  const meta = (job.meta ?? {}) as { suggestions?: DateItem[]; documentIds?: string[]; ungrounded?: number; duplicates?: number; requoted?: number };
   const docId = meta.documentIds?.[0] ?? null;
   const doc = docId ? await db.document.findUnique({ where: { id: docId }, select: { id: true, title: true, caseId: true } }) : null;
   const isOwner = job.userId === user.id;
@@ -46,6 +47,13 @@ export default async function AssistantJobPage({ params }: { params: Promise<{ i
             <Panel title="مهلت‌های پیشنهادی" icon={<FileCheck2 />}>
               <p className="mb-2 text-sm text-ink-2">هر پیشنهاد را با متن سند تطبیق دهید و فقط موارد درست را ثبت کنید.</p>
               <DateSuggestions items={meta.suggestions ?? []} source="AI_SUGGESTED" caseId={doc?.caseId ?? job.caseId} canCreate={can(user, "deadline.manage")} testId="ai-date-suggestions" />
+              {(meta.ungrounded ?? 0) + (meta.duplicates ?? 0) + (meta.requoted ?? 0) > 0 && (
+                <p className="mt-2 text-xs leading-6 text-ink-3" data-testid="ai-date-discarded">
+                  {meta.ungrounded ? `${faNum(meta.ungrounded)} پیشنهاد مدل کنار گذاشته شد، چون تاریخش در متن سند نبود یا با جمله نقل‌شده نمی‌خواند. ` : ""}
+                  {meta.duplicates ? `${faNum(meta.duplicates)} پیشنهاد تکراری یک بار نمایش داده شد. ` : ""}
+                  {meta.requoted ? `برای ${faNum(meta.requoted)} پیشنهاد، جمله نقل‌شده مدل عیناً در سند نبود و متن پیرامون همان تاریخ در سند نمایش داده شد.` : ""}
+                </p>
+              )}
             </Panel>
           )}
           {job.status === "DONE" && draftLink && (

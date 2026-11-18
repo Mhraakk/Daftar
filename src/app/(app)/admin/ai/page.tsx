@@ -10,11 +10,12 @@ import { can, requirePagePerm } from "@/lib/auth/guard";
 import { db } from "@/lib/db";
 import { formatJalali, relativeTime } from "@/lib/jalali";
 import { faNum } from "@/lib/text";
-import { EFFORTS, getAiSettings, isExternalProvider, publicAiSettings } from "@/server/ai/config";
+import { getAiSettings, isExternalProvider, publicAiSettings } from "@/server/ai/config";
 import { getQueueState } from "@/server/ai/jobs";
 import { aiUsage } from "@/server/usage-charts";
 import { resolveUi } from "@/theme/prefs";
 import { saveAiSettingsAction, syncSkillsAction } from "./actions";
+import { aiSettingsFields } from "./fields";
 
 export const metadata = { title: "هوش مصنوعی" };
 
@@ -25,9 +26,6 @@ const JOB_STATUS: Record<string, { label: string; tone: "info" | "accent" | "suc
 const MODE_LABEL: Record<string, string> = { RUN: "قابل اجرا در دفتر", REFERENCE: "مرجع (قابل اجرا)", AGENT_ONLY: "فقط در Claude Code" };
 const RECENT_JOBS = 25;
 const MS_PER_SEC = 1_000;
-// eslint-disable-next-line ts-patterns/no-magic-numbers -- FieldDef.span needs the literal type 2
-const FULL = 2 as const;
-const NOTE_ROWS = 3;
 const SHORT_SHA = 7;
 
 /** بازه نمودارهای مصرف (هفته) */
@@ -79,25 +77,7 @@ export default async function AiAdminPage() {
           <div className="mt-4">
             <SmartForm action={saveAiSettingsAction} submitLabel="ذخیره تنظیمات" successMessage="تنظیمات هوش مصنوعی ذخیره شد."
               initial={{ ...pub, apiKey: "", clearApiKey: false } as unknown as Record<string, unknown>}
-              fields={[
-                { name: "enabled", label: "هوش مصنوعی در دفتر فعال باشد", type: "checkbox", span: FULL },
-                { name: "provider", label: "نوع ارائه‌دهنده", type: "select", required: true, options: [{ value: "anthropic", label: "Anthropic (Claude) — API رسمی" }, { value: "openai_compatible", label: "سازگار با OpenAI (Ollama / llama.cpp / vLLM / LM Studio)" }] },
-                { name: "model", label: "نام مدل", required: true, ltr: true, hint: "مثلاً claude-opus-5-5 یا qwen2.5:7b-instruct" },
-                { name: "baseUrl", label: "نشانی سرور", required: true, ltr: true, span: FULL, hint: "Anthropic: https://api.anthropic.com — Ollama: http://192.168.1.50:11434/v1 — llama.cpp: http://<host>:8080/v1" },
-                { name: "apiKey", label: "کلید API", type: "password", ltr: true, hint: pub.hasApiKey ? `کلید ثبت‌شده: ${pub.apiKeyHint ?? "••••"} — برای تغییر، کلید تازه وارد کنید` : "برای مدل محلی بدون کلید، خالی بگذارید" },
-                { name: "clearApiKey", label: "حذف کلید ثبت‌شده", type: "checkbox" },
-                { name: "effort", label: "سطح تلاش مدل (Claude)", type: "select", options: EFFORTS.map((e) => ({ value: e, label: e })), showIf: { field: "provider", equals: "anthropic" } },
-                { name: "refusalFallback", label: "در صورت امتناع، اجرای خودکار روی مدل جایگزین (server-side fallback)", type: "checkbox", showIf: { field: "provider", equals: "anthropic" } },
-                { name: "temperature", label: "دمای نمونه‌برداری", type: "number", showIf: { field: "provider", equals: "openai_compatible" }, hint: "برای متن حقوقی مقدار کم (۰ تا ۰٫۳) مناسب است" },
-                { name: "maxOutputTokens", label: "سقف توکن خروجی", type: "number", required: true },
-                { name: "contextWindow", label: "ظرفیت ورودی مدل (توکن)", type: "number", required: true, hint: "برای مدل محلی ۸۱۹۲ تا ۳۲۷۶۸؛ برای Claude تا ۱٬۰۰۰٬۰۰۰" },
-                { name: "timeoutSec", label: "سقف زمان هر اجرا (ثانیه)", type: "number", required: true },
-                { name: "concurrency", label: "اجرای هم‌زمان", type: "number", required: true, hint: "برای مدل محلی روی یک سرور، ۱" },
-                { name: "allowConfidential", label: "ارسال اسناد محرمانه به ارائه‌دهنده بیرون از شبکه مجاز است", type: "checkbox", span: FULL },
-                { name: "practiceRole", label: "نقش کاربران در نمایه مهارت‌ها", type: "select", required: true, options: [{ value: "nonlawyer_with_attorney", label: "غیرحقوق‌دان با دسترسی به وکیل/مشاور" }, { value: "lawyer", label: "وکیل / حقوق‌دان دارای پروانه" }, { value: "nonlawyer_without_attorney", label: "غیرحقوق‌دان بدون دسترسی به وکیل" }] },
-                { name: "attorneyContact", label: "مرجع بررسی حقوقی دفتر", placeholder: "مثلاً: آقای ... مشاور حقوقی دفتر" },
-                { name: "officeNotes", label: "توضیحات افزوده به نمایه دفتر", type: "textarea", rows: NOTE_ROWS, span: FULL, hint: "این متن در «نمایه تمرین» همه مهارت‌ها قرار می‌گیرد؛ اطلاعات شخصی ننویسید." },
-              ]} />
+              fields={aiSettingsFields(pub)} />
           </div>
         </Panel>
         <div className="flex flex-col gap-4">

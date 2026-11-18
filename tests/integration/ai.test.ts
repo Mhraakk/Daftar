@@ -1,10 +1,13 @@
 /* eslint-disable ts-patterns/no-magic-numbers -- assertions compare against literal expected values */
 // صف هوش مصنوعی و اجرای مهارت‌های حقوقی روی پایگاه داده واقعی، با سرور مدل آزمایشی محلی (پروتکل OpenAI).
+import { readFileSync } from "node:fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { SessionUser } from "@/lib/auth/guard";
 import { startAssistantJob } from "@/server/ai/assistant";
-import { DEFAULT_AI } from "@/server/ai/config";
+import { aiSettingsSchema, DEFAULT_AI, getAiSettings } from "@/server/ai/config";
+import { ECHO_WARN } from "@/server/ai/echo";
 import { cancelAiJob, claimJobs, executeJob, recoverStaleJobs } from "@/server/ai/jobs";
+import { saveAiSettings } from "@/server/ai/settings";
 import { continueSkillRun, reviewSkillRun, skillRunToDraft, startSkillRun, type StartSkillRunInput } from "@/server/ai/skill-runner";
 import { syncSkills } from "@/server/ai/skill-catalog";
 import { createCase } from "@/server/cases";
@@ -114,6 +117,16 @@ describe("اجرای مهارت حقوقی از صف", () => {
     const draft = await prisma.legalDraft.findUniqueOrThrow({ where: { id: d.id } });
     expect(draft).toMatchObject({ aiAssisted: true, caseId, status: "DRAFT" });
     expect(draft.contentHtml).toContain("<h2>بررسی قرارداد</h2>");
+    expect((await prisma.skillRun.findUniqueOrThrow({ where: { id: runId } })).messages).not.toEqual(expect.arrayContaining([expect.objectContaining({ echo: expect.any(Number) })]));
+  });
+  it("پاسخی که متن خود مهارت را تکرار کند با نشان هشدار ذخیره می‌شود", async () => {
+    // همان رفتاری که مدل کوچک محلی در آزمون زنده نشان داد: بازگرداندن فهرست‌های بررسی مهارت به‌جای بررسی سند
+    const skillLines = readFileSync("vendor/legal-skills/contract-review/SKILL.md", "utf8").split("\n").filter((l) => l.trim().length > 30).slice(10, 30);
+    stub.respond(openAiStream(skillLines.join("\n")));
+    const { jobId } = await continueSkillRun(runId, "دوباره بررسی کن", legal);
+    expect(await runQueued(jobId)).toBe("DONE");
+    const messages = (await prisma.skillRun.findUniqueOrThrow({ where: { id: runId } })).messages as { role: string; echo?: number }[];
+    expect(messages.at(-1)?.echo).toBeGreaterThanOrEqual(ECHO_WARN);
   });
 });
 
@@ -160,12 +173,21 @@ describe("پایداری صف", () => {
 });
 
 describe("دستیار حقوقی", () => {
-  it("پیشنهاد مهلت از سند: فقط تاریخ‌های معتبر ذخیره می‌شود", async () => {
-    stub.respond(openAiStream('[{"date":"1405/03/20","type":"HEARING","title":"جلسه رسیدگی","quote":"وقت رسیدگی"},{"date":"1405/07/31","type":"HEARING","title":"نامعتبر","quote":""}]'));
-    const { jobId } = await startAssistantJob(mk({ task: "dates", documentIds: [docId], text: "", includeConfidential: false, confirmSend: false }), legal);
+  it("پیشنهاد مهلت از سند: فقط تاریخ‌های معتبر و موجود در متن سند ذخیره می‌شود", async () => {
+    const notice = "اخطاریه\nوقت رسیدگی: ۱۴۰۵/۰۳/۲۰ ساعت ۹ صبح\nمهلت ارائه لایحه تا ۱۴۰۵/۰۳/۱۰";
+    const noticeId = (await prisma.document.create({
+      data: {
+        code: `D-T-${T}-NOTICE`, title: `اخطاریه ${T}`, category: "اخطاریه / ابلاغیه", caseId, createdById: legal.id,
+        versions: { create: { versionNo: 1, fileName: "n.txt", mimeType: "text/plain", size: notice.length, sha256: "x", storageKey: `t/${T}/n`, extractedText: notice, textStatus: "EXTRACTED", uploadedById: legal.id } },
+      },
+    })).id;
+    // تاریخ نامعتبر (مهر ۳۰ روزه است)، تاریخ ساختگی که در سند نیست، و تکرار یک پیشنهاد درست
+    stub.respond(openAiStream('[{"date":"1405/03/20","type":"HEARING","title":"جلسه رسیدگی","quote":"وقت رسیدگی: ۱۴۰۵/۰۳/۲۰ ساعت ۹ صبح"},{"date":"1405/07/31","type":"HEARING","title":"نامعتبر","quote":""},{"date":"1405/05/01","type":"OTHER","title":"ساختگی","quote":""},{"date":"1405/03/20","type":"HEARING","title":"جلسه رسیدگی","quote":"وقت رسیدگی: ۱۴۰۵/۰۳/۲۰ ساعت ۹ صبح"}]'));
+    const { jobId } = await startAssistantJob(mk({ task: "dates", documentIds: [noticeId], text: "", includeConfidential: false, confirmSend: false }), legal);
     expect(await runQueued(jobId)).toBe("DONE");
     const job = await prisma.aiInteraction.findUniqueOrThrow({ where: { id: jobId } });
     expect((job.meta as { suggestions: { date: string }[] }).suggestions.map((s) => s.date)).toEqual(["1405/03/20"]);
+    expect(job.meta).toMatchObject({ ungrounded: 1, duplicates: 1 });
     expect(await prisma.deadline.count({ where: { caseId, source: "AI_SUGGESTED" } })).toBe(0);
   });
   it("پیش‌نویس هوش مصنوعی در ویرایشگر و گردش‌کار بررسی قرار می‌گیرد", async () => {
@@ -184,5 +206,16 @@ describe("دستیار حقوقی", () => {
     await expect(startAssistantJob(mk({ task: "doc_summary", documentIds: [secretDocId], text: "", includeConfidential: true, confirmSend: true }), legal)).rejects.toThrow("مجاز نشده");
     const n = stub.requests.length;
     expect(stub.requests.length).toBe(n);
+  });
+});
+
+describe("ذخیره تنظیمات هوش مصنوعی از فرم", () => {
+  const form = { enabled: false, model: "qwen2.5-1.5b-instruct", baseUrl: "http://127.0.0.1:8088/v1", maxOutputTokens: "1024", contextWindow: "8192", timeoutSec: "900", concurrency: "1", allowConfidential: false, practiceRole: "nonlawyer_with_attorney", attorneyContact: "", officeNotes: "" };
+  it("فیلدهای ویژه ارائه‌دهنده‌ای که انتخاب نیست مقدار ذخیره‌شده را نگه می‌دارند", async () => {
+    await setAi({ provider: "anthropic", effort: "max", refusalFallback: false, temperature: 0.7 });
+    await saveAiSettings(aiSettingsSchema.parse({ ...form, provider: "openai_compatible", temperature: "0.2" }), manager);
+    expect(await getAiSettings()).toMatchObject({ provider: "openai_compatible", temperature: 0.2, effort: "max", refusalFallback: false, contextWindow: 8192 });
+    await saveAiSettings(aiSettingsSchema.parse({ ...form, provider: "anthropic", effort: "low", refusalFallback: true }), manager);
+    expect(await getAiSettings()).toMatchObject({ provider: "anthropic", effort: "low", refusalFallback: true, temperature: 0.2 });
   });
 });

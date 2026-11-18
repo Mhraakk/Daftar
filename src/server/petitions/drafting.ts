@@ -146,7 +146,8 @@ async function draftSpec(petitionTypeId: string | null): Promise<PetitionSpec> {
 }
 
 /** ذخیره داده دادخواست و ساخت دوباره برگ؛ اگر برگ تغییر کند نسخه شماره‌دار تازه ثبت می‌شود */
-export async function savePetition(id: string, version: number, raw: unknown, user: SessionUser) {
+/** aiAssisted: کاربر پیشنهاد هوش مصنوعی را در این ذخیره اعمال کرده است (نشان سند برداشته نمی‌شود) */
+export async function savePetition(id: string, version: number, raw: unknown, user: SessionUser, aiAssisted = false) {
   const d = await assertDraftAccess(user, id);
   assertEditor(d, user);
   const spec = await draftSpec(d.petitionTypeId);
@@ -157,9 +158,9 @@ export async function savePetition(id: string, version: number, raw: unknown, us
     const changed = last?.contentHtml !== html;
     const versionNo = changed ? (last?.versionNo ?? 0) + 1 : d.currentVersion;
     if (changed) await tx.legalDraftVersion.create({ data: { draftId: id, versionNo, contentHtml: html, note: "به‌روزرسانی برگ دادخواست", source: "PETITION", authorId: user.id } });
-    const r = await tx.legalDraft.updateMany({ where: { id, version }, data: { petitionData: data as Prisma.InputJsonValue, contentHtml: html, currentVersion: versionNo, version: { increment: 1 } } });
+    const r = await tx.legalDraft.updateMany({ where: { id, version }, data: { petitionData: data as Prisma.InputJsonValue, contentHtml: html, currentVersion: versionNo, version: { increment: 1 }, ...(aiAssisted ? { aiAssisted: true } : {}) } });
     if (!r.count) throw new ConflictError("این سند هم‌زمان در جای دیگری ویرایش شده است. صفحه را تازه‌سازی کنید.");
-    await audit({ actorId: user.id, action: "draft.saved", entityType: "LegalDraft", entityId: id, entityLabel: `${d.title} (${d.code})`, caseId: d.caseId, clientId: d.clientId, meta: { versionNo, petition: true } }, tx);
+    await audit({ actorId: user.id, action: "draft.saved", entityType: "LegalDraft", entityId: id, entityLabel: `${d.title} (${d.code})`, caseId: d.caseId, clientId: d.clientId, meta: { versionNo, petition: true, aiAssisted } }, tx);
     return { version: version + 1, versionNo };
   });
   await reindex(id);

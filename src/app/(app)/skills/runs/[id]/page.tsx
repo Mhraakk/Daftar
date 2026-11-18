@@ -33,7 +33,9 @@ const SHORT_SHA = 12;
 const REQUEST_OPEN = "<request>";
 const REQUEST_CLOSE = "</request>";
 
-type Msg = { role: "user" | "assistant"; content: string; at: string };
+/** echo: سهم سطرهای پاسخ که عیناً از دستورالعمل مهارت تکرار شده (فقط بالای آستانه هشدار ذخیره می‌شود) */
+type Msg = { role: "user" | "assistant"; content: string; at: string; echo?: number };
+const PERCENT = 100;
 
 /** از پیام کاربر فقط متن درخواست نمایش داده می‌شود (متن اسناد و پرونده در بخش «داده ارسالی» خلاصه شده است) */
 function requestText(content: string): string {
@@ -78,6 +80,14 @@ export default async function SkillRunPage({ params }: { params: Promise<{ id: s
             ) : (
               <div key={`${m.at}-${i}`} className="rounded-lg border border-line bg-surface p-4" data-testid="run-output">
                 <p className="mb-2 flex items-center gap-1 text-xs text-ink-3"><Bot className="size-3.5" />خروجی مدل · {formatJalali(new Date(m.at), "datetime")}</p>
+                {m.echo !== undefined && (
+                  <div className="mb-3" data-testid="run-echo-warning">
+                    <Notice tone="danger" title="این پاسخ عمدتاً تکرار دستورالعمل مهارت است">
+                      حدود {faNum(Math.round(m.echo * PERCENT))}٪ سطرهای این پاسخ عیناً در متن مهارت آمده است؛ مدل احتمالاً کار را روی اسناد شما انجام نداده و
+                      نمونه‌ها یا فهرست‌های خود مهارت را بازگردانده است. به این خروجی تکیه نکنید و برای این مهارت مدل بزرگ‌تری تنظیم کنید.
+                    </Notice>
+                  </div>
+                )}
                 {/* خروجی مدل روی سرور با فهرست سفید برچسب‌ها پاک‌سازی می‌شود */}
                 <div className="prose-md" dangerouslySetInnerHTML={{ __html: renderAiMarkdown(m.content) }} />
               </div>

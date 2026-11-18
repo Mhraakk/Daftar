@@ -282,7 +282,9 @@
   .prose-md h4 { @apply mb-1 mt-3 font-bold; }
   .prose-md td, .prose-md th { overflow-wrap: anywhere; }
   .prose-md table { table-layout: auto; max-width: 100%; }
-  .prose-md pre { @apply my-2 whitespace-pre-wrap rounded bg-surface-2 p-2 text-xs; }
+  .prose-md pre { @apply my-2 whitespace-pre-wrap rounded bg-surface-2 p-2 text-left text-xs; direction: ltr; }
+  /* جهت هر بند از نخستین حرف آن: بند انگلیسی (مثلاً در خروجی مدل) چپ‌چین و با نشانه‌گذاری درست، بند فارسی راست‌چین */
+  .prose-md :is(p, li, h1, h2, h3, h4, td, th, blockquote) { unicode-bidi: plaintext; text-align: start; }
   .prose-ltr { direction: ltr; text-align: left; }
 }
 

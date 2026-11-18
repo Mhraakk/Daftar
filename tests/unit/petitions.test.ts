@@ -9,11 +9,12 @@ import { DEADLINE_RULES } from "../../prisma/seed-data/deadline-rules";
 import { sha256 } from "@/lib/storage";
 import type { ExtractedLaw } from "@/server/law-import";
 import { countSteps, stepOf, systemRows } from "@/components/petitions/studio-model";
+import { groundBodySuggestion, parseBodySuggestion } from "@/server/petitions/ai-body";
 import { emptyParty, emptyPetitionData, petitionDataSchema, plainSpec, toSpec, type PetitionData, type PetitionSpec, type PetitionTypeRow } from "@/server/petitions/data";
 import { blankify, cleanCellText, parseValue, splitInvestigations, splitNumbered, type ParsedForm } from "@/server/petitions/form-parser";
 import { formCode, parseFormFile } from "@/server/petitions/import-form";
 import { LAW_PETITION_TYPES, type LawPetitionType } from "@/server/petitions/law-types";
-import { BLANK_BINDINGS, blankKeys, fillBody, formatAmount, renderPetitionHtml, sideLabels, templateParts, userBlanks } from "@/server/petitions/render";
+import { BLANK_BINDINGS, blankKeys, blankSentence, fillBody, formatAmount, renderPetitionHtml, sideLabels, templateParts, userBlanks } from "@/server/petitions/render";
 import { ANCHORS, validatePetition, type PetitionCheck } from "@/server/petitions/validate";
 import { sanitizeLegalHtml } from "@/server/sanitize";
 
@@ -340,5 +341,56 @@ describe("petition studio model", () => {
     expect(Object.keys(plain)).not.toContain("createdAt");
     expect(Object.keys(plain)).not.toContain("sourceSha256");
     expect(plain).toEqual(spec);
+  });
+});
+
+describe("AI petition-body suggestions", () => {
+  it("keeps only requested, non-empty blanks from the model's JSON, even inside a code fence", () => {
+    const reply = "پیشنهاد:\n```json\n{\"تاریخ\": \"۱۴۰۰/۰۵/۱۰\", \"مهریه\": \"\", \"کلید ناخواسته\": \"x\"}\n```";
+    expect(parseBodySuggestion(reply, ["تاریخ", "مهریه"])).toEqual({ "تاریخ": "۱۴۰۰/۰۵/۱۰" });
+    expect(parseBodySuggestion("بدون JSON", ["تاریخ"])).toEqual({});
+    expect(parseBodySuggestion("{خراب}", ["تاریخ"])).toEqual({});
+    expect(parseBodySuggestion("[\"آرایه\"]", ["تاریخ"])).toEqual({});
+  });
+});
+
+describe("راهنمای جای خالی و سنجش پیشنهاد شرح خواسته", () => {
+  // قالب «استرداد ثمن معامله» (FK-459FDCAB): برچسب «لحاظ» به‌تنهایی بی‌معناست و مدل محلی تاریخ امروز را در آن گذاشت
+  const TEMPLATE = "ریاست محترم {{مرجع رسیدگی}}\nبه موجب مستندات ابرازی اینجانب مبلغ {{اینجانب مبلغ}} به عنوان ثمن معامله به خوانده پرداخت نموده که به لحاظ {{لحاظ}} قرارداد تنظیمی از اعتبار ساقط و علیرغم مراجعه و مطالبه ثمن پرداختی متأسفانه خوانده از استرداد آن خودداری می نماید";
+  it("جمله هر جای خالی با «[____]» و جاهای خالی دیگر با «…»", () => {
+    const s = blankSentence(TEMPLATE, "لحاظ");
+    expect(s).toContain("به لحاظ [____] قرارداد تنظیمی از اعتبار ساقط");
+    expect(s).toContain("مبلغ … به عنوان ثمن");
+    expect(blankSentence(TEMPLATE, "ناموجود")).toBe("");
+  });
+  const SENT = "<case>شرح پرونده: موکل مجموعاً ۵٬۵۰۰٬۰۰۰٬۰۰۰ ریال پرداخت کرده؛ اظهارنامه فسخ مورخ ۱۴۰۵/۰۶/۲۵</case>";
+  it("مبلغ با جداکننده دیگر پذیرفته و مبلغ یا تاریخ ساختگی کنار گذاشته می‌شود", () => {
+    const g = groundBodySuggestion({
+      "اینجانب مبلغ": "۵,۵۰۰,۰۰۰,۰۰۰ ریال",
+      "لحاظ": "فسخ معامله با اظهارنامه مورخ ۱۴۰۵/۰۶/۲۵",
+      "تاریخ": "۱۴۰۵/۰۸/۲۷",
+      "خسارت": "۷۰۰٬۰۰۰٬۰۰۰ ریال",
+    }, SENT);
+    expect(Object.keys(g.kept)).toEqual(["اینجانب مبلغ", "لحاظ"]);
+    expect(g.dropped).toEqual(["تاریخ", "خسارت"]);
+  });
+  it("جای خالی متنی مقدار فقط‌عددی نمی‌پذیرد و پاسخ تودرتو (filled_blanks) هم خوانده می‌شود", () => {
+    // دو پاسخ واقعی مدل محلی در آزمون زنده
+    const live = '{"title": "استرداد ثمن معامله", "filled_blanks": {"اینجانب مبلغ": "۵,۵۰۰,۰۰۰,۰۰۰ ریال", "لحاظ": "۶۴/۱۲"}, "template": "…"}';
+    const parsed = parseBodySuggestion(live, ["اینجانب مبلغ", "لحاظ"]);
+    expect(parsed).toEqual({ "اینجانب مبلغ": "۵,۵۰۰,۰۰۰,۰۰۰ ریال", "لحاظ": "۶۴/۱۲" });
+    const g = groundBodySuggestion(parsed, SENT);
+    expect(g.kept).toEqual({ "اینجانب مبلغ": "۵,۵۰۰,۰۰۰,۰۰۰ ریال" });
+    expect(g.dropped).toEqual(["لحاظ"]);
+  });
+  it("مقداری که جمله خود قالب را بازمی‌گرداند پذیرفته نیست؛ علت واقعی پذیرفته است", () => {
+    // پاسخ واقعی سوم مدل محلی: همان جمله قالب به‌جای علت بی‌اعتباری قرارداد
+    const echo = "به موجب مستندات ابرازی اینجانب مبلغ ۵,۵۰۰,۰۰۰,۰۰۰ ریال به عنوان ثمن معامله به خوانده پرداخت نموده که به لحاظ اعتبار ساقط";
+    const g = groundBodySuggestion({ "لحاظ": echo }, SENT, TEMPLATE);
+    expect(g.dropped).toEqual(["لحاظ"]);
+    expect(groundBodySuggestion({ "لحاظ": "فسخ معامله توسط خواهان به استناد ماده ۶ مبایعه‌نامه" }, SENT, TEMPLATE).dropped).toEqual([]);
+  });
+  it("متن بدون عدد سنجیده نمی‌شود و عددهای کوتاه (مانند ۱۰ روز) معیار نیستند", () => {
+    expect(groundBodySuggestion({ "لحاظ": "فسخ قرارداد ظرف ۱۰ روز" }, SENT).dropped).toEqual([]);
   });
 });

@@ -93,8 +93,9 @@ function SaveState({ dirty, saving, error, editable }: { dirty: boolean; saving:
   return <span className={cn("text-xs", dirty ? "text-zafaran" : "text-sabz")}>{dirty ? "تغییرات ذخیره‌نشده" : "ذخیره شده"}</span>;
 }
 
-export function PetitionStudio({ draftId, version, editable, spec, initialData, initialDeadline }: {
+export function PetitionStudio({ draftId, version, editable, spec, initialData, initialDeadline, ai }: {
   draftId: string; version: number; editable: boolean; spec: PetitionSpec; initialData: PetitionData; initialDeadline: PetitionDeadline;
+  ai: { available: boolean; external: boolean };
 }) {
   const toast = useToast();
   const [data, setData] = useState(initialData);
@@ -105,6 +106,8 @@ export function PetitionStudio({ draftId, version, editable, spec, initialData, 
   const [deadline, setDeadline] = useState(initialDeadline);
   const [deadlineLoading, setDeadlineLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** پیشنهاد هوش مصنوعی اعمال شده و هنوز ذخیره نشده است */
+  const [aiUsed, setAiUsed] = useState(false);
   const [saving, startSave] = useTransition();
   const latest = useRef(data);
   const sides = sideLabels(spec);
@@ -122,7 +125,7 @@ export function PetitionStudio({ draftId, version, editable, spec, initialData, 
     const snapshot = latest.current;
     setError(null);
     startSave(async () => {
-      const r = await savePetitionAction({ id: draftId, version: ver, data: snapshot });
+      const r = await savePetitionAction({ id: draftId, version: ver, data: snapshot, aiAssisted: aiUsed });
       if (!r.ok) {
         setError(r.error);
         toast.error(r.error);
@@ -130,10 +133,11 @@ export function PetitionStudio({ draftId, version, editable, spec, initialData, 
       }
       setVer(r.data.version);
       setSaved(snapshot);
+      setAiUsed(false);
       setDeadline(r.data.deadline);
       toast.success(`ذخیره شد — نسخه ${toFaDigits(r.data.versionNo)}`);
     });
-  }, [draftId, editable, saving, toast, ver]);
+  }, [aiUsed, draftId, editable, saving, toast, ver]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -180,7 +184,7 @@ export function PetitionStudio({ draftId, version, editable, spec, initialData, 
     evidence: () => <EvidenceStep {...stepProps} />,
     extras: () => <ExtrasStep {...stepProps} />,
     court: () => <CourtStep {...stepProps} deadline={deadline} deadlineLoading={deadlineLoading} />,
-    body: () => <BodyStep {...stepProps} />,
+    body: () => <BodyStep {...stepProps} ai={ai.available && editable ? { draftId, external: ai.external, onApplied: () => setAiUsed(true) } : undefined} />,
     review: () => (
       <div className="flex flex-col gap-4">
         <Card title="بررسی شکلی دادخواست" icon={<ShieldCheck />} note="هر بررسی به ماده و بند قانون آیین دادرسی مدنی و عبارت دقیق آن پیوند دارد. بررسی جای نظر حقوقی را نمی‌گیرد.">

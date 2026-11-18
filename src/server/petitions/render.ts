@@ -103,6 +103,21 @@ export function userBlanks(spec: Pick<PetitionSpec, "bodyTemplate" | "optionalCl
   return blankKeys([spec.bodyTemplate, ...spec.optionalClauses.map((c) => c.text)].join("\n")).filter((k) => !(k in BLANK_BINDINGS));
 }
 
+/** نیم‌پهنای پنجره جمله پیرامون جای خالی (نویسه) */
+const SENTENCE_HALF = 160;
+export const BLANK_MARK = "[____]";
+
+/**
+ * جمله‌ای از متن قالب که جای خالی در آن است: همین جای خالی «[____]» و بقیه «…». برچسب جای خالی گاهی به‌تنهایی بی‌معناست
+ * (مثلاً «لحاظ» در «به لحاظ {{لحاظ}} قرارداد…»)؛ مدل باید جمله را ببیند تا بداند چه چیزی جای آن می‌نشیند.
+ */
+export function blankSentence(template: string, key: string): string {
+  const line = template.split("\n").find((l) => l.includes(`{{${key}}}`)) ?? "";
+  const marked = line.split(`{{${key}}}`).map((part) => part.replace(BLANK, "…")).join(BLANK_MARK).trim();
+  const at = marked.indexOf(BLANK_MARK);
+  return at < 0 ? "" : marked.slice(Math.max(0, at - SENTENCE_HALF), at + BLANK_MARK.length + SENTENCE_HALF).trim();
+}
+
 function withClauses(template: string, clauses: string[]): string {
   if (!clauses.length) return template;
   const lines = template.split("\n");

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { runAction } from "@/lib/action";
 import { petitionTypeUpdateSchema, setPetitionTypeStatus, updatePetitionType } from "@/server/petitions/catalog";
 import { PETITION_TYPE_STATUSES, petitionDataSchema } from "@/server/petitions/data";
+import { bodySuggestionState, requestBodySuggestion } from "@/server/petitions/ai-body";
 import { createPetitionDraft, createPetitionSchema, petitionDeadline, petitionReport, savePetition } from "@/server/petitions/drafting";
 
 const ID_MAX = 40;
@@ -15,8 +16,8 @@ export async function createPetitionAction(raw: unknown) {
 }
 
 export async function savePetitionAction(raw: unknown) {
-  return runAction(z.object({ id, version: z.number().int().min(1), data: z.unknown() }), "draft.create", raw, async (input, user) => {
-    const saved = await savePetition(input.id, input.version, input.data, user);
+  return runAction(z.object({ id, version: z.number().int().min(1), data: z.unknown(), aiAssisted: z.boolean().optional() }), "draft.create", raw, async (input, user) => {
+    const saved = await savePetition(input.id, input.version, input.data, user, input.aiAssisted ?? false);
     const report = await petitionReport(input.id, user);
     revalidatePath(`/drafts/${input.id}`);
     return { ...saved, validation: report.validation, deadline: report.deadline };
@@ -52,4 +53,13 @@ export async function setPetitionTypeStatusAction(raw: unknown) {
     revalidatePath("/petitions");
     revalidatePath(`/petitions/${input.id}`);
   });
+}
+
+/** درخواست پیشنهاد هوش مصنوعی برای جاهای خالی شرح خواسته (خروجی تا اعمال کاربر در سند نمی‌نشیند) */
+export async function requestBodySuggestionAction(raw: unknown) {
+  return runAction(z.object({ id, confirmSend: z.boolean().default(false) }), "ai.use", raw, (input, user) => requestBodySuggestion(input.id, user, input.confirmSend));
+}
+
+export async function bodySuggestionAction(raw: unknown) {
+  return runAction(z.object({ jobId: id }), "ai.use", raw, (input, user) => bodySuggestionState(input.jobId, user));
 }

@@ -12,11 +12,13 @@ import { DEADLINE_TYPE, LEGAL_DOC_TYPES } from "@/lib/labels";
 import { toEnDigits } from "@/lib/text";
 import { assertCan, type SessionUser } from "@/lib/auth/guard";
 import { assertDraftAccess } from "@/server/access";
+import { extractJalaliDates } from "@/server/deadline-calc";
 import { createDraft, saveDraft } from "@/server/drafts";
 import { getAiSettings, isAiReady, isExternalProvider } from "./config";
 import { caseContextText, describeScope, documentBlock, documentsForAi, scopeSummary } from "./context";
 import { enqueueAiJob, getJobForUser, registerJobHandlers } from "./jobs";
 import { aiMarkdownToDraftHtml } from "./markdown";
+import { jsonObjectsIn } from "./model-json";
 
 export const ASSISTANT_TASKS = {
   case_analysis: "تحلیل پرونده (خلاصه، گاه‌شمار، کمبودها، ناسازگاری‌ها، اقدام بعدی)",
@@ -104,18 +106,20 @@ export async function startAssistantJob(input: AssistantInput, user: SessionUser
   const text = input.task === "rewrite" && draft && !input.text.trim() ? parseHtml(draft.contentHtml).structuredText.trim() : input.text;
   if (input.task === "rewrite" && !text.trim()) throw new AppError("متن پیش‌نویس خالی است.");
   const kase = input.caseId ? await caseContextText(input.caseId, user) : null;
+  // استخراج تاریخ فقط از متن یک سند است؛ خلاصه پرونده فرستاده نمی‌شود (مدل محلی در آزمون زنده سطرهای پرونده را جای متن سند نقل کرد)
+  const caseBlock = input.task === "dates" ? null : kase;
   const docs = await documentsForAi(input.documentIds, user, settings, input.includeConfidential);
   const docTypeLabel = input.docType ? LEGAL_DOC_TYPES[input.docType] : null;
   const userMessage = [
     `<run>\ntask: ${input.task}\ndate: ${formatJalali(new Date())} (Asia/Tehran)${docTypeLabel ? `\ndocument_type: ${docTypeLabel}` : ""}\n</run>`,
-    kase ? `<case number="${kase.number}">\n${kase.text}\n</case>` : null,
+    caseBlock ? `<case number="${caseBlock.number}">\n${caseBlock.text}\n</case>` : null,
     ...docs.map(documentBlock),
     requestBlock({ ...input, text }),
   ].filter((x): x is string => !!x).join("\n\n");
   const system = `${BASE_SYSTEM}\n\n${TASK_INSTRUCTIONS[input.task]}`;
   const scope = describeScope(settings, [
     { label: "دستورالعمل دستیار", text: system },
-    ...(kase ? [{ label: `خلاصه پرونده ${kase.number}`, text: kase.text }] : []),
+    ...(caseBlock ? [{ label: `خلاصه پرونده ${caseBlock.number}`, text: caseBlock.text }] : []),
     ...docs.map((d) => ({ label: `سند ${d.code}`, text: d.text })),
     { label: input.task === "rewrite" ? "متن برای بازنویسی" : "متن درخواست", text },
   ]);
@@ -133,21 +137,9 @@ export async function startAssistantJob(input: AssistantInput, user: SessionUser
 
 export interface DateSuggestion { date: string; type: string; title: string; quote: string; relative: boolean }
 
-/** پاسخ مدل برای استخراج تاریخ: آرایه JSON (حتی اگر درون متن یا قطعه کد آمده باشد) با اعتبارسنجی تاریخ شمسی */
+/** پاسخ مدل برای استخراج تاریخ: شیءهای JSON کامل (حتی درون متن، قطعه کد یا آرایه بریده‌شده) با اعتبارسنجی تاریخ شمسی */
 export function parseDateSuggestions(text: string): DateSuggestion[] {
-  const start = text.indexOf("[");
-  const end = text.lastIndexOf("]");
-  if (start < 0 || end <= start) return [];
-  let raw: unknown;
-  try {
-    raw = JSON.parse(text.slice(start, end + 1));
-  } catch {
-    return [];
-  }
-  if (!Array.isArray(raw)) return [];
-  return raw.flatMap((item: unknown) => {
-    if (!item || typeof item !== "object") return [];
-    const o = item as Record<string, unknown>;
+  return jsonObjectsIn(text).flatMap((o) => {
     const parts = toEnDigits(String(o.date ?? "")).split("/").map(Number);
     if (parts.length !== DATE_PARTS) return [];
     const [jy, jm, jd] = parts as [number, number, number];
@@ -163,11 +155,67 @@ export function parseDateSuggestions(text: string): DateSuggestion[] {
   }).slice(0, MAX_SUGGESTIONS);
 }
 
+/** سقف تاریخ‌هایی که برای تطبیق از متن سند خوانده می‌شود */
+const MAX_DOC_DATES = 500;
+const dateKeyOf = (d: { jy: number; jm: number; jd: number }): string => `${d.jy}/${d.jm}/${d.jd}`;
+/** «1405/04/15» → «1405/4/15» تا با کلید تاریخ‌های استخراجی هم‌شکل شود */
+const suggestionKey = (date: string): string => date.split("/").map(Number).join("/");
+// Runs of whitespace to collapse before comparing a quote with the document: matches " \n  ", rejects "ا".
+// https://regex101.com/?regex=%5Cs%2B&testString=%D8%A7%20%20%0A%20%D8%A8&flavor=javascript
+const SPACES = /\s+/g;
+const squash = (s: string): string => toEnDigits(s).replace(SPACES, " ").trim();
+
+export interface GroundedDates { kept: DateSuggestion[]; ungrounded: number; duplicates: number; requoted: number }
+
+// A stated period, after digit normalisation: matches "ظرف 10 روز", "مهلت" and "3 ماه"; rejects "در تاریخ 1405/06/20 ساعت 10 صبح".
+// https://regex101.com/?regex=%D8%B8%D8%B1%D9%81%7C%D9%85%D9%87%D9%84%D8%AA%7C%5Cd%2B%5Cs*%28%3F%3A%D8%B1%D9%88%D8%B2%7C%D9%87%D9%81%D8%AA%D9%87%7C%D9%85%D8%A7%D9%87%7C%D8%B3%D8%A7%D9%84%29&testString=%D8%B8%D8%B1%D9%81%2010%20%D8%B1%D9%88%D8%B2&flavor=javascript
+const PERIOD = /ظرف|مهلت|\d+\s*(?:روز|هفته|ماه|سال)/;
+
+interface Graded { s: DateSuggestion; key: string; evidence: number; requoted: boolean; index: number }
+/** پشتوانه پیشنهاد: جمله عین سند که خود تاریخ یا مدت را دارد، یا متن پیرامون تاریخ که جایگزین جمله مدل شده است */
+const STRONG = 2;
+const WEAK = 1;
+
+/**
+ * پیشنهادهای مدل در برابر متن سند (همه قواعد از خطاهای دیده‌شده در آزمون زنده با مدل محلی آمده است):
+ * - تاریخی که در متن سند نیست کنار می‌رود؛ مدل نباید تاریخ بسازد.
+ * - «نسبی» فقط وقتی پذیرفته است که جمله نقل‌شده عیناً در سند باشد و واقعاً مدتی بیان کند (ظرف، مهلت، N روز…).
+ * - برای تاریخ ثابت، جمله نقل‌شده‌ای که عیناً در سند است باید همان تاریخ را داشته باشد؛ اگر تاریخ دیگری دارد پیشنهاد
+ *   کنار می‌رود (جفت نادرست) و اگر تاریخی ندارد یا در سند نیست، متن پیرامون همان تاریخ در سند جایش را می‌گیرد.
+ * - برای هر تاریخ ثابت یک پیشنهاد (با بهترین پشتوانه) و برای هر مهلت نسبی یک پیشنهاد؛ فهرست به ترتیب تاریخ است.
+ */
+export function groundDateSuggestions(items: readonly DateSuggestion[], source: string): GroundedDates {
+  const contextOf = new Map(extractJalaliDates(source, MAX_DOC_DATES).map((d) => [dateKeyOf(d), d.context]));
+  const doc = squash(source);
+  const grade = (s: DateSuggestion, index: number): Graded | null => {
+    const key = suggestionKey(s.date);
+    const context = contextOf.get(key);
+    if (context === undefined) return null;
+    const quote = squash(s.quote);
+    const verbatim = !!quote && doc.includes(quote);
+    if (s.relative && verbatim && PERIOD.test(quote)) return { s, key: `R|${key}|${quote}`, evidence: STRONG, requoted: false, index };
+    const quoteDates = verbatim ? extractJalaliDates(s.quote).map(dateKeyOf) : [];
+    if (quoteDates.includes(key)) return { s: { ...s, relative: false }, key: `F|${key}`, evidence: STRONG, requoted: false, index };
+    if (quoteDates.length) return null;
+    return { s: { ...s, relative: false, quote: context }, key: `F|${key}`, evidence: WEAK, requoted: true, index };
+  };
+  const graded = items.map(grade).filter((g): g is Graded => g !== null);
+  const best = (g: Graded): boolean => !graded.some((o) => o.key === g.key && (o.evidence > g.evidence || (o.evidence === g.evidence && o.index < g.index)));
+  const kept = [...graded.filter(best)].sort((a, b) => a.s.date.localeCompare(b.s.date) || a.index - b.index);
+  return {
+    kept: kept.map((g) => g.s), ungrounded: items.length - graded.length, duplicates: graded.length - kept.length,
+    requoted: kept.filter((g) => g.requoted).length,
+  };
+}
+
 registerJobHandlers("assistant.dates", async (job, result) => {
-  const suggestions = parseDateSuggestions(result.text);
-  await db.aiInteraction.update({ where: { id: job.id }, data: { meta: { ...job.meta, suggestions } as unknown as Prisma.InputJsonObject } });
   const docId = (job.meta.documentIds as string[] | undefined)?.[0];
-  return { link: docId ? `/documents/${docId}?ai=${job.id}#dates` : `/assistant/${job.id}` };
+  const version = docId ? await db.documentVersion.findFirst({ where: { documentId: docId }, orderBy: { versionNo: "desc" }, select: { extractedText: true } }) : null;
+  const parsed = parseDateSuggestions(result.text);
+  const g = version?.extractedText ? groundDateSuggestions(parsed, version.extractedText) : { kept: parsed, ungrounded: 0, duplicates: 0, requoted: 0 };
+  await db.aiInteraction.update({ where: { id: job.id }, data: { meta: { ...job.meta, suggestions: g.kept, ungrounded: g.ungrounded, duplicates: g.duplicates, requoted: g.requoted } as unknown as Prisma.InputJsonObject } });
+  // پیشنهادها در صفحه نتیجه نمایش داده می‌شوند (صفحه سند فقط تاریخ‌های استخراج قطعی را دارد)
+  return { link: `/assistant/${job.id}` };
 });
 
 registerJobHandlers("assistant.draft", async (job, result) => {

@@ -2,6 +2,8 @@
 const nextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  // نشانگر حالت توسعه Next روی صفحه نیاید (در تصویرهای آزمون و نمایش)
+  devIndicators: false,
   serverExternalPackages: ["playwright-core", "exceljs", "docx", "mammoth", "unpdf"],
   experimental: { serverActions: { bodySizeLimit: "30mb" } },
   eslint: { ignoreDuringBuilds: true },
