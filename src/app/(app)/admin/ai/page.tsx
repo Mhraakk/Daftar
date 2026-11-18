@@ -30,6 +30,9 @@ const SHORT_SHA = 7;
 
 /** بازه نمودارهای مصرف (هفته) */
 const USAGE_WEEKS = 8;
+const hostOf = (url: string): string => {
+  try { return new URL(url).host; } catch { return url; }
+};
 const sum = (xs: number[]): number => xs.reduce((a, b) => a + b, 0);
 
 export default async function AiAdminPage() {
@@ -72,12 +75,21 @@ export default async function AiAdminPage() {
       <div className="grid gap-4 xl:grid-cols-[1fr_380px]">
         <Panel title="ارائه‌دهنده و سیاست داده">
           <Notice tone="info" title="بدون پیکربندی، بدون خروجی ساختگی">
-            دو نوع ارائه‌دهنده پشتیبانی می‌شود: API رسمی Anthropic (مدل‌های Claude، بیرون از شبکه دفتر) و هر سرور سازگار با OpenAI مانند Ollama، llama.cpp، vLLM یا LM Studio روی شبکه داخلی دفتر (بدون خروج داده و بدون نیاز به اینترنت). کلید API رمزنگاری‌شده ذخیره می‌شود و هرگز نمایش داده نمی‌شود.
+            دو نوع ارائه‌دهنده پشتیبانی می‌شود: API رسمی Anthropic (مدل‌های Claude، بیرون از شبکه دفتر) و هر سرور سازگار با OpenAI؛ چه روی شبکه داخلی دفتر مانند Ollama، llama.cpp، vLLM یا LM Studio (بدون خروج داده و بدون نیاز به اینترنت) و چه سرویس بیرونی مانند Hugging Face، OpenRouter یا DeepSeek. کلید API رمزنگاری‌شده ذخیره می‌شود و هرگز نمایش داده نمی‌شود؛ با متغیرهای محیطی <span dir="ltr">LLM_*</span> هم می‌توان ارائه‌دهنده و کلید را فقط در سرور تعیین کرد.
           </Notice>
+          {settings.source === "env" ? (
+            <div className="mt-3" data-testid="ai-env-notice">
+              <Notice tone="warning" title="پیکربندی ارائه‌دهنده از متغیرهای محیطی سرور">
+                نوع ارائه‌دهنده، نشانی، مدل و کلید از متغیرهای <span dir="ltr">LLM_*</span> سرور خوانده می‌شوند و در این فرم تغییر نمی‌کنند:{" "}
+                <span dir="ltr" className="font-mono text-xs">{settings.envProvider} · {hostOf(settings.baseUrl)} · {settings.model}</span>
+                {" "}— کلید: {pub.hasApiKey ? `ثبت‌شده (${pub.apiKeyHint ?? "••••"})` : "تعیین نشده"}. برای تغییر، متغیرها را در فایل محیط سرور ویرایش و برنامه و سرویس پس‌زمینه را دوباره راه‌اندازی کنید.
+              </Notice>
+            </div>
+          ) : null}
           <div className="mt-4">
             <SmartForm action={saveAiSettingsAction} submitLabel="ذخیره تنظیمات" successMessage="تنظیمات هوش مصنوعی ذخیره شد."
               initial={{ ...pub, apiKey: "", clearApiKey: false } as unknown as Record<string, unknown>}
-              fields={aiSettingsFields(pub)} />
+              fields={aiSettingsFields(pub, settings.source === "env" ? { provider: settings.provider } : null)} />
           </div>
         </Panel>
         <div className="flex flex-col gap-4">

@@ -14,14 +14,18 @@ import { DocumentPicker, type PickedDoc } from "./document-picker";
 const REWRITE_ROWS = 8;
 const TEXT_ROWS = 4;
 
-type Task = "case_analysis" | "doc_summary" | "question" | "rewrite" | "draft" | "dates";
+type Task = "case_analysis" | "doc_summary" | "question" | "legal_qa" | "rewrite" | "draft" | "dates";
 
-/** sendsCase: خلاصه پرونده در درخواست به مدل می‌رود؛ برای استخراج تاریخ پرونده فقط برای انتخاب سند و ثبت مهلت است */
-interface TaskUi { needsCase: boolean; caseOptional: boolean; sendsCase?: false; docs: "none" | "single" | "multi"; text: "none" | "required" | "optional"; textLabel: string; placeholder: string }
+/**
+ * sendsCase: خلاصه پرونده در درخواست به مدل می‌رود؛ برای استخراج تاریخ پرونده فقط برای انتخاب سند و ثبت مهلت است.
+ * retrieval: فقط قطعه‌های مرتبط کتابخانه قانون، اسناد و پرونده فرستاده می‌شود (پرسش حقوقی از منابع دفتر).
+ */
+interface TaskUi { needsCase: boolean; caseOptional: boolean; sendsCase?: false; retrieval?: true; docs: "none" | "single" | "multi"; text: "none" | "required" | "optional"; textLabel: string; placeholder: string }
 const UI: Record<Task, TaskUi> = {
   case_analysis: { needsCase: true, caseOptional: false, docs: "multi", text: "optional", textLabel: "تمرکز تحلیل (اختیاری)", placeholder: "مثلاً: با تأکید بر مهلت‌های پیش رو و مدارک ناقص" },
   doc_summary: { needsCase: false, caseOptional: true, docs: "single", text: "optional", textLabel: "نکته مورد توجه (اختیاری)", placeholder: "مثلاً: تعهدات مالی و مهلت‌ها را برجسته کن" },
   question: { needsCase: false, caseOptional: true, docs: "multi", text: "required", textLabel: "پرسش", placeholder: "پرسش خود را درباره پرونده یا اسناد بنویسید" },
+  legal_qa: { needsCase: false, caseOptional: true, retrieval: true, docs: "multi", text: "required", textLabel: "پرسش حقوقی", placeholder: "مثلاً: مهلت تجدیدنظرخواهی از رأی دادگاه بدوی چقدر است؟" },
   rewrite: { needsCase: false, caseOptional: false, docs: "none", text: "required", textLabel: "متن برای بازنویسی رسمی", placeholder: "متن را اینجا وارد کنید؛ واقعیت‌ها، نام‌ها، اعداد و تاریخ‌ها بدون تغییر می‌مانند" },
   draft: { needsCase: false, caseOptional: true, docs: "multi", text: "optional", textLabel: "شرح سند موردنیاز", placeholder: "مثلاً: اظهارنامه مطالبه اجاره‌بهای معوق سه ماه اخیر خطاب به مستأجر" },
   dates: { needsCase: false, caseOptional: true, sendsCase: false, docs: "single", text: "none", textLabel: "", placeholder: "" },
@@ -118,13 +122,19 @@ export function AssistantForm(p: AssistantFormProps) {
           <textarea id="as-text" className="input" rows={task === "rewrite" ? REWRITE_ROWS : TEXT_ROWS} value={text} onChange={(e) => setText(e.target.value)} placeholder={ui.placeholder} />
         </div>
       )}
+      {ui.retrieval && (
+        <Notice tone="info" title="فقط از منابع دفتر، با ارجاع">
+          پاسخ فقط از مواد کتابخانه قانون دفتر، اسناد انتخاب‌شده و خلاصه پرونده ساخته می‌شود و هر بند باید به منبعش ([S1]، [S2]…) ارجاع دهد. اگر منبعی پیدا نشود، مدل فراخوانی نمی‌شود؛ پاسخ بدون منبع یا با ماده، مبلغ، مهلت یا تاریخی که در منابع نیست «مردود» نمایش داده می‌شود.
+        </Notice>
+      )}
 
       <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface-2/60 p-3 text-sm">
         <p className="flex items-center gap-1 font-bold"><ShieldAlert className="size-4" />آنچه ارسال می‌شود</p>
         <ul className="list-disc ps-5 text-ink-2">
           <li>دستورالعمل دستیار (بدون داده شخصی)</li>
-          {caseId && (ui.needsCase || ui.caseOptional) && ui.sendsCase !== false && <li>خلاصه پرونده انتخاب‌شده (کد ملی پوشانده می‌شود)</li>}
-          {ui.docs !== "none" && docs.map((d) => <li key={d.id}>متن سند «{d.label}»{d.confidential ? " — محرمانه" : ""}</li>)}
+          {ui.retrieval && <li>چند قطعه مرتبط از کتابخانه قانون دفتر (حداکثر ۸ منبع، همراه قطعه‌های اسناد و پرونده انتخاب‌شده)</li>}
+          {caseId && (ui.needsCase || ui.caseOptional) && ui.sendsCase !== false && <li>{ui.retrieval ? "قطعه‌های مرتبط خلاصه پرونده" : "خلاصه پرونده انتخاب‌شده"} (کد ملی پوشانده می‌شود)</li>}
+          {ui.docs !== "none" && docs.map((d) => <li key={d.id}>{ui.retrieval ? "قطعه‌های مرتبط سند" : "متن سند"} «{d.label}»{d.confidential ? " — محرمانه" : ""}</li>)}
           {fromDraft && <li>متن پیش‌نویس «{p.initial.draftTitle}»</li>}
           {text.trim() && ui.text !== "none" && <li>متن واردشده شما</li>}
         </ul>

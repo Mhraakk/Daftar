@@ -47,6 +47,7 @@ function statusError(status: number, body: string): AiProviderError {
 
 const trimTrailingSlashes = (url: string): string => (url.endsWith("/") ? trimTrailingSlashes(url.slice(0, -1)) : url);
 const chatUrl = (baseUrl: string): string => `${trimTrailingSlashes(baseUrl)}/chat/completions`;
+const embeddingsUrl = (baseUrl: string): string => `${trimTrailingSlashes(baseUrl)}/embeddings`;
 
 interface Accumulator { text: string; model: string | null; finish: string | null; inTok: number | null; outTok: number | null }
 interface LineResult { acc: Accumulator; delta: string | null; done: boolean }
@@ -152,4 +153,53 @@ export function openAiCompatibleProvider(cfg: OpenAiCompatibleConfig): AiProvide
       }
     },
   };
+}
+
+// ───────── امبدینگ (POST /embeddings) برای مرتب‌سازی معنایی منابع پرسش حقوقی ─────────
+
+/** بیشترین تعداد متن در هر درخواست امبدینگ */
+const EMBED_BATCH = 32;
+
+export interface EmbeddingConfig {
+  baseUrl: string;
+  apiKey: string | null;
+  model: string;
+  timeoutSec: number;
+}
+
+interface EmbeddingRow { index?: number; embedding?: unknown }
+
+const isVector = (v: unknown): v is number[] => Array.isArray(v) && v.length > 0 && v.every((x) => typeof x === "number" && Number.isFinite(x));
+
+async function embedBatch(cfg: EmbeddingConfig, input: string[]): Promise<number[][]> {
+  const timeout = AbortSignal.timeout(cfg.timeoutSec * MS_PER_SEC);
+  try {
+    const res = await fetch(embeddingsUrl(cfg.baseUrl), {
+      method: "POST",
+      headers: { "content-type": "application/json", ...(cfg.apiKey ? { authorization: `Bearer ${cfg.apiKey}` } : {}) },
+      body: JSON.stringify({ model: cfg.model, input }),
+      signal: timeout,
+    });
+    if (!res.ok) throw statusError(res.status, await res.text());
+    const body = (await res.json()) as { data?: EmbeddingRow[] };
+    const rows = [...(body.data ?? [])].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+    const vectors = rows.map((r) => r.embedding);
+    if (vectors.length !== input.length || !vectors.every(isVector)) {
+      throw new AiProviderError("bad_request", false, `پاسخ امبدینگ نامعتبر است (${vectors.length} بردار برای ${input.length} متن)`);
+    }
+    return vectors;
+  } catch (e) {
+    if (e instanceof AiProviderError) throw e;
+    if (timeout.aborted) throw new AiProviderError("timeout", true);
+    throw new AiProviderError("network", true, (e instanceof Error ? e.message : String(e)).slice(0, MAX_DETAIL));
+  }
+}
+
+/** بردار امبدینگ هر متن به همان ترتیب ورودی؛ همه بردارها باید هم‌بعد باشند */
+export async function openAiEmbeddings(cfg: EmbeddingConfig, inputs: string[]): Promise<number[][]> {
+  const batches = Array.from({ length: Math.ceil(inputs.length / EMBED_BATCH) }, (_, i) => inputs.slice(i * EMBED_BATCH, (i + 1) * EMBED_BATCH));
+  const vectors = await batches.reduce<Promise<number[][]>>(async (acc, batch) => [...(await acc), ...(await embedBatch(cfg, batch))], Promise.resolve([]));
+  const dims = new Set(vectors.map((v) => v.length));
+  if (dims.size > 1) throw new AiProviderError("bad_request", false, "بردارهای امبدینگ هم‌بعد نیستند");
+  return vectors;
 }

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { FileCheck2, FilePen } from "lucide-react";
 import { DateSuggestions, type DateItem } from "@/components/ai/date-suggestions";
 import { JobView } from "@/components/ai/job-view";
+import { GroundingBanner, QaSources } from "@/components/ai/legal-qa-result";
 import { ActionButton } from "@/components/ui/action-button";
 import { LinkButton } from "@/components/ui/button";
 import { DL, Notice, PageHeader, Panel } from "@/components/ui/page";
@@ -13,6 +14,7 @@ import { AppError } from "@/lib/errors";
 import { formatJalali } from "@/lib/jalali";
 import { ASSISTANT_TASKS } from "@/server/ai/assistant";
 import { getJobForUser } from "@/server/ai/jobs";
+import type { Grounding, QaSource, RetrievalInfo } from "@/server/ai/legal-qa";
 import { jobSnapshot } from "@/server/ai/snapshot";
 import { applyRewriteAction } from "../actions";
 
@@ -28,11 +30,17 @@ export default async function AssistantJobPage({ params }: { params: Promise<{ i
   const user = await requireUser();
   const { id } = await params;
   const job = await getJobForUser(id, user).catch((e: unknown) => { if (e instanceof AppError) notFound(); throw e; });
+  const isOwner = job.userId === user.id;
   const snapshot = await jobSnapshot(id, user);
-  const meta = (job.meta ?? {}) as { suggestions?: DateItem[]; documentIds?: string[]; ungrounded?: number; duplicates?: number; requoted?: number };
+  const meta = (job.meta ?? {}) as {
+    suggestions?: DateItem[]; documentIds?: string[]; ungrounded?: number; duplicates?: number; requoted?: number;
+    sources?: QaSource[]; retrieval?: RetrievalInfo; grounding?: Grounding;
+  };
+  const legalQa = job.kind === "assistant.legal_qa";
+  const grounding = legalQa && job.status === "DONE" ? meta.grounding ?? null : null;
+  const resultView = <JobView initial={snapshot} path={`/assistant/${id}`} canCancel={isOwner || can(user, "ai.configure")} />;
   const docId = meta.documentIds?.[0] ?? null;
   const doc = docId ? await db.document.findUnique({ where: { id: docId }, select: { id: true, title: true, caseId: true } }) : null;
-  const isOwner = job.userId === user.id;
   const draftLink = job.kind === "assistant.draft" && job.draftId ? `/drafts/${job.draftId}` : null;
   return (
     <>
@@ -42,7 +50,13 @@ export default async function AssistantJobPage({ params }: { params: Promise<{ i
       <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-4">
           <Notice tone="warning" title="خروجی هوش مصنوعی — نیازمند بررسی انسانی">این متن را مدل زبانی تولید کرده است و ممکن است نادرست یا ناقص باشد. واقعیت‌ها را با اسناد پرونده و ارجاع‌های قانونی را با متن رسمی تطبیق دهید.</Notice>
-          <Panel title="نتیجه"><JobView initial={snapshot} path={`/assistant/${id}`} canCancel={isOwner || can(user, "ai.configure")} /></Panel>
+          {grounding && <GroundingBanner grounding={grounding} />}
+          <Panel title="نتیجه">
+            {grounding?.status === "rejected"
+              ? <details data-testid="qa-rejected-answer"><summary className="cursor-pointer text-sm text-ink-3">نمایش متن ردشده پاسخ مدل (فقط برای بررسی)</summary><div className="mt-3">{resultView}</div></details>
+              : resultView}
+          </Panel>
+          {legalQa && (meta.sources?.length ?? 0) > 0 && <QaSources sources={meta.sources ?? []} retrieval={meta.retrieval ?? null} cited={grounding?.cited ?? []} />}
           {job.status === "DONE" && job.kind === "assistant.dates" && (
             <Panel title="مهلت‌های پیشنهادی" icon={<FileCheck2 />}>
               <p className="mb-2 text-sm text-ink-2">هر پیشنهاد را با متن سند تطبیق دهید و فقط موارد درست را ثبت کنید.</p>

@@ -7,12 +7,14 @@ import { startAssistantJob } from "@/server/ai/assistant";
 import { aiSettingsSchema, DEFAULT_AI, getAiSettings } from "@/server/ai/config";
 import { ECHO_WARN } from "@/server/ai/echo";
 import { cancelAiJob, claimJobs, executeJob, recoverStaleJobs } from "@/server/ai/jobs";
+import { LEGAL_QA_SYSTEM, NOT_FOUND, retrieveForQuestion, type Grounding, type QaSource, type RetrievalInfo } from "@/server/ai/legal-qa";
+import { jobSnapshot } from "@/server/ai/snapshot";
 import { saveAiSettings } from "@/server/ai/settings";
 import { continueSkillRun, reviewSkillRun, skillRunToDraft, startSkillRun, type StartSkillRunInput } from "@/server/ai/skill-runner";
 import { syncSkills } from "@/server/ai/skill-catalog";
 import { createCase } from "@/server/cases";
 import { createClient } from "@/server/clients";
-import { jsonError, openAiStream, startStub, type Stub } from "../helpers/ai-stub";
+import { jsonError, openAiStream, startStub, type Responder, type Stub } from "../helpers/ai-stub";
 import { asUser, nationalId, prisma, tag } from "./helpers";
 
 let legal: SessionUser, reviewer: SessionUser, manager: SessionUser;
@@ -209,6 +211,112 @@ describe("دستیار حقوقی", () => {
   });
 });
 
+// ───────── پرسش حقوقی از منابع دفتر (ماژول اتصال LLM) ─────────
+
+// Source id of the ACP article 336 inside the <sources> block: matches 'id="S3" kind="قانون" title="ماده 336 قانون'; rejects 'title="ماده 3361'.
+// https://regex101.com/?regex=%3Csource%20id%3D%22%28S%5Cd%2B%29%22%5B%5E%3E%5D*title%3D%22%D9%85%D8%A7%D8%AF%D9%87%20336%20&testString=%3Csource%20id%3D%22S3%22%20kind%3D%22x%22%20title%3D%22%D9%85%D8%A7%D8%AF%D9%87%20336%20%D9%82&flavor=javascript
+const A336_SOURCE = /<source id="(S\d+)"[^>]*title="ماده 336 /;
+const lastMessage = (body: Record<string, unknown>): string => String((body.messages as { content: string }[] | undefined)?.at(-1)?.content ?? "");
+/** مدل آزمایشی که به منبع حاوی ماده ۳۳۶ (هر شناسه‌ای که گرفته باشد) ارجاع می‌دهد */
+const answerCiting = (make: (id: string) => string): Responder => (req, res) => openAiStream(make(A336_SOURCE.exec(lastMessage(req.body))?.[1] ?? "S1"))(req, res);
+/** پرسش‌های طبیعی با ماده پاسخ که از متن قانون واردشده در پایگاه داده تأیید شده است */
+const EVAL: [string, string[]][] = [
+  ["مهلت تجدیدنظرخواهی از رأی دادگاه بدوی برای کسی که در ایران زندگی می‌کند چقدر است؟", ["336"]],
+  ["تا چند روز بعد از ابلاغ رای می‌توان درخواست تجدیدنظر داد؟", ["336"]],
+  ["مهلت تجدیدنظر از حکم دادگاه چند روز است؟", ["336"]],
+  ["به حکم غیابی تا چند روز می‌شود اعتراض کرد؟", ["306"]],
+  ["مهلت فرجام‌خواهی در دیوان عالی کشور چقدر است؟", ["397"]],
+  ["مهلت درخواست اعاده دادرسی چند روز است؟", ["427"]],
+  ["در امور فوری چگونه دستور موقت صادر می‌شود؟", ["310"]],
+  ["شخص ثالث چطور می‌تواند وارد دعوای دیگران شود؟", ["130", "131"]],
+  ["تا چه زمانی می‌توان شخص ثالث را به دعوا جلب کرد؟", ["135"]],
+  ["اعتراض ثالث چند نوع است؟", ["417", "418", "419"]],
+  ["خواهان تا چه زمانی می‌تواند درخواست تأمین خواسته بدهد؟", ["108"]],
+  ["آیا طرفین می‌توانند اختلاف خود را به داوری ارجاع دهند؟", ["454"]],
+  ["آیا طرفین در میانه دادرسی می‌توانند با هم سازش کنند؟", ["178"]],
+  ["دعوا را باید در کدام دادگاه اقامه کرد؟", ["11"]],
+];
+
+describe("پرسش حقوقی از منابع دفتر", () => {
+  const QUESTION = `مهلت تجدیدنظرخواهی برای کسی که خارج از کشور زندگی می‌کند چقدر است؟ نشان ${T}`;
+  const ask = (text: string) => startAssistantJob(mk({ task: "legal_qa", text, documentIds: [], includeConfidential: false, confirmSend: false }), legal);
+  const metaOf = async (jobId: string) => (await prisma.aiInteraction.findUniqueOrThrow({ where: { id: jobId } })).meta as unknown as { sources: QaSource[]; retrieval: RetrievalInfo; grounding?: Grounding };
+  const lexical = { enabled: true, provider: "openai_compatible", baseUrl: "", model: "stub-model", contextWindow: 200_000, maxOutputTokens: 2_000 };
+  beforeAll(async () => { await setAi({ ...lexical, baseUrl: `${stub.url}/v1` }); });
+
+  it("بازیابی: ماده پاسخ در ۸ منبع نخست دست‌کم ۱۳ پرسش از ۱۴ (فقط واژگانی)", async () => {
+    const settings = await getAiSettings();
+    const hits = await Promise.all(EVAL.map(async ([text, want]) => {
+      const { sources } = await retrieveForQuestion({ text, caseId: null, documentIds: [], includeConfidential: false }, legal, settings);
+      return sources.some((s) => want.some((n) => s.href.includes(`a=${n}#`)));
+    }));
+    expect(hits.filter(Boolean).length).toBeGreaterThanOrEqual(13);
+  });
+  let groundedJob = "";
+  it("پاسخ مستند: دستورالعمل جداگانه، منابع با شناسه، برچسب‌های پیوندشده و سنجش «مستند»", async () => {
+    stub.respond(answerCiting((id) => `برای اشخاص مقیم خارج از کشور، مهلت درخواست تجدیدنظر دو ماه از تاریخ ابلاغ است [${id}].`));
+    const { jobId } = await ask(QUESTION);
+    groundedJob = jobId;
+    expect(await runQueued(jobId)).toBe("DONE");
+    const job = await prisma.aiInteraction.findUniqueOrThrow({ where: { id: jobId } });
+    const request = job.request as { system: string; messages: { content: string }[] };
+    expect(request.system).toBe(LEGAL_QA_SYSTEM);
+    expect(request.system).not.toContain("model knowledge");
+    // The user message layout: matches '<sources>\n<source id="S1" …</sources>\n\n<question>'; rejects a message without the <question> block.
+    // https://regex101.com/?regex=%3Csources%3E%5B%5Cs%5CS%5D*%3Csource%20id%3D%22S1%22%5B%5Cs%5CS%5D*%3C%5C%2Fsources%3E%5Cs*%3Cquestion%3E&testString=%3Csources%3E%0A%3Csource%20id%3D%22S1%22%3Ex%3C%2Fsource%3E%0A%3C%2Fsources%3E%0A%0A%3Cquestion%3E&flavor=javascript
+    expect(request.messages[0].content).toMatch(/<sources>[\s\S]*<source id="S1"[\s\S]*<\/sources>\s*<question>/);
+    const meta = await metaOf(jobId);
+    expect(meta.sources.some((s) => s.href.includes("a=336#"))).toBe(true);
+    expect(meta.retrieval).toMatchObject({ method: "lexical", fallback: null });
+    expect(meta.grounding).toMatchObject({ status: "grounded", untagged: 0, figures: [], articles: [] });
+    expect((await jobSnapshot(jobId, legal)).html).toContain('class="cite-tag" href="#src-S');
+  });
+  it("لاگ هر فراخوانی: ارائه‌دهنده، مدل، زمان و توکن، بدون متن پرسش", async () => {
+    const rows = await prisma.activityLog.findMany({ where: { entityId: groundedJob } });
+    expect(rows.map((r) => r.action)).toEqual(expect.arrayContaining(["ai.job.queued", "ai.job.completed"]));
+    expect(rows.find((r) => r.action === "ai.job.completed")?.meta).toMatchObject({ provider: "openai_compatible", model: "stub-model", inputTokens: 321, outputTokens: 45 });
+    expect(JSON.stringify(rows)).not.toContain(`نشان ${T}`);
+    expect(JSON.stringify(rows)).not.toContain("خارج از کشور زندگی");
+  });
+  it("پاسخ بی‌منبع یا با مدت ساختگی «مردود» است", async () => {
+    stub.respond(answerCiting((id) => `مهلت تجدیدنظر سی روز است [${id}].\nدر هر حال مشورت با وکیل لازم است.`));
+    const { jobId } = await ask(QUESTION);
+    expect(await runQueued(jobId)).toBe("DONE");
+    expect((await metaOf(jobId)).grounding).toMatchObject({ status: "rejected", untagged: 1, figures: ["30 روز"] });
+  });
+  it("«در منابع دفتر پیدا نکردم» وضعیت «پیدا نشد» می‌گیرد", async () => {
+    stub.respond(openAiStream(`${NOT_FOUND}.`));
+    const { jobId } = await ask(QUESTION);
+    expect(await runQueued(jobId)).toBe("DONE");
+    expect((await metaOf(jobId)).grounding?.status).toBe("not_found");
+  });
+  it("بی منبع مرتبط، مدل فراخوانی نمی‌شود", async () => {
+    const before = stub.requests.length;
+    await expect(ask("هزینه پرواز به کیش چقدر است؟")).rejects.toThrow("پیدا نشد");
+    expect(stub.requests.length).toBe(before);
+  });
+  it("مرتب‌سازی معنایی با مسیر /embeddings و بازگشت به رتبه واژگانی در خطا", async () => {
+    await setAi({ ...lexical, baseUrl: `${stub.url}/v1`, embeddingModel: "stub-embed" });
+    stub.respond((req, res) => {
+      if (!req.path.endsWith("/embeddings")) { openAiStream("—")(req, res); return; }
+      const inputs = req.body.input as string[];
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ data: inputs.map((t, index) => ({ index, embedding: index === 0 || t.includes("مقیم خارج") ? [1, 0] : [0, 1] })).reverse() }));
+    });
+    const hybrid = await ask(QUESTION);
+    expect((await metaOf(hybrid.jobId)).retrieval).toMatchObject({ method: "hybrid", embeddingModel: "stub-embed", fallback: null });
+    const embedCall = stub.requests.filter((r) => r.path.endsWith("/embeddings")).at(-1);
+    expect(embedCall?.body).toMatchObject({ model: "stub-embed" });
+    expect((embedCall?.body.input as string[])[0]).toBe(QUESTION);
+    stub.respond(jsonError(404, "no embeddings here", "not_found_error"));
+    const fallback = await ask(QUESTION);
+    expect((await metaOf(fallback.jobId)).retrieval).toMatchObject({ method: "lexical", embeddingModel: "stub-embed" });
+    expect((await metaOf(fallback.jobId)).retrieval.fallback).toBeTruthy();
+    await Promise.all([hybrid.jobId, fallback.jobId].map((id) => cancelAiJob(id, legal)));
+    await setAi({ ...lexical, baseUrl: `${stub.url}/v1` });
+  });
+});
+
 describe("ذخیره تنظیمات هوش مصنوعی از فرم", () => {
   const form = { enabled: false, model: "qwen2.5-1.5b-instruct", baseUrl: "http://127.0.0.1:8088/v1", maxOutputTokens: "1024", contextWindow: "8192", timeoutSec: "900", concurrency: "1", allowConfidential: false, practiceRole: "nonlawyer_with_attorney", attorneyContact: "", officeNotes: "" };
   it("فیلدهای ویژه ارائه‌دهنده‌ای که انتخاب نیست مقدار ذخیره‌شده را نگه می‌دارند", async () => {
@@ -217,5 +325,22 @@ describe("ذخیره تنظیمات هوش مصنوعی از فرم", () => {
     expect(await getAiSettings()).toMatchObject({ provider: "openai_compatible", temperature: 0.2, effort: "max", refusalFallback: false, contextWindow: 8192 });
     await saveAiSettings(aiSettingsSchema.parse({ ...form, provider: "anthropic", effort: "low", refusalFallback: true }), manager);
     expect(await getAiSettings()).toMatchObject({ provider: "anthropic", effort: "low", refusalFallback: true, temperature: 0.2 });
+  });
+  it("پیکربندی LLM_* محیط: فرم نوع ارائه‌دهنده، نشانی، مدل و کلید را تغییر نمی‌دهد و کلید محیط ذخیره نمی‌شود", async () => {
+    const ENV = { LLM_PROVIDER: "hf", LLM_BASE_URL: "https://router.huggingface.co/v1", LLM_MODEL: "Qwen/Qwen3.8-27B", LLM_API_KEY: "hf_env_secret_9876" };
+    await setAi({ provider: "anthropic", model: "claude-x", apiKeyEnc: null });
+    Object.assign(process.env, ENV);
+    try {
+      await saveAiSettings(aiSettingsSchema.parse({ ...form, provider: "openai_compatible", model: "other", baseUrl: "http://other.example/v1", apiKey: "typed-key", temperature: "0.1" }), manager);
+      const stored = (await prisma.setting.findUniqueOrThrow({ where: { key: "ai" } })).value as Record<string, unknown>;
+      expect(stored).toMatchObject({ provider: "anthropic", model: "claude-x", apiKeyEnc: null, temperature: 0.1 });
+      expect(stored).not.toHaveProperty("source");
+      expect(JSON.stringify(stored)).not.toContain("hf_env_secret_9876");
+      expect(await getAiSettings()).toMatchObject({ source: "env", envProvider: "hf", provider: "openai_compatible", model: ENV.LLM_MODEL, baseUrl: ENV.LLM_BASE_URL, apiKeyEnc: null });
+      const audit = await prisma.activityLog.findFirstOrThrow({ where: { action: "ai.settings_updated" }, orderBy: { createdAt: "desc" } });
+      expect(audit.meta).toMatchObject({ source: "env", provider: "openai_compatible", keyChanged: false });
+    } finally {
+      Object.keys(ENV).forEach((k) => { delete process.env[k]; });
+    }
   });
 });

@@ -2,7 +2,7 @@
 // سازگار با OpenAI (Ollama، llama.cpp، vLLM، LM Studio یا درگاه سازمانی). بدون پیکربندی، هیچ خروجی ساختگی تولید نمی‌شود.
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { decryptSecret } from "./secret";
+import { decryptSecret, secretHint } from "./secret";
 import type { AiProviderId } from "./types";
 
 export const AI_SETTING_KEY = "ai";
@@ -50,6 +50,12 @@ export interface AiSettings {
   practiceRole: PracticeRole;
   attorneyContact: string;
   officeNotes: string;
+  /** مدل امبدینگ برای مرتب‌سازی دوباره منابع پرسش حقوقی؛ خالی یعنی فقط بازیابی واژگانی */
+  embeddingModel: string;
+  /** «env»: ارائه‌دهنده، نشانی، مدل و کلید از متغیرهای محیطی سرور (LLM_*) خوانده شده و هرگز ذخیره نمی‌شود */
+  source: "db" | "env";
+  /** برچسب LLM_PROVIDER (مثلاً hf، openrouter، deepseek) وقتی پیکربندی از محیط است */
+  envProvider: string | null;
 }
 
 export const DEFAULT_AI: AiSettings = {
@@ -70,6 +76,9 @@ export const DEFAULT_AI: AiSettings = {
   practiceRole: "nonlawyer_with_attorney",
   attorneyContact: "",
   officeNotes: "",
+  embeddingModel: "",
+  source: "db",
+  envProvider: null,
 };
 
 /**
@@ -79,9 +88,9 @@ export const DEFAULT_AI: AiSettings = {
  */
 export const aiSettingsSchema = z.object({
   enabled: z.boolean(),
-  provider: z.enum(["anthropic", "openai_compatible"]),
-  baseUrl: z.string().trim().url("نشانی معتبر نیست.").max(MAX_URL_LENGTH),
-  model: z.string().trim().min(1, "نام مدل الزامی است.").max(MAX_MODEL_LENGTH),
+  provider: z.enum(["anthropic", "openai_compatible"]).optional(),
+  baseUrl: z.string().trim().url("نشانی معتبر نیست.").max(MAX_URL_LENGTH).optional(),
+  model: z.string().trim().min(1, "نام مدل الزامی است.").max(MAX_MODEL_LENGTH).optional(),
   apiKey: z.string().trim().max(MAX_KEY_LENGTH).optional().nullable(),
   clearApiKey: z.boolean().optional(),
   maxOutputTokens: z.coerce.number().int().min(MIN_OUTPUT_TOKENS).max(MAX_OUTPUT_TOKENS),
@@ -95,21 +104,75 @@ export const aiSettingsSchema = z.object({
   practiceRole: z.enum(USER_ROLES),
   attorneyContact: z.string().trim().max(MAX_CONTACT_LENGTH).default(""),
   officeNotes: z.string().trim().max(MAX_NOTES_LENGTH).default(""),
+  embeddingModel: z.string().trim().max(MAX_MODEL_LENGTH).optional(),
 });
 
-export async function getAiSettings(): Promise<AiSettings> {
-  const row = await db.setting.findUnique({ where: { key: AI_SETTING_KEY } });
-  return { ...DEFAULT_AI, ...((row?.value as Partial<AiSettings> | undefined) ?? {}) };
+const MS_PER_SEC = 1_000;
+
+/** پیکربندی ارائه‌دهنده از متغیرهای محیطی سرور (ماژول اتصال LLM) */
+export interface EnvAiConfig {
+  provider: AiProviderId;
+  label: string;
+  baseUrl: string;
+  model: string;
+  apiKey: string | null;
+  timeoutSec: number | null;
+  embeddingModel: string | null;
 }
 
-/** نسخه بی‌خطر برای ارسال به مرورگر (بدون متن رمز کلید) */
-export function publicAiSettings(s: AiSettings): Omit<AiSettings, "apiKeyEnc"> & { hasApiKey: boolean } {
-  const { apiKeyEnc, ...rest } = s;
-  return { ...rest, hasApiKey: !!apiKeyEnc };
+/**
+ * LLM_BASE_URL و LLM_MODEL لازم است؛ LLM_PROVIDER برچسب است (hf، openrouter، deepseek، ollama…) و فقط «anthropic» به
+ * API رسمی Claude می‌رود. LLM_API_KEY فقط در حافظه سرور می‌ماند و هرگز در پایگاه داده یا پاسخی ذخیره نمی‌شود.
+ */
+export function envAiConfig(env: Record<string, string | undefined> = process.env): EnvAiConfig | null {
+  const baseUrl = env.LLM_BASE_URL?.trim() ?? "";
+  const model = env.LLM_MODEL?.trim() ?? "";
+  if (!baseUrl || !model) return null;
+  const label = env.LLM_PROVIDER?.trim() || "openai_compatible";
+  const ms = Number(env.LLM_TIMEOUT_MS ?? "");
+  return {
+    provider: label === "anthropic" ? "anthropic" : "openai_compatible",
+    label,
+    baseUrl,
+    model,
+    apiKey: env.LLM_API_KEY?.trim() || null,
+    timeoutSec: Number.isFinite(ms) && ms > 0 ? Math.min(MAX_TIMEOUT_SEC, Math.max(MIN_TIMEOUT_SEC, Math.ceil(ms / MS_PER_SEC))) : null,
+    embeddingModel: env.LLM_EMBEDDING_MODEL?.trim() || null,
+  };
+}
+
+/** تنظیمات ذخیره‌شده با پیکربندی محیط روی آن (اگر تعیین شده باشد) */
+export function withEnv(s: AiSettings, env: EnvAiConfig | null): AiSettings {
+  if (!env) return { ...s, source: "db", envProvider: null };
+  return {
+    ...s, provider: env.provider, baseUrl: env.baseUrl, model: env.model, apiKeyEnc: null,
+    apiKeyHint: env.apiKey ? secretHint(env.apiKey) : null, timeoutSec: env.timeoutSec ?? s.timeoutSec,
+    embeddingModel: env.embeddingModel ?? s.embeddingModel, source: "env", envProvider: env.label,
+  };
+}
+
+/** فقط مقدارهای ذخیره‌شده در پایگاه داده (برای ذخیره دوباره، بدون پیکربندی محیط) */
+export async function getStoredAiSettings(): Promise<AiSettings> {
+  const row = await db.setting.findUnique({ where: { key: AI_SETTING_KEY } });
+  return { ...DEFAULT_AI, ...((row?.value as Partial<AiSettings> | undefined) ?? {}), source: "db", envProvider: null };
+}
+
+/** تنظیمات مؤثر: ذخیره‌شده‌ها، با ارائه‌دهنده و نشانی و مدل و کلید از محیط سرور اگر LLM_* تعیین شده باشد */
+export async function getAiSettings(): Promise<AiSettings> {
+  return withEnv(await getStoredAiSettings(), envAiConfig());
 }
 
 export function apiKeyOf(s: AiSettings): string | null {
+  if (s.source === "env") return envAiConfig()?.apiKey ?? null;
   return s.apiKeyEnc ? decryptSecret(s.apiKeyEnc) : null;
+}
+
+export const hasApiKey = (s: AiSettings): boolean => (s.source === "env" ? !!envAiConfig()?.apiKey : !!s.apiKeyEnc);
+
+/** نسخه بی‌خطر برای ارسال به مرورگر (بدون متن رمز کلید) */
+export function publicAiSettings(s: AiSettings): Omit<AiSettings, "apiKeyEnc"> & { hasApiKey: boolean } {
+  const { apiKeyEnc: _secret, ...rest } = s;
+  return { ...rest, hasApiKey: hasApiKey(s) };
 }
 
 const PRIVATE_NAMES = new Set(["localhost", "host.docker.internal", "::1", "[::1]"]);
@@ -158,7 +221,7 @@ export function isExternalProvider(s: Pick<AiSettings, "provider" | "baseUrl">):
 
 export function isAiReady(s: AiSettings): { ready: boolean; reason?: string } {
   if (!s.enabled) return { ready: false, reason: "هوش مصنوعی در تنظیمات دفتر غیرفعال است." };
-  if (s.provider === "anthropic" && !s.apiKeyEnc) return { ready: false, reason: "کلید API ارائه‌دهنده ثبت نشده است." };
+  if (s.provider === "anthropic" && !hasApiKey(s)) return { ready: false, reason: "کلید API ارائه‌دهنده ثبت نشده است." };
   if (!s.model) return { ready: false, reason: "نام مدل تعیین نشده است." };
   return { ready: true };
 }

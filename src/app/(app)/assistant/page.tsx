@@ -37,7 +37,7 @@ export default async function AssistantPage({ searchParams }: { searchParams: Pr
   ]);
   return (
     <>
-      <PageHeader title="دستیار هوشمند" subtitle="تحلیل پرونده، خلاصه سند، پرسش، بازنویسی رسمی، تهیه پیش‌نویس و استخراج مهلت — همه خروجی‌ها نیازمند بررسی انسانی‌اند" />
+      <PageHeader title="دستیار هوشمند" subtitle="تحلیل پرونده، خلاصه سند، پرسش، پرسش حقوقی از منابع دفتر با ارجاع، بازنویسی رسمی، تهیه پیش‌نویس و استخراج مهلت — همه خروجی‌ها نیازمند بررسی انسانی‌اند" />
       <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
         <Panel title={<span className="flex items-center gap-1"><Sparkles className="size-4 text-firuze" />درخواست تازه</span>}>
           {!ready.ready && <div className="mb-4"><Notice tone="warning" title="دستیار هنوز پیکربندی نشده است">{ready.reason} {can(user, "ai.configure") ? <Link className="text-lapis underline" href="/admin/ai">پیکربندی هوش مصنوعی</Link> : "از مدیر سامانه بخواهید ارائه‌دهنده را پیکربندی کند."}</Notice></div>}

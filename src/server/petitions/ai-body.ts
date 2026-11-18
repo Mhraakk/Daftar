@@ -8,7 +8,7 @@ import { assertDraftAccess } from "../access";
 import { getAiSettings, isAiReady, isExternalProvider } from "../ai/config";
 import { caseContextText } from "../ai/context";
 import { enqueueAiJob, getJobForUser } from "../ai/jobs";
-import { extractJalaliDates } from "../deadline-calc";
+import { datesIn, numbersIn } from "../ai/grounding";
 import { assertEditor } from "../drafts";
 import { partyName } from "./data";
 import { petitionReport } from "./drafting";
@@ -101,14 +101,6 @@ export function parseBodySuggestion(text: string, blanks: readonly string[]): Re
   }
 }
 
-/** کوتاه‌ترین عددی که سنجیده می‌شود؛ عددهای کوتاه (مانند «۱۰ روز») در هر متنی پیدا می‌شوند */
-const MIN_DIGITS = 3;
-// A number with optional thousands separators, after digit normalisation: matches "5,500,000,000" and "1405"; rejects "ریال".
-// https://regex101.com/?regex=%5Cd%28%3F%3A%5B%5Cd%2C%D9%AC%5D*%5Cd%29%3F&testString=5%2C500%2C000%2C000%20%D8%B1%DB%8C%D8%A7%D9%84&flavor=javascript&flags=g
-const NUMBER = /\d(?:[\d,٬]*\d)?/g;
-// Thousands separators inside a number: matches "," and "٬"; rejects "5".
-// https://regex101.com/?regex=%5B%2C%D9%AC%5D&testString=5%D9%AC500&flavor=javascript&flags=g
-const SEPARATORS = /[,٬]/g;
 // Blank labels that expect a number or date: matches "اینجانب مبلغ", "تاریخ دادنامه", "شماره چک"; rejects "لحاظ".
 // https://regex101.com/?regex=%D9%85%D8%A8%D9%84%D8%BA%7C%D8%AA%D8%A7%D8%B1%DB%8C%D8%AE%7C%D8%B4%D9%85%D8%A7%D8%B1%D9%87&testString=%D8%A7%DB%8C%D9%86%D8%AC%D8%A7%D9%86%D8%A8%20%D9%85%D8%A8%D9%84%D8%BA&flavor=javascript
 const NUMERIC_SLOT = /مبلغ|تاریخ|شماره|سال|تعداد|مقدار|بها|مدت|سن/;
@@ -127,8 +119,6 @@ const copiesTemplate = (value: string, template: string): boolean => {
   const tpl = wordsOf(template).join(" ");
   return !!tpl && Array.from({ length: Math.max(0, words.length - ECHO_WORDS + 1) }, (_, i) => words.slice(i, i + ECHO_WORDS).join(" ")).some((w) => tpl.includes(w));
 };
-const numbersIn = (text: string): string[] => [...toEnDigits(text).matchAll(NUMBER)].map((m) => m[0].replace(SEPARATORS, "")).filter((n) => n.length >= MIN_DIGITS);
-const datesIn = (text: string): string[] => extractJalaliDates(text).map((d) => `${d.jy}/${d.jm}/${d.jd}`);
 
 /**
  * پیشنهادی که عدد (مبلغ، سال، شماره) یا تاریخی دارد که در داده فرستاده‌شده به مدل نیست کنار می‌رود: مدل نباید مبلغ یا
